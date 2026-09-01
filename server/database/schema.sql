@@ -17,13 +17,16 @@ CREATE TABLE user_(
 
 CREATE TABLE genre(
    ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
    name VARCHAR(50) NOT NULL,
    CONSTRAINT PK_genre PRIMARY KEY(ID),
-   CONSTRAINT AK_genre UNIQUE(name)
+   CONSTRAINT AK_genre UNIQUE(tmdb_id),
+   CONSTRAINT AK_genre_1 UNIQUE(name)
 );
 
 CREATE TABLE media(
    ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
    name VARCHAR(150) NOT NULL,
    type VARCHAR(50) NOT NULL,
    released_at DATE,
@@ -34,12 +37,15 @@ CREATE TABLE media(
    status VARCHAR(50),
    original_name VARCHAR(150),
    original_language VARCHAR(50),
-   pegi INT,
-   CONSTRAINT PK_media PRIMARY KEY(ID)
+   pegi VARCHAR(50),
+   is_anime BOOLEAN NOT NULL,
+   CONSTRAINT PK_media PRIMARY KEY(ID),
+   CONSTRAINT AK_media UNIQUE(tmdb_id)
 );
 
 CREATE TABLE season(
    ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
    name VARCHAR(150),
    released_at DATE,
    poster VARCHAR(255),
@@ -48,11 +54,13 @@ CREATE TABLE season(
    number INT,
    ID_media INT NOT NULL,
    CONSTRAINT PK_season PRIMARY KEY(ID),
+   CONSTRAINT AK_season UNIQUE(tmdb_id),
    CONSTRAINT FK_season_media FOREIGN KEY(ID_media) REFERENCES media(ID)
 );
 
 CREATE TABLE episode(
    ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
    name VARCHAR(150),
    number INT,
    released_at DATE,
@@ -60,24 +68,29 @@ CREATE TABLE episode(
    duration INT NOT NULL,
    ID_season INT NOT NULL,
    CONSTRAINT PK_episode PRIMARY KEY(ID),
+   CONSTRAINT AK_episode UNIQUE(tmdb_id),
    CONSTRAINT FK_episode_season FOREIGN KEY(ID_season) REFERENCES season(ID)
 );
 
 CREATE TABLE platform(
    ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
    name VARCHAR(50) NOT NULL,
    logo VARCHAR(255),
    url VARCHAR(255),
    CONSTRAINT PK_platform PRIMARY KEY(ID),
-   CONSTRAINT AK_platform UNIQUE(name)
+   CONSTRAINT AK_platform UNIQUE(tmdb_id),
+   CONSTRAINT AK_platform_1 UNIQUE(name)
 );
 
 CREATE TABLE person(
    ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
    biography TEXT,
    photo VARCHAR(255),
    name VARCHAR(50) NOT NULL,
-   CONSTRAINT PK_person PRIMARY KEY(ID)
+   CONSTRAINT PK_person PRIMARY KEY(ID),
+   CONSTRAINT AK_person UNIQUE(tmdb_id)
 );
 
 CREATE TABLE classify_as(
