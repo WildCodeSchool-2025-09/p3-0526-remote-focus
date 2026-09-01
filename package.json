@@ -20,6 +20,8 @@
     "check:fix": "biome check --write --error-on-warnings --no-errors-on-unmatched --staged .",
     "clean": "node ./bin/clean",
     "db:migrate": "npm run db:migrate --workspace=server",
+    "tmdb:fetch": "npm run tmdb:fetch --workspace=server",
+    "tmdb:seed": "npm run tmdb:seed --workspace=server",
     "db:seed": "npm run db:seed --workspace=server",
     "dev": "concurrently -c green,yellow -t \"HH:mm:ss\" -p \"{name} {time}\" \"npm:dev:*\"",
     "dev:client": "npm run dev --workspace=client",

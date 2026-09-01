@@ -7,7 +7,9 @@
     "db:seed": "tsx ./bin/seed",
     "build": "tsx ./bin/migrate",
     "start": "tsx ./src/main",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "tmdb:fetch": "tsx ./bin/tmdbFetch.ts",
+    "tmdb:seed": "tsx ./bin/tmdbSeed.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
