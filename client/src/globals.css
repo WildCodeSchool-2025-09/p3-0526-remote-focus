@@ -7,7 +7,7 @@
    font-optical-sizing plus bas), ce qui remplace les découpes 18pt/24pt/28pt. */
 @font-face {
   font-family: "Inter";
-  src: url("/fonts/Inter/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  src: url("/fonts/Inter/Inter-VariableFont.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
