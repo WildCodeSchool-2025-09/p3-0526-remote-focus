@@ -81,7 +81,7 @@
   /* Barre de scroll accordée au thème (Firefox + WebKit) */
   * {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.focus.teal-dark") transparent;
+    scrollbar-color: #2e6373 transparent;
   }
 
   *::-webkit-scrollbar {
