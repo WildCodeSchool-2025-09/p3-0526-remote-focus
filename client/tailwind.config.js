@@ -16,6 +16,7 @@ export default {
       // Palette brute, accessible via text-focus-yellow, border-focus-muted, etc.
       // À utiliser seulement quand les tokens DaisyUI (primary, base-200...)
       // ne conviennent pas.
+
       colors: {
         focus: {
           yellow: "#F2B705",
@@ -29,6 +30,9 @@ export default {
           "muted-dark": "#7B8B93",
           line: "#4A555C",
         },
+      },
+      boxShadow: {
+        badge: "0 2px 10px rgba(13, 17, 23, 0.55)",
       },
     },
   },
