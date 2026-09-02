@@ -21,7 +21,8 @@ const app = express();
 import cors from "cors";
 
 if (process.env.CLIENT_URL != null) {
-  app.use(cors({ origin: [process.env.CLIENT_URL] }));
+  app.use(cors({ origin: [process.env.CLIENT_URL], credentials: true }));
+  app.use(cookieParser());
 }
 
 // If you need to allow extra origins, you can add something like this:
@@ -106,6 +107,7 @@ if (fs.existsSync(clientBuildPath)) {
 // Important: Error-handling middleware should be defined last, after other app.use() and routes calls.
 
 import type { ErrorRequestHandler } from "express";
+import cookieParser from "cookie-parser";
 
 // Define a middleware function to log errors
 const logErrors: ErrorRequestHandler = (err, req, res, next) => {
