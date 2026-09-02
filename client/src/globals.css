@@ -7,7 +7,7 @@
    font-optical-sizing plus bas), ce qui remplace les découpes 18pt/24pt/28pt. */
 @font-face {
   font-family: "Inter";
-  src: url("/fonts/Inter/Inter-VariableFont.ttf") format("truetype");
+  src: url("/fonts/Inter/Inter-VariableFont.woff2") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: "Poppins";
-  src: url("/fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+  src: url("/fonts/Poppins/Poppins-Regular.woff2") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -23,7 +23,7 @@
 
 @font-face {
   font-family: "Poppins";
-  src: url("/fonts/Poppins/Poppins-SemiBold.ttf") format("truetype");
+  src: url("/fonts/Poppins/Poppins-SemiBold.woff2") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -31,7 +31,7 @@
 
 @font-face {
   font-family: "Poppins";
-  src: url("/fonts/Poppins/Poppins-Bold.ttf") format("truetype");
+  src: url("/fonts/Poppins/Poppins-Bold.woff2") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
