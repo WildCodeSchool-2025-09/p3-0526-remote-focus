@@ -5,11 +5,11 @@ CREATE TABLE user_(
    email VARCHAR(255) NOT NULL,
    born_at DATE NOT NULL,
    login VARCHAR(50) NOT NULL,
-   password VARCHAR(50) NOT NULL,
-   dark_theme BOOLEAN NOT NULL,
-   is_pegi16 BOOLEAN NOT NULL,
-   role BOOLEAN NOT NULL,
-   avatar VARCHAR(255) NOT NULL,
+   password VARCHAR(255) NOT NULL,
+   dark_theme BOOLEAN NOT NULL DEFAULT TRUE,
+   is_pegi16 BOOLEAN NOT NULL DEFAULT FALSE,
+   role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+   avatar VARCHAR(255) NOT NULL DEFAULT '/assets/images/default-avatar.svg',
    CONSTRAINT PK_user_ PRIMARY KEY(ID),
    CONSTRAINT AK_user_ UNIQUE(email),
    CONSTRAINT AK_user__1 UNIQUE(login)
@@ -33,14 +33,14 @@ CREATE TABLE media(
    duration INT,
    poster VARCHAR(255),
    synopsis TEXT,
-   overall_rating DECIMAL(15,2),
+   overall_rating DECIMAL(3,1),
    status VARCHAR(50),
    original_name VARCHAR(150),
    original_language VARCHAR(50),
    pegi VARCHAR(50),
    is_anime BOOLEAN NOT NULL,
    CONSTRAINT PK_media PRIMARY KEY(ID),
-   CONSTRAINT AK_media UNIQUE(tmdb_id)
+   CONSTRAINT AK_media UNIQUE(type, tmdb_id)
 );
 
 CREATE TABLE season(
@@ -129,7 +129,7 @@ CREATE TABLE track(
    ID_user INT,
    ID_media INT,
    favorite_media BOOLEAN NOT NULL,
-   user_rating DECIMAL(15,2),
+   user_rating DECIMAL(2,1),
    watchlist BOOLEAN NOT NULL,
    CONSTRAINT PK_track PRIMARY KEY(ID_user, ID_media),
    CONSTRAINT FK_track_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
