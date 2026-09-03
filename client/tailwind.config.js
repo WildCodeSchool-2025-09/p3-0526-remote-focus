@@ -7,15 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // font-sans est l'implicite : tout le texte courant
         sans: ["Inter", "system-ui", "sans-serif"],
-        // font-display : titres de page et de section
         display: ["Poppins", "Inter", "sans-serif"],
       },
-
-      // Palette brute, accessible via text-focus-yellow, border-focus-muted, etc.
-      // À utiliser seulement quand les tokens DaisyUI (primary, base-200...)
-      // ne conviennent pas.
 
       colors: {
         focus: {
@@ -65,7 +59,6 @@ export default {
           warning: "#F2B705",
           error: "#E83658",
 
-          // Rayons relevés dans le style guide
           "--rounded-box": "0.75rem", // 12px : cards, modales
           "--rounded-btn": "0.5rem", // 8px  : boutons, inputs
           "--rounded-badge": "1.375rem", // 22px : pastilles, tags
@@ -80,7 +73,7 @@ export default {
     ],
     // Quand le thème clair arrivera (US "modifier mon thème"), il suffira
     // d'ajouter un objet "focus-light" ci-dessus et de basculer l'attribut
-    // data-theme sur <html>. Aucune autre logique à retoucher.
+    // data-theme sur <html>.
     darkTheme: "focus",
     logs: false,
   },

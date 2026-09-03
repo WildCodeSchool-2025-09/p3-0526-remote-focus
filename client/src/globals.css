@@ -2,9 +2,6 @@
  * Polices — servies depuis client/public/fonts, donc chemins absolus
  * ================================================================== */
 
-/* Inter variable : un seul fichier couvre toutes les graisses de 100 à 900.
-   L'axe opsz s'ajuste automatiquement à la taille de rendu (voir
-   font-optical-sizing plus bas), ce qui remplace les découpes 18pt/24pt/28pt. */
 @font-face {
   font-family: "Inter";
   src: url("/fonts/Inter/Inter-VariableFont.woff2") format("truetype");
@@ -57,7 +54,6 @@
 
   body {
     @apply bg-base-100 text-base-content font-sans antialiased;
-    /* Active l'axe opsz d'Inter variable en fonction de la taille de rendu */
     font-optical-sizing: auto;
   }
 
@@ -85,12 +81,10 @@
     @apply font-display font-semibold text-sm;
   }
 
-  /* Focus clavier visible partout : critère d'accessibilité attendu */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
   }
 
-  /* Barre de scroll accordée au thème (Firefox + WebKit) */
   * {
     scrollbar-width: thin;
     scrollbar-color: #2e6373 transparent;
@@ -111,7 +105,6 @@
  * ================================================================== */
 
 @layer components {
-  /* Masque la scrollbar des carrousels sans bloquer le défilement */
   .scrollbar-none {
     scrollbar-width: none;
   }
