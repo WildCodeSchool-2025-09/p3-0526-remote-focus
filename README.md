@@ -123,7 +123,7 @@ Les conventions de nommage (routes API, fichiers back/front, composants, states,
 ## Équipe
 
 Projet réalisé par 4 étudiants de la promotion Wild Code School 2026-05
-Thomas FABULET : https://github.com/Tofalt
-Sophie LEBAS DE LACOUR : https://github.com/SophieLDL
-Dorian PENNEGAT : https://github.com/czagoh
-Alexandra VELISAR : https://github.com/alexandravelisar
+- Thomas FABULET : https://github.com/Tofalt
+- Sophie LEBAS DE LACOUR : https://github.com/SophieLDL
+- Dorian PENNEGAT : https://github.com/czagoh
+- Alexandra VELISAR : https://github.com/alexandravelisar
