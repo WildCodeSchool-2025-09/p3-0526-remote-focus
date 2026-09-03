@@ -116,9 +116,7 @@ const insertMany = async (
 
 /** Construit la correspondance tmdb_id → id auto-incrémenté. */
 const buildIdMap = async (table: string) => {
-  const [rows] = await database.query<Rows>(
-    `SELECT id, tmdb_id FROM ${table}`,
-  );
+  const [rows] = await database.query<Rows>(`SELECT id, tmdb_id FROM ${table}`);
 
   const map = new Map<number, number>();
 
