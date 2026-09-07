@@ -7,19 +7,29 @@
     "db:seed": "tsx ./bin/seed",
     "build": "tsx ./bin/migrate",
     "start": "tsx ./src/main",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "tmdb:fetch": "tsx ./bin/tmdbFetch.ts",
+    "tmdb:seed": "tsx ./bin/tmdbSeed.ts"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mysql2": "^3.14.0"
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.3.0",
+    "mysql2": "^3.14.0",
+    "sharp": "^0.35.4",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.6.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
     "@types/supertest": "^6.0.3",
     "jest": "^29.7.0",
     "supertest": "^7.1.0",

@@ -1,21 +1,175 @@
-create table user (
-  id int unsigned primary key auto_increment not null,
-  email varchar(255) not null unique,
-  password varchar(255) not null
+CREATE TABLE user_(
+   ID INT AUTO_INCREMENT,
+   firstname VARCHAR(100) NOT NULL,
+   lastname VARCHAR(50),
+   email VARCHAR(255) NOT NULL,
+   born_at DATE NOT NULL,
+   login VARCHAR(50) NOT NULL,
+   password VARCHAR(255) NOT NULL,
+   dark_theme BOOLEAN NOT NULL DEFAULT TRUE,
+   is_pegi16 BOOLEAN NOT NULL DEFAULT FALSE,
+   role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+   avatar VARCHAR(255) NOT NULL DEFAULT '/assets/images/default-avatar.svg',
+   CONSTRAINT PK_user_ PRIMARY KEY(ID),
+   CONSTRAINT AK_user_ UNIQUE(email),
+   CONSTRAINT AK_user__1 UNIQUE(login)
 );
 
-create table item (
-  id int unsigned primary key auto_increment not null,
-  title varchar(255) not null,
-  user_id int unsigned not null,
-  foreign key(user_id) references user(id)
+CREATE TABLE genre(
+   ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
+   name VARCHAR(50) NOT NULL,
+   CONSTRAINT PK_genre PRIMARY KEY(ID),
+   CONSTRAINT AK_genre UNIQUE(tmdb_id),
+   CONSTRAINT AK_genre_1 UNIQUE(name)
 );
 
-insert into user(id, email, password)
-values
-  (1, "jdoe@mail.com", "123456");
+CREATE TABLE media(
+   ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
+   name VARCHAR(150) NOT NULL,
+   type VARCHAR(50) NOT NULL,
+   released_at DATE,
+   duration INT,
+   poster VARCHAR(255),
+   synopsis TEXT,
+   overall_rating DECIMAL(3,1),
+   status VARCHAR(50),
+   original_name VARCHAR(150),
+   original_language VARCHAR(50),
+   pegi VARCHAR(50),
+   is_anime BOOLEAN NOT NULL,
+   CONSTRAINT PK_media PRIMARY KEY(ID),
+   CONSTRAINT AK_media UNIQUE(type, tmdb_id)
+);
 
-insert into item(id, title, user_id)
-values
-  (1, "Stuff", 1),
-  (2, "Doodads", 1);
+CREATE TABLE season(
+   ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
+   name VARCHAR(150),
+   released_at DATE,
+   poster VARCHAR(255),
+   synopsis TEXT,
+   is_finished BOOLEAN NOT NULL,
+   number INT,
+   ID_media INT NOT NULL,
+   CONSTRAINT PK_season PRIMARY KEY(ID),
+   CONSTRAINT AK_season UNIQUE(tmdb_id),
+   CONSTRAINT FK_season_media FOREIGN KEY(ID_media) REFERENCES media(ID)
+);
+
+CREATE TABLE episode(
+   ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
+   name VARCHAR(150),
+   number INT,
+   released_at DATE,
+   synopsis TEXT,
+   duration INT,
+   ID_season INT NOT NULL,
+   CONSTRAINT PK_episode PRIMARY KEY(ID),
+   CONSTRAINT AK_episode UNIQUE(tmdb_id),
+   CONSTRAINT FK_episode_season FOREIGN KEY(ID_season) REFERENCES season(ID)
+);
+
+CREATE TABLE platform(
+   ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
+   name VARCHAR(50) NOT NULL,
+   logo VARCHAR(255),
+   url VARCHAR(255),
+   CONSTRAINT PK_platform PRIMARY KEY(ID),
+   CONSTRAINT AK_platform UNIQUE(tmdb_id),
+   CONSTRAINT AK_platform_1 UNIQUE(name)
+);
+
+CREATE TABLE person(
+   ID INT AUTO_INCREMENT,
+   tmdb_id INT NOT NULL,
+   biography TEXT,
+   photo VARCHAR(255),
+   name VARCHAR(50) NOT NULL,
+   CONSTRAINT PK_person PRIMARY KEY(ID),
+   CONSTRAINT AK_person UNIQUE(tmdb_id)
+);
+
+CREATE TABLE classify_as(
+   ID_media INT,
+   ID_genre INT,
+   CONSTRAINT PK_classify_as PRIMARY KEY(ID_media, ID_genre),
+   CONSTRAINT FK_classify_as_media FOREIGN KEY(ID_media) REFERENCES media(ID),
+   CONSTRAINT FK_classify_as_genre FOREIGN KEY(ID_genre) REFERENCES genre(ID)
+);
+
+CREATE TABLE available_on(
+   ID_media INT,
+   ID_platform INT,
+   CONSTRAINT PK_available_on PRIMARY KEY(ID_media, ID_platform),
+   CONSTRAINT FK_available_on_media FOREIGN KEY(ID_media) REFERENCES media(ID),
+   CONSTRAINT FK_available_on_platform FOREIGN KEY(ID_platform) REFERENCES platform(ID)
+);
+
+CREATE TABLE favorite(
+   ID_user INT,
+   ID_person INT,
+   CONSTRAINT PK_favorite PRIMARY KEY(ID_user, ID_person),
+   CONSTRAINT FK_favorite_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
+   CONSTRAINT FK_favorite_person FOREIGN KEY(ID_person) REFERENCES person(ID)
+);
+
+CREATE TABLE like_(
+   ID_user INT,
+   ID_genre INT,
+   CONSTRAINT PK_like_ PRIMARY KEY(ID_user, ID_genre),
+   CONSTRAINT FK_like__user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
+   CONSTRAINT FK_like__genre FOREIGN KEY(ID_genre) REFERENCES genre(ID)
+);
+
+CREATE TABLE track(
+   ID_user INT,
+   ID_media INT,
+   favorite_media BOOLEAN NOT NULL,
+   user_rating DECIMAL(2,1),
+   watchlist BOOLEAN NOT NULL,
+   CONSTRAINT PK_track PRIMARY KEY(ID_user, ID_media),
+   CONSTRAINT FK_track_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
+   CONSTRAINT FK_track_media FOREIGN KEY(ID_media) REFERENCES media(ID)
+);
+
+CREATE TABLE media_user(
+   ID_user INT,
+   ID_media INT,
+   viewed_at DATETIME NOT NULL,
+   CONSTRAINT PK_media_user PRIMARY KEY(ID_user, ID_media),
+   CONSTRAINT FK_media_user_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
+   CONSTRAINT FK_media_user_media FOREIGN KEY(ID_media) REFERENCES media(ID)
+);
+
+CREATE TABLE episode_person(
+   ID_episode INT,
+   ID_person INT,
+   personnage_name VARCHAR(255),
+   role VARCHAR(50),
+   CONSTRAINT PK_episode_person PRIMARY KEY(ID_episode, ID_person),
+   CONSTRAINT FK_episode_person_episode FOREIGN KEY(ID_episode) REFERENCES episode(ID),
+   CONSTRAINT FK_episode_person_person FOREIGN KEY(ID_person) REFERENCES person(ID)
+);
+
+CREATE TABLE episode_user(
+   ID_user INT,
+   ID_episode INT,
+   viewed_at DATETIME NOT NULL,
+   CONSTRAINT PK_episode_user PRIMARY KEY(ID_user, ID_episode),
+   CONSTRAINT FK_episode_user_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
+   CONSTRAINT FK_episode_user_episode FOREIGN KEY(ID_episode) REFERENCES episode(ID)
+);
+
+CREATE TABLE media_person(
+   ID_media INT,
+   ID_person INT,
+   personnage_name VARCHAR(255),
+   role VARCHAR(50),
+   CONSTRAINT PK_media_person PRIMARY KEY(ID_media, ID_person),
+   CONSTRAINT FK_media_person_media FOREIGN KEY(ID_media) REFERENCES media(ID),
+   CONSTRAINT FK_media_person_person FOREIGN KEY(ID_person) REFERENCES person(ID)
+);
