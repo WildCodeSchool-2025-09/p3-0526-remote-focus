@@ -1,4 +1,5 @@
 import express from "express";
+import mediaActions from "./modules/media/mediaActions";
 
 const router = express.Router();
 
@@ -16,5 +17,5 @@ router.post("/api/items", itemActions.add);
 */
 
 /* ************************************************************************* */
-
+router.get("/api/movies/:id", mediaActions.read);
 export default router;
