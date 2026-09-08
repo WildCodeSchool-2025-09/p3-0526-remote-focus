@@ -20,28 +20,28 @@ function Navbar() {
         <ul className="flex flex-col gap-2 mr-2">
           <li>
             <NavLink to="/" end className={linkClass}>
-              <Home size={18} />
+              <Home size={20} />
               <span>Accueil</span>
             </NavLink>
           </li>
 
           <li>
             <NavLink to="/catalog" className={linkClass}>
-              <Tv size={18} />
+              <Tv size={20} />
               <span>Catalogue</span>
             </NavLink>
           </li>
 
           <li>
             <NavLink to="/calendar" className={linkClass}>
-              <Calendar size={18} />
+              <Calendar size={20} />
               <span>Calendrier</span>
             </NavLink>
           </li>
 
           <li>
             <NavLink to="/profile" className={linkClass}>
-              <User size={18} />
+              <User size={20} />
               <span>Profil</span>
             </NavLink>
           </li>
