@@ -11,7 +11,7 @@ function Navbar() {
     }`;
 
   return (
-    <aside className="bg-base-100 px-4 py-6 lg:sticky lg:top-0 lg:h-screen lg:w-52 lg:shrink-0">
+    <aside className="hidden border-r border-focus-line/20 bg-base-100 px-4 py-6 lg:block lg:sticky lg:top-0 lg:h-screen lg:w-52 lg:shrink-0">
       <nav aria-label="Navigation principale">
         <NavLink to="/" className="mb-8 block">
           <img src={logo_focus} alt="Focus" width={100} />

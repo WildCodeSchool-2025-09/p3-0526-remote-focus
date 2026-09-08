@@ -2,7 +2,7 @@ function Homepage() {
   return (
     <>
       <div className="min-h-screen bg-base-100 p-8 space-y-4">
-        <h1 className="text-4xl">Focus</h1>
+        <h1>Homepage</h1>
         <p className="text-focus-muted">Texte secondaire en Inter.</p>
         <div className="flex gap-3">
           <button type="button" className="btn btn-primary">
