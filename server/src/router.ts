@@ -1,4 +1,5 @@
 import express from "express";
+import actorActions from "./modules/actor/actorActions";
 import mediaActions from "./modules/media/mediaActions";
 
 const router = express.Router();
@@ -17,5 +18,7 @@ router.post("/api/items", itemActions.add);
 */
 
 /* ************************************************************************* */
-router.get("/api/movies/:id", mediaActions.read);
+router.get("/api/medias/:id", mediaActions.read);
+router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+
 export default router;
