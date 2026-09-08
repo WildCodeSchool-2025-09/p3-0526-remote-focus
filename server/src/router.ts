@@ -10,7 +10,7 @@ const router = express.Router();
 /* import itemActions from "./modules/item/itemActions.old";*/
 import CatalogActions from "./modules/Catalog/CatalogActions";
 
-router.get("/api/catalog", CatalogActions.readDiscoverSections);
+router.get("/api/medias/discover", CatalogActions.readDiscoverSections);
 
 /*
 router.get("/api/items", itemActions.browse);
