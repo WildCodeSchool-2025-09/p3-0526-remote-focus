@@ -45,6 +45,8 @@ const read: RequestHandler = async (req, res, next) => {
                 role: person.role,
             })),
             castTotal,
+            userStatus: null,
+            userRating: null,
         });
     } catch (err) {
         next(err);
