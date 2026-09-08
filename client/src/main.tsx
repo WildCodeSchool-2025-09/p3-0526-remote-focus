@@ -3,11 +3,11 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import "./globals.css";
 import App from "./App";
-import Homepage from "./pages/Homepage";
-import Catalog from "./pages/Catalog";
 import Calendar from "./pages/Calendar";
-import Profile from "./pages/Profile";
+import Catalog from "./pages/Catalog";
+import Homepage from "./pages/Homepage";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {

@@ -1,5 +1,5 @@
+import { Calendar, Home, Tv, User } from "lucide-react";
 import { NavLink } from "react-router";
-import { Home, Tv, Calendar, User } from "lucide-react";
 import logo_focus from "/images/logo_focus.png";
 
 function Navbar() {
