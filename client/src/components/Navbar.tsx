@@ -1,53 +1,47 @@
 import { NavLink } from "react-router";
-import logo_focus from "/images/logo_focus.png";
 import { Home, Tv, Calendar, User } from "lucide-react";
+import logo_focus from "/images/logo_focus.png";
 
 function Navbar() {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 rounded-md px-3 py-2 text-lg transition-colors ${
-      isActive
-        ? "bg-primary/10 text-primary font-semibold"
-        : "text-base-content/70 hover:bg-base-300 hover:text-lg-content"
-    }`;
+    `flex flex-1 flex-col items-center gap-1 rounded-md px-2 py-2 text-xs transition-colors
+     lg:flex-none lg:flex-row lg:gap-3 lg:px-3 lg:text-lg ${
+       isActive
+         ? "bg-primary/10 text-primary font-semibold"
+         : "text-base-content/70 hover:text-base-content lg:hover:bg-base-300"
+     }`;
 
   return (
-    <aside className="hidden border-r border-focus-line/20 bg-base-100 px-4 py-6 lg:block lg:sticky lg:top-0 lg:h-screen lg:w-52 lg:shrink-0">
-      <nav aria-label="Navigation principale">
-        <NavLink to="/" className="mb-8 block">
-          <img src={logo_focus} alt="Focus" width={100} />
-        </NavLink>
+    <nav
+      aria-label="Navigation principale"
+      className="fixed inset-x-0 bottom-0 z-40 flex gap-1 border-t border-focus-line/20 bg-base-100 p-2
+                 lg:sticky lg:top-0 lg:inset-x-auto lg:bottom-auto lg:h-screen lg:w-52 lg:shrink-0
+                 lg:flex-col lg:gap-2 lg:border-t-0 lg:border-r lg:px-4 lg:py-6"
+    >
+      <NavLink to="/" end className="mb-8 hidden lg:block">
+        <img src={logo_focus} alt="Focus" width={100} />
+      </NavLink>
 
-        <ul className="flex flex-col gap-2 mr-2">
-          <li>
-            <NavLink to="/" end className={linkClass}>
-              <Home size={20} />
-              <span>Accueil</span>
-            </NavLink>
-          </li>
+      <NavLink to="/" end className={linkClass}>
+        <Home size={20} />
+        <span>Accueil</span>
+      </NavLink>
 
-          <li>
-            <NavLink to="/catalog" className={linkClass}>
-              <Tv size={20} />
-              <span>Catalogue</span>
-            </NavLink>
-          </li>
+      <NavLink to="/catalog" className={linkClass}>
+        <Tv size={20} />
+        <span>Catalogue</span>
+      </NavLink>
 
-          <li>
-            <NavLink to="/calendar" className={linkClass}>
-              <Calendar size={20} />
-              <span>Calendrier</span>
-            </NavLink>
-          </li>
+      <NavLink to="/calendar" className={linkClass}>
+        <Calendar size={20} />
+        <span>Calendrier</span>
+      </NavLink>
 
-          <li>
-            <NavLink to="/profile" className={linkClass}>
-              <User size={20} />
-              <span>Profil</span>
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-    </aside>
+      <NavLink to="/profile" className={linkClass}>
+        <User size={20} />
+        <span>Profil</span>
+      </NavLink>
+    </nav>
   );
 }
 
