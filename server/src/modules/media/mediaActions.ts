@@ -17,10 +17,11 @@ const read: RequestHandler = async (req, res, next) => {
             return;
         }
 
-        const [genres, platforms, cast] = await Promise.all([
+        const [genres, platforms, cast, castTotal] = await Promise.all([
             mediaRepository.readGenres(id),
             mediaRepository.readPlatforms(id),
             mediaRepository.readCast(id),
+            mediaRepository.countCast(id),
         ]);
 
         res.json({
@@ -43,6 +44,7 @@ const read: RequestHandler = async (req, res, next) => {
                 characterName: person.personnage_name,
                 role: person.role,
             })),
+            castTotal,
         });
     } catch (err) {
         next(err);

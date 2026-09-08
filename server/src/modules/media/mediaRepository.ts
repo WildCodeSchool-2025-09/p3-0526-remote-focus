@@ -34,15 +34,26 @@ class MediaRepository {
         return rows;
     }
 
-    async readCast(id: number) {
+    async readCast(id: number, limit = 10) {
         const [rows] = await databaseClient.query<Rows>(
             `SELECT pe.ID, pe.name, pe.photo, mp.personnage_name, mp.role
        FROM person AS pe
        JOIN media_person AS mp ON mp.ID_person = pe.ID
-       WHERE mp.ID_media = ?`,
-            [id],
+       WHERE mp.ID_media = ? AND mp.role = 'actor'
+       LIMIT ?`,
+            [id, limit],
         );
         return rows;
+    }
+
+    async countCast(id: number) {
+        const [rows] = await databaseClient.query<Rows>(
+            `SELECT COUNT(*) AS total
+       FROM media_person
+       WHERE ID_media = ? AND role = 'actor'`,
+            [id],
+        );
+        return Number(rows[0].total);
     }
 }
 
