@@ -3,13 +3,13 @@ import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <>
+    <div className="min-h-screen lg:flex">
       <Navbar />
 
-      <main>
+      <main className="min-h-screen flex-1 p-6">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }
 

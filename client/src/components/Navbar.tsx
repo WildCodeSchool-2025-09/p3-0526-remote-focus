@@ -1,29 +1,53 @@
 import { NavLink } from "react-router";
+import logo_focus from "/images/logo_focus.png";
 import { Home, Tv, Calendar, User } from "lucide-react";
 
 function Navbar() {
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 rounded-md px-3 py-2 text-lg transition-colors ${
+      isActive
+        ? "bg-primary/10 text-primary font-semibold"
+        : "text-base-content/70 hover:bg-base-300 hover:text-lg-content"
+    }`;
+
   return (
-    <nav aria-label="Navigation principale">
-      <NavLink to="/">Focus</NavLink>
-      <ul>
-        <NavLink to="/">
-          <Home size={18} />
-          Accueil
+    <aside className="bg-base-100 px-4 py-6 lg:sticky lg:top-0 lg:h-screen lg:w-52 lg:shrink-0">
+      <nav aria-label="Navigation principale">
+        <NavLink to="/" className="mb-8 block">
+          <img src={logo_focus} alt="Focus" width={100} />
         </NavLink>
-        <NavLink to="/catalog">
-          <Tv size={18} />
-          Catalogue
-        </NavLink>
-        <NavLink to="/calendar">
-          <Calendar size={18} />
-          Calendrier
-        </NavLink>
-        <NavLink to="/profile">
-          <User size={18} />
-          Profil
-        </NavLink>
-      </ul>
-    </nav>
+
+        <ul className="flex flex-col gap-2 mr-2">
+          <li>
+            <NavLink to="/" end className={linkClass}>
+              <Home size={18} />
+              <span>Accueil</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/catalog" className={linkClass}>
+              <Tv size={18} />
+              <span>Catalogue</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/calendar" className={linkClass}>
+              <Calendar size={18} />
+              <span>Calendrier</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/profile" className={linkClass}>
+              <User size={18} />
+              <span>Profil</span>
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+    </aside>
   );
 }
 
