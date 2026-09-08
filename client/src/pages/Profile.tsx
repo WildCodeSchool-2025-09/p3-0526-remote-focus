@@ -1,5 +1,5 @@
-function Calendar() {
+function Profile() {
   return <h1>Profil</h1>;
 }
 
-export default Calendar;
+export default Profile;
