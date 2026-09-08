@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
-import { formatDuration } from "../utils/formatDuration";
+import MediaHeader from "../components/MediaHeader";
 
 function MovieDetail() {
     const { id } = useParams();
@@ -34,10 +34,8 @@ function MovieDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-base-100 p-8 space-y-4">
-            <h1 className="text-4xl">{mediaDetail.name}</h1>
-            <p>{formatDuration(mediaDetail.duration)}</p>
-            <p>{mediaDetail.synopsis}</p>
+        <div className="min-h-screen bg-base-100 p-4 md:p-8">
+            <MediaHeader media={mediaDetail} />
         </div>
     );
 }
