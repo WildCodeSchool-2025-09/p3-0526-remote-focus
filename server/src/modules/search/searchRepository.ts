@@ -1,6 +1,7 @@
 import client from "../../../database/client";
 import type { Rows } from "../../../database/client";
 
+//recherche par média
 export interface MediaSearchRow extends Rows {
   id: number;
   name: string;
@@ -32,6 +33,31 @@ export async function findMediaByTitle(
       ORDER BY m.name ASC
       LIMIT ? OFFSET ?`,
     params,
+  );
+
+  return rows;
+}
+
+//recherche par nom
+export interface PersonSearchRow extends Rows {
+  id: number;
+  name: string;
+  photo: string | null;
+}
+
+
+export async function findPersonByName(
+  q: string,
+  limit: number,
+  offset: number
+): Promise<PersonSearchRow[]> {
+  const [rows] = await client.query<PersonSearchRow[]>(
+    `SELECT p.ID as id, p.name, p.photo
+     FROM person p
+     WHERE p.name LIKE ?
+     ORDER BY p.name ASC
+     LIMIT ? OFFSET ?`,
+    [`%${q}%`, limit, offset]
   );
 
   return rows;
