@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
 import MediaHeader from "../components/MediaHeader";
+import CastList from "../components/CastList";
 
 function MovieDetail() {
     const { id } = useParams();
@@ -10,6 +11,7 @@ function MovieDetail() {
     const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
     useEffect(() => {
         if (id == null) {
@@ -25,6 +27,10 @@ function MovieDetail() {
             .finally(() => setLoading(false));
     }, [id]);
 
+    const handleSelectPerson = (personId: number) => {
+        setSelectedPersonId(personId);
+
+    };
     if (loading) {
         return <p className="p-8 text-focus-muted">Chargement…</p>;
     }
@@ -34,8 +40,14 @@ function MovieDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-base-100 p-4 md:p-8">
+        <div className="min-h-screen space-y-8 bg-base-100 p-4 md:p-8">
             <MediaHeader media={mediaDetail} />
+            <CastList
+                cast={mediaDetail.cast}
+                castTotal={mediaDetail.castTotal}
+                selectedPersonId={selectedPersonId}
+                onSelectPerson={handleSelectPerson}
+            />
         </div>
     );
 }
