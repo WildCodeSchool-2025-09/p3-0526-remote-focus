@@ -4,7 +4,6 @@ import { NavLink } from "react-router";
 function NotFound() {
   return (
     <section className="flex min-h-[70vh] flex-col items-center justify-center gap-5 text-center">
-      {/* Icône d'erreur (composant lucide-react, pas une image) */}
       <div
         className="flex h-20 w-20 items-center justify-center rounded-2xl bg-base-200 shadow-badge
                    lg:h-24 lg:w-24"
