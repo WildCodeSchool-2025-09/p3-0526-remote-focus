@@ -4,6 +4,7 @@ import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
 import MediaHeader from "../components/MediaHeader";
 import CastList from "../components/CastList";
+import KnownFrom from "../components/KnownFrom";
 
 function MovieDetail() {
     const { id } = useParams();
@@ -48,6 +49,9 @@ function MovieDetail() {
                 selectedPersonId={selectedPersonId}
                 onSelectPerson={handleSelectPerson}
             />
+            {selectedPersonId != null && (
+                <KnownFrom personId={selectedPersonId} mediaId={mediaDetail.id} />
+            )}
         </div>
     );
 }
