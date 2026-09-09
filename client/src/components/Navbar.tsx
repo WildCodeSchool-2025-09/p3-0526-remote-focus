@@ -1,6 +1,6 @@
 import { Calendar, Home, Tv, User } from "lucide-react";
 import { NavLink } from "react-router";
-import logo_focus from "/images/logo_focus.png";
+import logoFocus from "../assets/images/logoFocus.png";
 
 function Navbar() {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -19,7 +19,7 @@ function Navbar() {
                  lg:flex-col lg:gap-2 lg:border-t-0 lg:border-r lg:px-4 lg:py-6"
     >
       <NavLink to="/" end className="mb-8 hidden lg:block">
-        <img src={logo_focus} alt="Focus" width={100} />
+        <img src={logoFocus} alt="Focus" width={100} />
       </NavLink>
 
       <NavLink to="/" end className={linkClass}>
