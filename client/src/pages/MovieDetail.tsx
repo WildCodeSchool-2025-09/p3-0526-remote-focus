@@ -5,6 +5,7 @@ import type { Media } from "../types/media";
 import MediaHeader from "../components/MediaHeader";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
+import Breadcrumb from "../components/Breadcrumb";
 
 function MovieDetail() {
     const { id } = useParams();
@@ -42,6 +43,7 @@ function MovieDetail() {
 
     return (
         <div className="min-h-screen space-y-8 bg-base-100 p-4 md:p-8">
+            <Breadcrumb currentLabel={mediaDetail.name} />
             <MediaHeader media={mediaDetail} />
             <CastList
                 cast={mediaDetail.cast}
