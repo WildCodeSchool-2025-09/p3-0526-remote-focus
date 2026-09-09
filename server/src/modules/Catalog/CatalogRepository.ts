@@ -10,8 +10,8 @@ class CatalogRepository {
     limit = 10,
   ): Promise<Media[]> {
     const [rows] = await databaseClient.query<Media[]>(
-      "SELECT * FROM media WHERE type = ? OR ? IS NULL ORDER BY overall_rating DESC LIMIT ?",
-      [type, type, limit],
+      "SELECT * FROM media WHERE (? IS NULL OR (? = 'anime' AND is_anime = TRUE) OR (? = 'movie' AND type = 'movie' AND is_anime = FALSE) OR (? = 'tv' AND type = 'tv' AND is_anime = FALSE)) ORDER BY overall_rating DESC LIMIT ?",
+      [type, type, type, type, limit],
     );
     return rows;
   }
@@ -21,8 +21,8 @@ class CatalogRepository {
     limit = 10,
   ): Promise<Media[]> {
     const [rows] = await databaseClient.query<Media[]>(
-      "SELECT * FROM media WHERE (released_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW()) AND (type = ? OR ? IS NULL) ORDER BY released_at DESC LIMIT ?",
-      [type, type, limit],
+      "SELECT * FROM media WHERE (released_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW()) AND (? IS NULL OR (? = 'anime' AND is_anime = TRUE) OR (? = 'movie' AND type = 'movie' AND is_anime = FALSE) OR (? = 'tv' AND type = 'tv' AND is_anime = FALSE)) ORDER BY released_at DESC LIMIT ?",
+      [type, type, type, type, limit],
     );
     return rows;
   }
@@ -33,8 +33,8 @@ class CatalogRepository {
     limit = 10,
   ): Promise<Media[]> {
     const [rows] = await databaseClient.query<Media[]>(
-      "SELECT media.* FROM media JOIN classify_as ON media.ID=classify_as.ID_media WHERE classify_as.ID_genre = ? AND (media.type = ? OR ? IS NULL) ORDER BY media.overall_rating DESC LIMIT ?",
-      [genreId, type, type, limit],
+      "SELECT media.*, genre.name AS genreName FROM media JOIN classify_as ON media.ID = classify_as.ID_media JOIN genre ON genre.ID = classify_as.ID_genre WHERE classify_as.ID_genre = ? AND (? IS NULL OR (? = 'anime' AND is_anime = TRUE) OR (? = 'movie' AND type = 'movie' AND is_anime = FALSE) OR (? = 'tv' AND type = 'tv' AND is_anime = FALSE)) ORDER BY media.overall_rating DESC LIMIT ?",
+      [genreId, type, type, type, type, limit],
     );
     return rows;
   }

@@ -1,14 +1,17 @@
 import databaseClient from "../../../database/client";
 
-import type { Result, Rows } from "../../../database/client";
+import type { LikedGenre } from "../../types/Genre/Genre.types";
 
 class UserRepository {
-  async readRandomGenres(userId: number | undefined, count = 3) {
-    let rows: Rows = [];
+  async readRandomGenres(
+    userId: number | undefined,
+    count = 3,
+  ): Promise<LikedGenre[]> {
+    let rows: LikedGenre[] = [];
 
     if (userId != null) {
-      [rows] = await databaseClient.query<Rows>(
-        "SELECT ID_genre FROM like_ WHERE ID_user = ? ORDER BY RAND() LIMIT ?",
+      [rows] = await databaseClient.query<LikedGenre[]>(
+        "SELECT ID_genre, genre.name FROM like_ JOIN genre ON genre.ID = like_.ID_genre WHERE like_.ID_user = ? ORDER BY RAND() LIMIT ?",
         [userId, count],
       );
     }
@@ -18,12 +21,12 @@ class UserRepository {
 
       const [userGenres] =
         excludedIds.length > 0
-          ? await databaseClient.query<Rows>(
-              "SELECT id AS ID_genre FROM genre WHERE id NOT IN (?) ORDER BY RAND() LIMIT ?",
+          ? await databaseClient.query<LikedGenre[]>(
+              "SELECT ID AS ID_genre, name FROM genre WHERE ID NOT IN (?) ORDER BY RAND() LIMIT ?",
               [excludedIds, count - rows.length],
             )
-          : await databaseClient.query<Rows>(
-              "SELECT id AS ID_genre FROM genre ORDER BY RAND() LIMIT ?",
+          : await databaseClient.query<LikedGenre[]>(
+              "SELECT ID AS ID_genre, name FROM genre ORDER BY RAND() LIMIT ?",
               [count - rows.length],
             );
       rows = [...rows, ...userGenres];

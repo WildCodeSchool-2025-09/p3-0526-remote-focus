@@ -4,6 +4,21 @@ import CatalogRepository from "./CatalogRepository";
 import UserRepository from "../User/UserRepository";
 import type { Media, EnrichedMedia } from "../../types/Media/Media.types";
 
+const isMediaNew = (releasedAt: Date | string | null): boolean => {
+  const today = new Date();
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const releasedAtDate = releasedAt ? new Date(releasedAt) : null;
+
+  return (
+    releasedAtDate !== null &&
+    releasedAtDate >= thirtyDaysAgo &&
+    releasedAtDate <= today
+  );
+};
+
 const enrichRanking = (medias: Media[]): EnrichedMedia[] => {
   return medias.map((media, index) => {
     const position = index + 1;
@@ -16,15 +31,7 @@ const enrichRanking = (medias: Media[]): EnrichedMedia[] => {
       topRank = "top10";
     }
 
-    const today = new Date();
-
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const releasedAt = media.released_at ? new Date(media.released_at) : null;
-
-    const isNew =
-      releasedAt !== null && releasedAt >= thirtyDaysAgo && releasedAt <= today;
+    const isNew = isMediaNew(media.released_at);
 
     return { ...media, topRank, isNew };
   });
@@ -32,14 +39,29 @@ const enrichRanking = (medias: Media[]): EnrichedMedia[] => {
 
 const readDiscoverSections: RequestHandler = async (req, res, next) => {
   try {
-    const type = typeof req.query.type === "string" ? req.query.type : null;
+    const requestedType = req.query.type;
+
+    if (
+      requestedType !== undefined &&
+      requestedType !== "movie" &&
+      requestedType !== "tv" &&
+      requestedType !== "anime"
+    ) {
+      res.status(400).json({
+        error: "Invalid media type",
+      });
+      return;
+    }
+
+    const type = requestedType ? requestedType : null;
+
     const userId = req.user?.id;
 
     const topRated = await CatalogRepository.readTopRated(type);
 
     const newReleases = await CatalogRepository.readLatest30Days(type);
 
-    const likedGenres = await UserRepository.readRandomGenres(userId);
+    const likedGenres = await UserRepository.readRandomGenres(3);
 
     const topGenres = await Promise.all(
       likedGenres.map((likedGenre) =>
@@ -58,12 +80,13 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
         return {
           ...media,
           topRank: rankedMedia ? rankedMedia.topRank : null,
-          isNew: rankedMedia ? rankedMedia.isNew : false,
+          isNew: isMediaNew(media.released_at),
         };
       });
 
       return {
-        genre: likedGenre.ID_genre,
+        id: likedGenre.ID_genre,
+        name: likedGenre.name,
         medias,
       };
     });
