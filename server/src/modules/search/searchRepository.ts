@@ -45,11 +45,10 @@ export interface PersonSearchRow extends Rows {
   photo: string | null;
 }
 
-
 export async function findPersonByName(
   q: string,
   limit: number,
-  offset: number
+  offset: number,
 ): Promise<PersonSearchRow[]> {
   const [rows] = await client.query<PersonSearchRow[]>(
     `SELECT p.ID as id, p.name, p.photo
@@ -57,8 +56,29 @@ export async function findPersonByName(
      WHERE p.name LIKE ?
      ORDER BY p.name ASC
      LIMIT ? OFFSET ?`,
-    [`%${q}%`, limit, offset]
+    [`%${q}%`, limit, offset],
   );
 
   return rows;
+}
+
+//pour stocker le nombre de résultat
+export async function countMediaByTitle(
+  q: string,
+  type: string | undefined,
+): Promise<number> {
+  const params: unknown[] = [`%${q}%`];
+  let typeClause = "";
+
+  if (type) {
+    typeClause = "AND m.type = ?";
+    params.push(type);
+  }
+
+  const [rows] = await client.query<Rows>(
+    `SELECT COUNT(*) as total FROM media m WHERE m.name LIKE ? ${typeClause}`,
+    params,
+  );
+
+  return (rows as { total: number }[])[0].total;
 }
