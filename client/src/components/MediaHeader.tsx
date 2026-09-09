@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Media } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
 import MediaInfo from "./MediaInfo";
@@ -12,6 +13,12 @@ function MediaHeader({ media }: MediaHeaderProps) {
     const year = media.releasedAt
         ? new Date(media.releasedAt).getFullYear()
         : null;
+
+    const [isMetaOpen, setIsMetaOpen] = useState(false);
+
+    const handleToggleMeta = () => {
+        setIsMetaOpen(!isMetaOpen);
+    };
 
     return (
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
@@ -33,18 +40,36 @@ function MediaHeader({ media }: MediaHeaderProps) {
                         </span>
                     ))}
                     {year != null && <span className={PILL}>{year}</span>}
-                    {media.originalLanguage != null && (
-                        <span className={PILL}>
-                            VO : {media.originalLanguage.toUpperCase()}
-                        </span>
-                    )}
-                    {media.duration != null && (
-                        <span className={PILL}>{formatDuration(media.duration)}</span>
-                    )}
-                    {media.overallRating != null && (
-                        <span className={PILL}>★ {media.overallRating}</span>
-                    )}
-                    {media.pegi != null && <span className={PILL}>PEGI {media.pegi}</span>}
+
+                    <button
+                        type="button"
+                        onClick={handleToggleMeta}
+                        aria-expanded={isMetaOpen}
+                        aria-label="Afficher plus d'informations"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
+                        style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
+                    >
+                        {isMetaOpen ? "⌃" : "⌄"}
+                    </button>
+
+                    <div
+                        className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
+                    >
+                        {media.originalLanguage != null && (
+                            <span className={PILL}>
+                                VO : {media.originalLanguage.toUpperCase()}
+                            </span>
+                        )}
+                        {media.duration != null && (
+                            <span className={PILL}>{formatDuration(media.duration)}</span>
+                        )}
+                        {media.overallRating != null && (
+                            <span className={PILL}>★ {media.overallRating}</span>
+                        )}
+                        {media.pegi != null && (
+                            <span className={PILL}>PEGI {media.pegi}</span>
+                        )}
+                    </div>
                 </div>
 
                 <MediaInfo media={media} />
@@ -88,12 +113,12 @@ function ActionButton({ label, color, icon }: ActionButtonProps) {
             <button
                 type="button"
                 disabled
-                className="flex h-13 w-13 items-center justify-center rounded-full border-2 text-xl md:h-12 md:w-12"
+                className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 text-xl md:h-12 md:w-12"
                 style={{ borderColor: color, color }}
             >
                 {icon}
             </button>
-            <span className="hidden text-sm text-white/60 md:block">{label}</span>
+            <span className="text-sm text-white/60">{label}</span>
         </div>
     );
 }
