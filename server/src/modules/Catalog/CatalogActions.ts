@@ -61,7 +61,7 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
 
     const newReleases = await CatalogRepository.readLatest30Days(type);
 
-    const likedGenres = await UserRepository.readRandomGenres(3);
+    const likedGenres = await UserRepository.readRandomGenres(userId);
 
     const topGenres = await Promise.all(
       likedGenres.map((likedGenre) =>
