@@ -53,9 +53,10 @@ export async function browseResults(
       releasedAt: row.released_at,
     };
 
-    if (row.type === "movie") movies.push(dto);
+    // is_anime prime sur type : un anime reste un anime, qu'il soit "movie" ou "series"
+    if (row.is_anime) animes.push(dto);
+    else if (row.type === "movie") movies.push(dto);
     else if (row.type === "series") series.push(dto);
-    else if (row.type === "anime") animes.push(dto);
   }
 
   const actors: PersonDto[] = personRows.map((p) => ({
