@@ -1,5 +1,6 @@
 import type { Media } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
+import MediaInfo from "./MediaInfo";
 
 type MediaHeaderProps = {
     media: Media;
@@ -45,6 +46,8 @@ function MediaHeader({ media }: MediaHeaderProps) {
                     )}
                     {media.pegi != null && <span className={PILL}>PEGI {media.pegi}</span>}
                 </div>
+
+                <MediaInfo media={media} />
 
                 <div className="mt-1 flex flex-wrap items-start gap-4">
                     <ActionButton label="Favoris" color="#E83658" icon="♥" />
