@@ -5,6 +5,8 @@ type MediaHeaderProps = {
     media: Media;
 };
 
+const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
+
 function MediaHeader({ media }: MediaHeaderProps) {
     const year = media.releasedAt
         ? new Date(media.releasedAt).getFullYear()
@@ -16,7 +18,7 @@ function MediaHeader({ media }: MediaHeaderProps) {
                 <img
                     src={`https://image.tmdb.org/t/p/w500${media.poster}`}
                     alt={media.name}
-                    className="w-32 h-48 shrink-0 rounded-lg object-cover md:w-66 md:h-99"
+                    className="h-48 w-32 shrink-0 rounded-lg object-cover md:h-[396px] md:w-[264px]"
                 />
             )}
 
@@ -25,45 +27,70 @@ function MediaHeader({ media }: MediaHeaderProps) {
 
                 <div className="flex flex-wrap items-center gap-2">
                     {media.genres.map((genre) => (
-                        <span
-                            key={genre.ID}
-                            className="rounded-full border border-white/30 px-4 py-2 text-sm"
-                        >
+                        <span key={genre.ID} className={PILL}>
                             {genre.name}
                         </span>
                     ))}
-
-                    {year != null && (
-                        <span className="rounded-full border border-white/30 px-4 py-2 text-sm">
-                            {year}
-                        </span>
-                    )}
-
+                    {year != null && <span className={PILL}>{year}</span>}
                     {media.originalLanguage != null && (
-                        <span className="rounded-full border border-white/30 px-4 py-2 text-sm">
+                        <span className={PILL}>
                             VO : {media.originalLanguage.toUpperCase()}
                         </span>
                     )}
-
                     {media.duration != null && (
-                        <span className="rounded-full border border-white/30 px-4 py-2 text-sm">
-                            {formatDuration(media.duration)}
-                        </span>
+                        <span className={PILL}>{formatDuration(media.duration)}</span>
                     )}
-
                     {media.overallRating != null && (
-                        <span className="rounded-full border border-white/30 px-4 py-2 text-sm">
-                            ★ {media.overallRating}
-                        </span>
+                        <span className={PILL}>★ {media.overallRating}</span>
                     )}
+                    {media.pegi != null && <span className={PILL}>PEGI {media.pegi}</span>}
+                </div>
 
-                    {media.pegi != null && (
-                        <span className="rounded-full border border-white/30 px-4 py-2 text-sm">
-                            PEGI {media.pegi}
-                        </span>
+                <div className="mt-1 flex flex-wrap items-start gap-4">
+                    <ActionButton label="Favoris" color="#E83658" icon="♥" />
+                    <ActionButton label="Watchlist" color="#F5F5F0" icon="+" />
+                    <ActionButton label="Vu" color="#17B890" icon="✓" />
+                    <ActionButton label="Noter" color="#F2B705" icon="★" />
+
+                    {media.platforms.length > 0 && (
+                        <>
+                            <div className="hidden h-12 w-px bg-white/15 md:block" />
+                            <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
+                                {media.platforms.map((platform) => (
+                                    <img
+                                        key={platform.ID}
+                                        src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
+                                        alt={platform.name}
+                                        className="h-8 w-8 rounded object-contain"
+                                    />
+                                ))}
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
+        </div>
+    );
+}
+
+type ActionButtonProps = {
+    label: string;
+    color: string;
+    icon: string;
+};
+
+function ActionButton({ label, color, icon }: ActionButtonProps) {
+    return (
+        <div className="flex flex-col items-center gap-2">
+            <button
+                type="button"
+                disabled
+                className="flex h-13 w-13 items-center justify-center rounded-full border-2 text-xl md:h-12 md:w-12"
+                style={{ borderColor: color, color }}
+            >
+                {icon}
+            </button>
+            <span className="hidden text-sm text-white/60 md:block">{label}</span>
         </div>
     );
 }
