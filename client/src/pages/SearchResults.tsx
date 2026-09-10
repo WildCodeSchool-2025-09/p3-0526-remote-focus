@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
+//a voir avec les composants extérieur
+import MediaList from "../components/MediaList";
+import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
 import { searchMedias } from "../services/api";
 import type { SearchResults as SearchResultsType } from "../types/Media";
-//a voir avec les composants extérieur
-import MediaList from "../components/MediaList";
-import SearchBar from "../components/SearchBar";
-
 
 const DEBOUNCE_DELAY_MS = 400;
 const MIN_QUERY_LENGTH = 2;
@@ -22,7 +21,7 @@ const emptyResults: SearchResultsType = {
 
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
+  const { searchQuery, setSearchQuery } = useSearch();
   const [searchResults, setSearchResults] =
     useState<SearchResultsType>(emptyResults);
   const [loading, setLoading] = useState(false);
@@ -30,6 +29,14 @@ const SearchResults = () => {
 
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate le contexte depuis l'URL une seule fois au montage, pas à chaque frappe
+  useEffect(() => {
+    const queryFromUrl = searchParams.get("q");
+    if (queryFromUrl && queryFromUrl !== searchQuery) {
+      setSearchQuery(queryFromUrl);
+    }
+  }, []);
 
   useEffect(() => {
     setSearchParams(trimmedQuery ? { q: trimmedQuery } : {}, { replace: true });
@@ -67,7 +74,7 @@ const SearchResults = () => {
     };
   }, [trimmedQuery]);
 
-    const hasResults =
+  const hasResults =
     searchResults.films.length > 0 ||
     searchResults.series.length > 0 ||
     searchResults.animes.length > 0 ||
@@ -77,19 +84,20 @@ const SearchResults = () => {
     <div className="min-h-screen bg-base-100 p-8 space-y-6">
       <h1>Recherche</h1>
 
-      <SearchBar value={searchQuery} onChange={setSearchQuery} />
-
       {loading && <span className="loading loading-spinner text-primary" />}
 
       {!loading && error && (
         <p className="text-error">Une erreur est survenue, réessayez.</p>
       )}
 
-      {!loading && !error && trimmedQuery.length >= MIN_QUERY_LENGTH && !hasResults && (
-        <p className="text-focus-muted">
-          Aucun résultat trouvé pour « {trimmedQuery} ».
-        </p>
-      )}
+      {!loading &&
+        !error &&
+        trimmedQuery.length >= MIN_QUERY_LENGTH &&
+        !hasResults && (
+          <p className="text-focus-muted">
+            Aucun résultat trouvé pour « {trimmedQuery} ».
+          </p>
+        )}
 
       {!loading && !error && hasResults && (
         <div className="space-y-8">

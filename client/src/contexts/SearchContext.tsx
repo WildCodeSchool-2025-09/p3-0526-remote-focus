@@ -6,9 +6,7 @@ type SearchContextValue = {
   setSearchQuery: (value: string) => void;
 };
 
-const SearchContext = createContext<SearchContextValue | undefined>(
-  undefined,
-);
+const SearchContext = createContext<SearchContextValue | undefined>(undefined);
 
 const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchQuery, setSearchQuery] = useState("");
