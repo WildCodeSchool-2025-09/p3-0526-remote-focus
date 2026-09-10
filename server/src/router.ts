@@ -8,9 +8,9 @@ const router = express.Router();
 
 // Define item-related routes
 /* import itemActions from "./modules/item/itemActions.old";*/
-import CatalogActions from "./modules/Catalog/CatalogActions";
+import catalogActions from "./modules/catalog/catalogActions";
 
-router.get("/api/medias/discover", CatalogActions.readDiscoverSections);
+router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 
 /*
 router.get("/api/items", itemActions.browse);

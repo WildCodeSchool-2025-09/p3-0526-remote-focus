@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 
-import CatalogRepository from "./CatalogRepository";
-import UserRepository from "../User/UserRepository";
+import catalogRepository from "./catalogRepository";
+import userRepository from "../user/userRepository";
 import type { Media, EnrichedMedia } from "../../types/Media/Media.types";
 
 const isMediaNew = (releasedAt: Date | string | null): boolean => {
@@ -31,7 +31,7 @@ const enrichRanking = (medias: Media[]): EnrichedMedia[] => {
       topRank = "top10";
     }
 
-    const isNew = isMediaNew(media.released_at);
+    const isNew = isMediaNew(media.releasedAt);
 
     return { ...media, topRank, isNew };
   });
@@ -57,15 +57,15 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
 
     const userId = req.user?.id;
 
-    const topRated = await CatalogRepository.readTopRated(type);
+    const topRated = await catalogRepository.readTopRated(type);
 
-    const newReleases = await CatalogRepository.readLatest30Days(type);
+    const newReleases = await catalogRepository.readLatest30Days(type);
 
-    const likedGenres = await UserRepository.readRandomGenres(userId);
+    const likedGenres = await userRepository.readRandomGenres(userId);
 
     const topGenres = await Promise.all(
       likedGenres.map((likedGenre) =>
-        CatalogRepository.readTopByGenre(likedGenre.ID_genre, type),
+        catalogRepository.readTopByGenre(likedGenre.id, type),
       ),
     );
 
@@ -74,18 +74,18 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
     const genreSections = likedGenres.map((likedGenre, index) => {
       const medias = topGenres[index].map((media) => {
         const rankedMedia = enrichedTopRated.find(
-          (rankedMedia) => rankedMedia.ID === media.ID,
+          (rankedMedia) => rankedMedia.id === media.id,
         );
 
         return {
           ...media,
           topRank: rankedMedia ? rankedMedia.topRank : null,
-          isNew: isMediaNew(media.released_at),
+          isNew: isMediaNew(media.releasedAt),
         };
       });
 
       return {
-        id: likedGenre.ID_genre,
+        id: likedGenre.id,
         name: likedGenre.name,
         medias,
       };

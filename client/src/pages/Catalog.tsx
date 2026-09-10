@@ -3,6 +3,7 @@ import fetchDiscover from "../services/catalogService";
 import type { DiscoverResponse } from "../types/Catalog";
 import { useSearchParams } from "react-router";
 import Carousel from "../components/Carousel";
+import MediaCard from "../components/MediaCard";
 
 function Catalog() {
   const [searchParams] = useSearchParams();
@@ -29,21 +30,34 @@ function Catalog() {
     <>
       <h1>Catalogue</h1>
       {console.log(discover)}
-      {discover ? <p>{discover.latest[0].ID}</p> : <p>Chargement ...</p>}
-      <Carousel>
-        <div className="catalog-carousel-item">Carte 1</div>
-        <div className="catalog-carousel-item">Carte 2</div>
-        <div className="catalog-carousel-item">Carte 3</div>
-        <div className="catalog-carousel-item">Carte 4</div>
-        <div className="catalog-carousel-item">Carte 5</div>
-        <div className="catalog-carousel-item">Carte 6</div>
-        <div className="catalog-carousel-item">Carte 1</div>
-        <div className="catalog-carousel-item">Carte 2</div>
-        <div className="catalog-carousel-item">Carte 3</div>
-        <div className="catalog-carousel-item">Carte 4</div>
-        <div className="catalog-carousel-item">Carte 5</div>
-        <div className="catalog-carousel-item">Carte 6</div>
-      </Carousel>
+      <h2>Populaires</h2>
+      {discover ? (
+        <Carousel>
+          {discover?.topRated.map((media) => (
+            <MediaCard
+              key={media.id}
+              media={media}
+              className="catalog-carousel-item"
+            />
+          ))}
+        </Carousel>
+      ) : (
+        <p>Chargement ...</p>
+      )}
+      <h2>Nouveautés</h2>
+      {discover ? (
+        <Carousel>
+          {discover?.topRated.map((media) => (
+            <MediaCard
+              key={media.id}
+              media={media}
+              className="catalog-carousel-item"
+            />
+          ))}
+        </Carousel>
+      ) : (
+        <p>Chargement ...</p>
+      )}
     </>
   );
 }

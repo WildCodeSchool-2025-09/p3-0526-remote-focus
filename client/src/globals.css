@@ -114,11 +114,11 @@
   }
 
   .carousel-container {
-    @apply carousel carousel-start gap-4 w-full py-2 scrollbar-none;
+    @apply carousel carousel-start gap-4 py-2 scrollbar-none;
   }
 
   .catalog-carousel-item {
-    @apply carousel-item w-40 shrink-0;
+    @apply carousel-item w-40 shrink-0 card;
   }
 
   .carousel-nav {

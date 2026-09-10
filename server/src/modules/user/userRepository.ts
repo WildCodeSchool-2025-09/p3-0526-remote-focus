@@ -11,22 +11,22 @@ class UserRepository {
 
     if (userId != null) {
       [rows] = await databaseClient.query<LikedGenre[]>(
-        "SELECT ID_genre, genre.name FROM like_ JOIN genre ON genre.ID = like_.ID_genre WHERE like_.ID_user = ? ORDER BY RAND() LIMIT ?",
+        "SELECT like_.ID_genre AS id, genre.name FROM like_ JOIN genre ON genre.ID = like_.ID_genre WHERE like_.ID_user = ? ORDER BY RAND() LIMIT ?",
         [userId, count],
       );
     }
 
     if (rows.length < count) {
-      const excludedIds = rows.map((row) => row.ID_genre);
+      const excludedIds = rows.map((row) => row.id);
 
       const [userGenres] =
         excludedIds.length > 0
           ? await databaseClient.query<LikedGenre[]>(
-              "SELECT ID AS ID_genre, name FROM genre WHERE ID NOT IN (?) ORDER BY RAND() LIMIT ?",
+              "SELECT ID AS id, name FROM genre WHERE ID NOT IN (?) ORDER BY RAND() LIMIT ?",
               [excludedIds, count - rows.length],
             )
           : await databaseClient.query<LikedGenre[]>(
-              "SELECT ID AS ID_genre, name FROM genre ORDER BY RAND() LIMIT ?",
+              "SELECT ID AS id, name FROM genre ORDER BY RAND() LIMIT ?",
               [count - rows.length],
             );
       rows = [...rows, ...userGenres];
