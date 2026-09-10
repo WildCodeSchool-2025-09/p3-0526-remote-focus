@@ -1,7 +1,8 @@
-// Import necessary modules from React and React Router
-import SearchResults from "./pages/SearchResults";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { SearchProvider } from "./contexts/SearchContext";
+// Import necessary modules from React and React Router
+import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
 import Calendar from "./pages/Calendar";
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
         element: <Catalog />,
       },
       {
-        path: "/search",
+        path: "search",
         element: <SearchResults />,
       },
       {
@@ -54,7 +55,11 @@ if (rootElement == null) {
 }
 
 // Render the app inside the root element
-createRoot(rootElement).render(<RouterProvider router={router} />);
+createRoot(rootElement).render(
+  <SearchProvider>
+    <RouterProvider router={router} />
+  </SearchProvider>,
+);
 
 /**
  * Helpful Notes:
