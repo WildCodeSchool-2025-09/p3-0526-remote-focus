@@ -1,4 +1,4 @@
-import type { Media, EnrichedMedia } from "../Media/Media.types";
+import type { EnrichedMedia, Media } from "../Media/Media.types";
 
 export type GenreSection = {
   id: number;
