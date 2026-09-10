@@ -18,12 +18,10 @@ interface PersonDto {
 }
 
 export interface SearchResult {
-  results: {
-    movies: MediaDto[];
-    series: MediaDto[];
-    animes: MediaDto[];
-    actors: PersonDto[];
-  };
+  films: MediaDto[];
+  series: MediaDto[];
+  animes: MediaDto[];
+  actors: PersonDto[];
   hasMore: boolean;
 }
 
@@ -41,7 +39,7 @@ export async function browseResults(
     countMediaByTitle(q, type),
   ]);
 
-  const movies: MediaDto[] = [];
+  const films: MediaDto[] = [];
   const series: MediaDto[] = [];
   const animes: MediaDto[] = [];
 
@@ -55,7 +53,7 @@ export async function browseResults(
 
     // is_anime prime sur type : un anime reste un anime, qu'il soit "movie" ou "series"
     if (row.is_anime) animes.push(dto);
-    else if (row.type === "movie") movies.push(dto);
+    else if (row.type === "movie") films.push(dto);
     else if (row.type === "series") series.push(dto);
   }
 
@@ -66,7 +64,10 @@ export async function browseResults(
   }));
 
   return {
-    results: { movies, series, animes, actors },
+    films,
+    series,
+    animes,
+    actors,
     hasMore: offset + mediaRows.length < totalMedia,
   };
 }
