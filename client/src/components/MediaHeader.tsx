@@ -8,6 +8,8 @@ type MediaHeaderProps = {
 };
 
 const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
+const PILL_ACTIVE =
+    "rounded-full border border-[#F2B705] bg-[#F2B705] px-4 py-2 text-sm font-semibold text-[#0D1117]";
 
 function MediaHeader({ media }: MediaHeaderProps) {
     const year = media.releasedAt
@@ -21,21 +23,21 @@ function MediaHeader({ media }: MediaHeaderProps) {
     };
 
     return (
-        <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+        <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
             {media.poster != null && (
                 <img
                     src={`https://image.tmdb.org/t/p/w500${media.poster}`}
                     alt={media.name}
-                    className="h-48 w-32 shrink-0 rounded-lg object-cover md:h-[396px] md:w-[264px]"
+                    className="col-start-1 row-start-1 h-48 w-32 rounded-lg object-cover md:row-span-2 md:h-[396px] md:w-[264px]"
                 />
             )}
 
-            <div className="flex min-w-0 flex-1 flex-col gap-4">
+            <div className="col-start-2 row-start-1 flex min-w-0 flex-col gap-3 md:gap-4">
                 <h1 className="text-2xl font-bold md:text-4xl">{media.name}</h1>
 
                 <div className="flex flex-wrap items-center gap-2">
                     {media.genres.map((genre) => (
-                        <span key={genre.ID} className={PILL}>
+                        <span key={genre.ID} className={PILL_ACTIVE}>
                             {genre.name}
                         </span>
                     ))}
@@ -46,7 +48,7 @@ function MediaHeader({ media }: MediaHeaderProps) {
                         onClick={handleToggleMeta}
                         aria-expanded={isMetaOpen}
                         aria-label="Afficher plus d'informations"
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
                         style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
                     >
                         {isMetaOpen ? "⌃" : "⌄"}
@@ -71,14 +73,16 @@ function MediaHeader({ media }: MediaHeaderProps) {
                         )}
                     </div>
                 </div>
+            </div>
 
+            <div className="col-span-2 row-start-2 flex flex-col gap-4 md:col-span-1 md:col-start-2">
                 <MediaInfo media={media} />
 
-                <div className="mt-1 flex flex-wrap items-start gap-4">
-                    <ActionButton label="Favoris" color="#E83658" icon="♥" />
+                <div className="flex flex-wrap items-start gap-4">
+                    <ActionButton label="Favoris" color="#E83658" icon="♡" />
                     <ActionButton label="Watchlist" color="#F5F5F0" icon="+" />
                     <ActionButton label="Vu" color="#17B890" icon="✓" />
-                    <ActionButton label="Noter" color="#F2B705" icon="★" />
+                    <ActionButton label="Noter" color="#F2B705" icon="☆" />
 
                     {media.platforms.length > 0 && (
                         <>

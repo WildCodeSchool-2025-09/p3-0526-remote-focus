@@ -42,7 +42,7 @@ function MovieDetail() {
     }
 
     return (
-        <div className="min-h-screen space-y-8 bg-base-100 p-4 md:p-8">
+        <div className="min-h-screen w-full min-w-0 space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
             <Breadcrumb currentLabel={mediaDetail.name} />
             <MediaHeader media={mediaDetail} />
             <CastList

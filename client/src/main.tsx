@@ -35,12 +35,13 @@ const router = createBrowserRouter([
         path: "*",
         element: <NotFound />,
       },
+      {
+        path: "movies/:id",
+        element: <MovieDetail />,
+      },
     ],
   },
-  {
-    path: "/movies/:id",
-    element: <MovieDetail />,
-  },
+
   // Try adding a new route! For example, "/about" with an About component
 ]);
 

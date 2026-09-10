@@ -21,7 +21,7 @@ function CastList({
     const remaining = castTotal - cast.length;
 
     return (
-        <section className="flex flex-col gap-4">
+        <section className="relative flex min-w-0 flex-col gap-4">
             <h2 className="text-xl font-bold md:text-2xl">
                 Comédiens &amp; personnages
             </h2>
@@ -47,6 +47,8 @@ function CastList({
                     </div>
                 )}
             </div>
+
+            <div className="pointer-events-none absolute bottom-0 right-0 top-12 w-16 bg-gradient-to-l from-[#0D1117] to-transparent" />
         </section>
     );
 }
