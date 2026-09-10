@@ -10,7 +10,7 @@ function MediaCard({ media, className }: MediaCardProps) {
   return (
     <div className={className}>
       <img
-        src={`https://image.tmdb.org/t/p/w154/${media.poster}`}
+        src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
         alt={`${media.name} poster`}
         className="rounded-box"
       />
