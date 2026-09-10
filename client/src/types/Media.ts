@@ -1,3 +1,4 @@
+//voir le typage de Media avec la cardMedia d'alex
 type Media = {
   id: number;
   name: string;

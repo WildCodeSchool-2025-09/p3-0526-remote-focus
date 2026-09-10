@@ -1,0 +1,105 @@
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+
+import useDebounce from "../hooks/useDebounce";
+import { searchMedias } from "../services/api";
+import type { SearchResults as SearchResultsType } from "../types/Media";
+//a voir avec les composants extérieur
+import MediaList from "../components/MediaList";
+import SearchBar from "../components/SearchBar";
+
+
+const DEBOUNCE_DELAY_MS = 400;
+const MIN_QUERY_LENGTH = 2;
+
+const emptyResults: SearchResultsType = {
+  films: [],
+  series: [],
+  animes: [],
+  actors: [],
+  hasMore: false,
+};
+
+const SearchResults = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
+  const [searchResults, setSearchResults] =
+    useState<SearchResultsType>(emptyResults);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
+  const trimmedQuery = debouncedQuery.trim();
+
+  useEffect(() => {
+    setSearchParams(trimmedQuery ? { q: trimmedQuery } : {}, { replace: true });
+  }, [trimmedQuery, setSearchParams]);
+
+  useEffect(() => {
+    if (trimmedQuery.length < MIN_QUERY_LENGTH) {
+      setSearchResults(emptyResults);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
+
+    searchMedias(trimmedQuery)
+      .then((results) => {
+        if (!cancelled) {
+          setSearchResults(results);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [trimmedQuery]);
+
+    const hasResults =
+    searchResults.films.length > 0 ||
+    searchResults.series.length > 0 ||
+    searchResults.animes.length > 0 ||
+    searchResults.actors.length > 0;
+
+  return (
+    <div className="min-h-screen bg-base-100 p-8 space-y-6">
+      <h1>Recherche</h1>
+
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+
+      {loading && <span className="loading loading-spinner text-primary" />}
+
+      {!loading && error && (
+        <p className="text-error">Une erreur est survenue, réessayez.</p>
+      )}
+
+      {!loading && !error && trimmedQuery.length >= MIN_QUERY_LENGTH && !hasResults && (
+        <p className="text-focus-muted">
+          Aucun résultat trouvé pour « {trimmedQuery} ».
+        </p>
+      )}
+
+      {!loading && !error && hasResults && (
+        <div className="space-y-8">
+          <MediaList title="Films" medias={searchResults.films} />
+          <MediaList title="Séries" medias={searchResults.series} />
+          <MediaList title="Animés" medias={searchResults.animes} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SearchResults;

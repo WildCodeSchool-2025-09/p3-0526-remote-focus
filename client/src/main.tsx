@@ -1,4 +1,5 @@
 // Import necessary modules from React and React Router
+import SearchResults from "./pages/SearchResults";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import "./globals.css";
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
         element: <Catalog />,
       },
       {
+        path: "/search",
+        element: <SearchResults />,
+      },
+      {
         path: "calendar",
         element: <Calendar />,
       },
@@ -36,6 +41,8 @@ const router = createBrowserRouter([
       },
     ],
   },
+
+  // Try adding a new route! For example, "/about" with an About component
 ]);
 
 /* ************************************************************************* */
