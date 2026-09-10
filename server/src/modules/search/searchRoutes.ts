@@ -1,5 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
+import type { SearchResult } from "./searchActions";
 import { browseResults } from "./searchActions";
+
+// En dessous de ce nombre de caractères, on ne lance pas de requête SQL
+const MIN_QUERY_LENGTH = 2;
+
+const emptyResult: SearchResult = {
+  films: [],
+  series: [],
+  animes: [],
+  actors: [],
+  hasMore: false,
+};
 
 export async function browse(
   req: Request,
@@ -11,8 +23,8 @@ export async function browse(
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 20;
 
-  if (!q) {
-    res.status(400).json({ error: "Le paramètre q est requis" });
+  if (!q || q.length < MIN_QUERY_LENGTH) {
+    res.status(200).json(emptyResult);
     return;
   }
 
