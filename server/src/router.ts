@@ -5,7 +5,7 @@ const router = express.Router();
 /* ************************************************************************* */
 // Define Your API Routes Here
 /* ************************************************************************* */
-router.get("/api/search", searchRoutes.browse);
+router.get("/api/medias/search", searchRoutes.browse);
 
 // Define item-related routes
 /* import itemActions from "./modules/item/itemActions.old";*/
