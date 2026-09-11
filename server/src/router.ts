@@ -1,8 +1,11 @@
 import express from "express";
+import { verifyToken } from "./middlewares/verifyToken";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
+import genreActions from "./modules/genre/genreActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
+import userActions from "./modules/user/userActions";
 
 const router = express.Router();
 
@@ -11,6 +14,9 @@ const router = express.Router();
 /* ************************************************************************* */
 router.post("/api/auth/register", authActions.register);
 router.post("/api/auth/login", authActions.login);
+
+router.get("/api/genres", genreActions.browse);
+router.post("/api/me/preferences", verifyToken, userActions.savePreferences);
 
 router.get("/api/medias/search", searchRoutes.browse);
 

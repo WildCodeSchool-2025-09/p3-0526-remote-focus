@@ -1,6 +1,6 @@
 import type { SearchResults } from "../types/Search";
 import type { User } from "../types/User";
-import type { FilmographyItem, Media } from "../types/media";
+import type { FilmographyItem, Genre, Media } from "../types/media";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
@@ -92,4 +92,32 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
   });
 
   return handleAuthResponse(response);
+}
+
+export async function fetchGenres(): Promise<Genre[]> {
+  const response = await fetch(`${API_URL}/api/genres`);
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer les genres");
+  }
+
+  return response.json();
+}
+
+export async function saveGenrePreferences(
+  genreIds: number[],
+  token: string,
+): Promise<void> {
+  const response = await fetch(`${API_URL}/api/me/preferences`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ genreIds }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible d'enregistrer vos préférences");
+  }
 }

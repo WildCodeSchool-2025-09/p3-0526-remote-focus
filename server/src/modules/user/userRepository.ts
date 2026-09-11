@@ -33,6 +33,30 @@ class UserRepository {
     }
     return rows;
   }
+
+  async addGenrePreferences(userId: number, genreIds: number[]) {
+    if (genreIds.length === 0) {
+      return;
+    }
+
+    const values = genreIds.map((genreId) => [userId, genreId]);
+
+    await databaseClient.query(
+      "INSERT IGNORE INTO like_ (ID_user, ID_genre) VALUES ?",
+      [values],
+    );
+  }
+
+  async readPreferences(userId: number) {
+    const [rows] = await databaseClient.query<LikedGenre[]>(
+      `SELECT genre.ID AS id, genre.name
+       FROM like_
+       JOIN genre ON genre.ID = like_.ID_genre
+       WHERE like_.ID_user = ?`,
+      [userId],
+    );
+    return rows;
+  }
 }
 
 export default new UserRepository();

@@ -13,6 +13,7 @@ import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
+import Preferences from "./pages/Preferences";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 
@@ -48,6 +49,14 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <Register />,
+      },
+      {
+        path: "preferences",
+        element: (
+          <PrivateRoute>
+            <Preferences />
+          </PrivateRoute>
+        ),
       },
       {
         path: "login",
