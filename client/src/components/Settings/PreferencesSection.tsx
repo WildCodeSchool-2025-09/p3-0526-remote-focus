@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import { updatePegiFilter } from "../../services/api";
 
 type PreferencesSectionProps = {
@@ -8,6 +9,7 @@ type PreferencesSectionProps = {
 
 function PreferencesSection({ initialIsPegi16 }: PreferencesSectionProps) {
   const { token, updateUser } = useAuth();
+  const { isDarkTheme } = useTheme();
   const [draftIsPegi16, setDraftIsPegi16] = useState(initialIsPegi16);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +54,7 @@ function PreferencesSection({ initialIsPegi16 }: PreferencesSectionProps) {
           <input
             type="checkbox"
             className="toggle toggle-primary"
-            checked
+            checked={isDarkTheme}
             disabled
             readOnly
             aria-label="Thème sombre"

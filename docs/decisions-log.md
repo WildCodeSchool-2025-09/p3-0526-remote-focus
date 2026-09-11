@@ -803,3 +803,38 @@ favori/watchlist avant l'activation — visiteur non connecté jamais filtré, c
 qui réapparaît à la désactivation, 401 sans token et 400 sur payload invalide sur
 la route de toggle. Utilisateurs de test nettoyés après coup ; base partagée
 vérifiée à 0 utilisateur restant après cette phase.
+
+## US-PRO-11
+
+**US-PRO-11 — Mécanisme calqué sur ce que l'équipe avait déjà anticipé** :
+`tailwind.config.js` contenait déjà un commentaire explicite ("Quand le thème clair
+arrivera... il suffira d'ajouter un objet 'focus-light'... et de basculer l'attribut
+`data-theme` sur `<html>`") et `index.html` a déjà `data-theme="focus"` en dur. Le
+nouveau `ThemeContext` (`client/src/contexts/ThemeContext.tsx`, même structure que
+`AuthContext` : provider + hook `useTheme` dans un seul fichier) applique cet
+attribut dynamiquement (`"focus"` / `"focus-light"`) et persiste le choix à la fois
+en `localStorage` (visiteur) et via `PATCH /api/me/theme` → `user_.dark_theme`
+(utilisateur connecté). Le thème `"focus-light"` n'existe pas encore dans
+`tailwind.config.js` — bascule vers ce thème actuellement sans effet visuel
+(DaisyUI retombe sur ses valeurs par défaut), sans impact pratique puisque le
+toggle reste non interactif dans l'UI (cf. ci-dessous).
+
+**US-PRO-11 — Toggle "Thème sombre" reste `disabled` dans `PreferencesSection`**,
+conforme à la carte ("le toggle est affiché mais désactivé, avec la mention 'Non
+disponible'"). Il reflète toutefois la vraie valeur de `useTheme().isDarkTheme`
+(plutôt qu'un `checked` figé en dur) : mécanique complète en place, seule
+l'interaction utilisateur est coupée pour l'instant.
+
+**US-PRO-11 — Persistance double (localStorage + backend)** : un visiteur non
+connecté garde son choix de thème d'une visite à l'autre via `localStorage` (aucun
+compte pour stocker `dark_theme`) ; un utilisateur connecté voit son choix
+synchronisé sur son compte (`dark_theme` déjà présent sur `user_`, défaut `TRUE`
+= sombre). Au login, le thème du compte prime sur celui éventuellement stocké en
+local (cohérent avec le fait que le compte est la source de vérité une fois connecté).
+
+Testé en réel : `PATCH /api/me/theme` avec `true`/`false` (200, valeur reflétée dans
+la réponse), 401 sans token, 400 sur payload invalide. Frontend vérifié par
+transformation Vite sans erreur sur `ThemeContext.tsx`, `main.tsx` et
+`PreferencesSection.tsx` (pas de vérification visuelle en navigateur, comme pour
+US-PRO-07 — aucun outil de navigation automatisée disponible dans cette session).
+Utilisateur de test nettoyé après coup.

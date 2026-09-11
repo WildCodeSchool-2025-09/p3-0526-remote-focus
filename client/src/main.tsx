@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 // Import necessary modules from React and React Router
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
@@ -134,9 +135,11 @@ if (rootElement == null) {
 // Render the app inside the root element
 createRoot(rootElement).render(
   <AuthProvider>
-    <SearchProvider>
-      <RouterProvider router={router} />
-    </SearchProvider>
+    <ThemeProvider>
+      <SearchProvider>
+        <RouterProvider router={router} />
+      </SearchProvider>
+    </ThemeProvider>
   </AuthProvider>,
 );
 

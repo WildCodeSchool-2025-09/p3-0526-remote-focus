@@ -54,6 +54,13 @@ class UserRepository {
     return Boolean(rows[0]?.is_pegi16);
   }
 
+  async updateDarkTheme(userId: number, darkTheme: boolean) {
+    await databaseClient.query("UPDATE user_ SET dark_theme = ? WHERE ID = ?", [
+      darkTheme,
+      userId,
+    ]);
+  }
+
   async readRandomGenres(
     userId: number | undefined,
     count = 3,

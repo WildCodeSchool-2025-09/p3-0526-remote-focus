@@ -416,6 +416,28 @@ export async function updatePegiFilter(
   return response.json();
 }
 
+export async function updateTheme(
+  darkTheme: boolean,
+  token: string,
+): Promise<User> {
+  const response = await fetch(`${API_URL}/api/me/theme`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ darkTheme }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(
+        response,
+        "Impossible de mettre à jour le thème",
+      ),
+    );
+  }
+
+  return response.json();
+}
+
 export async function uploadAvatar(file: File, token: string): Promise<User> {
   const formData = new FormData();
   formData.append("avatar", file);

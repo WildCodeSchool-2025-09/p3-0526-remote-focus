@@ -36,6 +36,7 @@ router.patch(
   userActions.uploadAvatar,
 );
 router.patch("/api/me/pegi-filter", verifyToken, userActions.updatePegiFilter);
+router.patch("/api/me/theme", verifyToken, userActions.updateTheme);
 
 router.get("/api/medias/search", optionalAuth, searchRoutes.browse);
 
