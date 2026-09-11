@@ -37,9 +37,13 @@ function SeasonDetail() {
           setSeasonDetail(data);
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (active) {
-          setError("Cette saison est introuvable.");
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Cette saison est introuvable.",
+          );
         }
       })
       .finally(() => {

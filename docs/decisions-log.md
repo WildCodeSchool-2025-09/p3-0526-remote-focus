@@ -765,16 +765,14 @@ actif, même si l'utilisateur l'a lui-même ajouté avant d'activer le filtre �
 littérale retenue plutôt qu'une exception "mes propres choix restent visibles", qui
 n'est écrite nulle part dans la carte.
 
-**US-PRO-10 — Détection d'un accès direct aux fiches détail non traitée ici** : la
-carte scope explicitement le filtre aux pages/sections qui LISTENT des médias, pas
-à l'accès direct à une fiche (US-DET-01 à 07) via son URL. Un utilisateur avec le
-filtre actif peut donc toujours ouvrir directement la fiche d'un média 16+ (il n'est
-juste plus listé nulle part). Note pour la suite : le fichier de convention de
-nommage partagé par l'équipe (carte Trello "Convention de nommage") documente un
-code retour `403` explicitement prévu pour "interdit (PEGI, média non vu)" — un
-futur US pourrait donc vouloir bloquer l'accès direct en 403, mais ce n'est écrit
-dans aucune carte US actuelle : non implémenté, à netraiter que si une US le demande
-explicitement.
+**US-PRO-10 — [SUPERSEDÉ, voir addendum ci-dessous] Détection d'un accès direct aux
+fiches détail** : au moment du premier passage sur cette US, la carte semblait
+scoper le filtre aux pages/sections qui LISTENT des médias, sans traiter l'accès
+direct à une fiche via son URL — non implémenté à ce stade, avec une note sur le
+code `403` documenté dans la convention de nommage de l'équipe pour ce cas
+("interdit (PEGI, média non vu)"). Clarification produit reçue le 2026-09-11 :
+l'accès direct DOIT aussi être bloqué pour un utilisateur connecté avec le filtre
+actif — voir l'addendum "US-PRO-10 (suite)" plus bas pour l'implémentation.
 
 **US-PRO-10 — Utilitaire `applyPegiFilter.ts` extrait dans `server/src/utils/`**
 (`pegiFilterClause(alias)` + constante `PEGI16_VALUES` partagée) après avoir
@@ -803,6 +801,60 @@ favori/watchlist avant l'activation — visiteur non connecté jamais filtré, c
 qui réapparaît à la désactivation, 401 sans token et 400 sur payload invalide sur
 la route de toggle. Utilisateurs de test nettoyés après coup ; base partagée
 vérifiée à 0 utilisateur restant après cette phase.
+
+### US-PRO-10 (suite, 2026-09-11) — Blocage de l'accès direct + confirmation visiteur
+
+**Clarification produit reçue** : le filtre PEGI doit aussi bloquer l'accès direct
+par URL à une fiche détail 16+/18 (film, série, saison, épisode) pour un
+utilisateur connecté avec le filtre actif — pas seulement l'exclure des listes.
+Et confirmation explicitement demandée : un visiteur non connecté ne doit jamais
+être filtré, ni sur les listes ni sur les fiches détail.
+
+**Implémentation** : chaque route de lecture de fiche détail
+(`GET /api/medias/:id`, `/api/series/:id`, `/api/series/:serieId/seasons/:seasonId`,
+`/api/series/:serieId/seasons/:seasonId/episodes/:episodeId`) vérifie, juste après
+avoir chargé la ressource et confirmé qu'elle existe : si `req.user` est présent
+(connecté) ET que le PEGI du média concerné est `'16'` ou `'18'` ET que
+`is_pegi16` de cet utilisateur est actif → réponse `403` (pas de corps), sans
+exécuter le reste des requêtes de la page (cast, plateformes, etc.). Nouvelle
+fonction `isPegiRestricted(pegi)` ajoutée à `applyPegiFilter.ts`, réutilisée ici
+comme dans les clauses SQL des listes. Saison et épisode n'ayant pas de colonne
+`pegi` propre, `seasonRepository.read`/`episodeRepository.read` remontent
+désormais aussi `m.pegi AS seriesPegi` (le PEGI du média parent) dans leur
+`SELECT` existant — aucune requête supplémentaire.
+
+Code retour `403` choisi en cohérence avec le fichier de convention de nommage de
+l'équipe, qui le réserve explicitement à ce cas ("interdit (PEGI, média non vu)").
+
+**Confirmation du comportement visiteur** : aucun changement de code nécessaire
+côté visiteur — `userId` (`req.user?.id`) est toujours `undefined` sans token
+valide (aucune des routes de liste ni de détail ne force l'authentification), donc
+la condition `userId != null` est déjà fausse pour tout visiteur, sur les listes
+comme sur les fiches détail. Vérifié en réel (voir tests ci-dessous) plutôt que
+supposé correct.
+
+**Frontend — messages d'erreur distingués** : `fetchMedia`/`fetchSeries`/
+`fetchSeason`/`fetchEpisode` (`client/src/services/api.ts`) détectent désormais un
+`403` et lèvent un message dédié ("Ce contenu est masqué par votre filtre PEGI
+16+...") plutôt que le message générique "introuvable" — sans cela, un utilisateur
+bloqué par son propre filtre aurait vu un message laissant croire que le contenu
+n'existe pas. Les 4 pages détail (`MovieDetail`, `SerieDetail`, `SeasonDetail`,
+`EpisodeDetail`) affichent désormais `err.message` au lieu d'un texte figé.
+
+Testé en réel avec un utilisateur temporaire, un film PEGI 16, une série PEGI 18
+(saison + épisode inclus) et un contenu "sûr" (PEGI 12) :
+- **Visiteur (sans token)** : catalogue, recherche, ET accès direct aux 4 types de
+  fiche détail (film/série/saison/épisode 16+/18) → toujours 200, jamais filtré.
+- **Connecté, filtre désactivé par défaut** : accès direct au film 16+ → 200.
+- **Connecté, filtre activé** : accès direct au film 16+, à la série 18, à sa
+  saison et à son épisode → 403 sur les 4 ; le contenu "sûr" reste accessible en
+  200 pendant que le filtre est actif (pas de sur-blocage) ; un visiteur qui
+  consulte en parallèle le même film 16+ reste à 200 (le filtre est bien par
+  utilisateur, pas global).
+- **Connecté, filtre réactivé puis désactivé** : les 4 routes 16+/18 repassent à
+  200.
+Utilisateur de test nettoyé après coup ; base partagée revérifiée à 0 utilisateur
+restant.
 
 ## US-PRO-11
 

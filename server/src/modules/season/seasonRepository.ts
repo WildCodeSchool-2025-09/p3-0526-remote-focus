@@ -5,7 +5,7 @@ class SeasonRepository {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT s.ID, s.name, s.number, s.poster, s.released_at, s.synopsis, s.is_finished,
               m.ID AS mediaId, m.name AS seriesName, m.poster AS seriesPoster,
-              m.overall_rating AS seriesOverallRating
+              m.overall_rating AS seriesOverallRating, m.pegi AS seriesPegi
        FROM season AS s
        JOIN media AS m ON m.ID = s.ID_media
        WHERE s.ID = ?`,

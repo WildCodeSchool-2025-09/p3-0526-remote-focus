@@ -14,6 +14,9 @@ import type {
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
+const PEGI_BLOCKED_MESSAGE =
+  "Ce contenu est masqué par votre filtre PEGI 16+. Désactivez-le dans vos paramètres pour y accéder.";
+
 function authHeaders(token?: string): HeadersInit {
   return token != null ? { Authorization: `Bearer ${token}` } : {};
 }
@@ -22,6 +25,10 @@ export async function fetchMedia(id: number, token?: string): Promise<Media> {
   const response = await fetch(`${API_URL}/api/medias/${id}`, {
     headers: authHeaders(token),
   });
+
+  if (response.status === 403) {
+    throw new Error(PEGI_BLOCKED_MESSAGE);
+  }
 
   if (!response.ok) {
     throw new Error(`Média ${id} introuvable`);
@@ -34,6 +41,10 @@ export async function fetchSeries(id: number, token?: string): Promise<Series> {
   const response = await fetch(`${API_URL}/api/series/${id}`, {
     headers: authHeaders(token),
   });
+
+  if (response.status === 403) {
+    throw new Error(PEGI_BLOCKED_MESSAGE);
+  }
 
   if (!response.ok) {
     throw new Error(`Série ${id} introuvable`);
@@ -52,6 +63,10 @@ export async function fetchSeason(
     { headers: authHeaders(token) },
   );
 
+  if (response.status === 403) {
+    throw new Error(PEGI_BLOCKED_MESSAGE);
+  }
+
   if (!response.ok) {
     throw new Error(`Saison ${seasonId} introuvable`);
   }
@@ -69,6 +84,10 @@ export async function fetchEpisode(
     `${API_URL}/api/series/${seriesId}/seasons/${seasonId}/episodes/${episodeId}`,
     { headers: authHeaders(token) },
   );
+
+  if (response.status === 403) {
+    throw new Error(PEGI_BLOCKED_MESSAGE);
+  }
 
   if (!response.ok) {
     throw new Error(`Épisode ${episodeId} introuvable`);

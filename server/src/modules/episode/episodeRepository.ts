@@ -7,7 +7,7 @@ class EpisodeRepository {
               s.ID AS seasonId, s.name AS seasonName, s.number AS seasonNumber,
               s.poster AS seasonPoster,
               m.ID AS mediaId, m.name AS seriesName, m.poster AS seriesPoster,
-              m.overall_rating AS seriesOverallRating
+              m.overall_rating AS seriesOverallRating, m.pegi AS seriesPegi
        FROM episode AS e
        JOIN season AS s ON s.ID = e.ID_season
        JOIN media AS m ON m.ID = s.ID_media

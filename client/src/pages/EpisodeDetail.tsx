@@ -41,9 +41,11 @@ function EpisodeDetail() {
           setEpisodeDetail(data);
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (active) {
-          setError("Cet épisode est introuvable.");
+          setError(
+            err instanceof Error ? err.message : "Cet épisode est introuvable.",
+          );
         }
       })
       .finally(() => {

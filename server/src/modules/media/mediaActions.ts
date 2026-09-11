@@ -1,6 +1,8 @@
 import type { RequestHandler } from "express";
+import { isPegiRestricted } from "../../utils/applyPegiFilter";
 import trackRepository from "../track/trackRepository";
 import trackingRepository from "../tracking/trackingRepository";
+import userRepository from "../user/userRepository";
 import mediaRepository from "./mediaRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -20,6 +22,15 @@ const read: RequestHandler = async (req, res, next) => {
     }
 
     const userId = req.user?.id;
+
+    if (userId != null && isPegiRestricted(movie.pegi)) {
+      const hidePegi16 = await userRepository.readIsPegi16(userId);
+
+      if (hidePegi16) {
+        res.sendStatus(403);
+        return;
+      }
+    }
 
     const [genres, platforms, cast, castTotal, track, isWatched] =
       await Promise.all([

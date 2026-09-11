@@ -1,7 +1,9 @@
 import type { RequestHandler } from "express";
+import { isPegiRestricted } from "../../utils/applyPegiFilter";
 import mediaRepository from "../media/mediaRepository";
 import trackRepository from "../track/trackRepository";
 import trackingRepository from "../tracking/trackingRepository";
+import userRepository from "../user/userRepository";
 import seriesRepository from "./seriesRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -21,6 +23,15 @@ const read: RequestHandler = async (req, res, next) => {
     }
 
     const userId = req.user?.id;
+
+    if (userId != null && isPegiRestricted(series.pegi)) {
+      const hidePegi16 = await userRepository.readIsPegi16(userId);
+
+      if (hidePegi16) {
+        res.sendStatus(403);
+        return;
+      }
+    }
 
     const [
       genres,

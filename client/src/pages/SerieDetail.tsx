@@ -35,9 +35,11 @@ function SerieDetail() {
           setSeriesDetail(data);
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (active) {
-          setError("Cette série est introuvable.");
+          setError(
+            err instanceof Error ? err.message : "Cette série est introuvable.",
+          );
         }
       })
       .finally(() => {

@@ -34,9 +34,11 @@ function MovieDetail() {
           setMediaDetail(data);
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (active) {
-          setError("Ce film est introuvable.");
+          setError(
+            err instanceof Error ? err.message : "Ce film est introuvable.",
+          );
         }
       })
       .finally(() => {
