@@ -1,5 +1,6 @@
 import type { Format } from "../../types/Catalog";
 import type { Genre } from "../../types/media";
+import Carousel from "./Carousel";
 
 type FilterBarProps = {
   genres: Genre[];
@@ -40,30 +41,34 @@ function FilterBar({
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {genres.map((genre) => {
-          const isSelected = selectedGenres.includes(genre.id);
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <Carousel>
+            {genres.map((genre) => {
+              const isSelected = selectedGenres.includes(genre.id);
 
-          return (
-            <button
-              key={genre.id}
-              type="button"
-              onClick={() => onGenreToggle(genre.id)}
-              className={
-                isSelected
-                  ? "rounded-full bg-primary px-4 py-2 text-sm font-semibold text-base-100"
-                  : "rounded-full border border-base-content/30 px-4 py-2 text-sm"
-              }
-            >
-              {genre.name}
-            </button>
-          );
-        })}
+              return (
+                <button
+                  key={genre.id}
+                  type="button"
+                  onClick={() => onGenreToggle(genre.id)}
+                  className={
+                    isSelected
+                      ? "shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-base-100"
+                      : "shrink-0 rounded-full border border-base-content/30 px-4 py-2 text-sm"
+                  }
+                >
+                  {genre.name}
+                </button>
+              );
+            })}
+          </Carousel>
+        </div>
 
         {selectedGenres.length > 0 && (
           <button
             type="button"
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm shrink-0"
             onClick={onResetGenres}
           >
             Retour à la découverte

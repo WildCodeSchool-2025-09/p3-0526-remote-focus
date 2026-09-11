@@ -54,27 +54,29 @@ function MediaCard({ media, className }: MediaCardProps) {
 
   return (
     <div className={className}>
-      <Link to={getMediaPath(media.type, media.id)} className="relative block">
-        <MediaCardActions
-          mediaId={media.id}
-          mediaType={media.type}
-          initialIsWatched={media.isWatched}
-        />
-        {badgeLabel != null && (
-          <span
-            className={`badge absolute left-2 top-2 z-10 ${
-              media.topRank ? "badge-secondary" : "badge-accent"
-            }`}
-          >
-            {badgeLabel}
-          </span>
-        )}
-        <TypePictogram media={media} />
-        <img
-          src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
-          alt={`${media.name} poster`}
-          className="rounded-box"
-        />
+      <Link to={getMediaPath(media.type, media.id)} className="block">
+        <div className="relative">
+          <MediaCardActions
+            mediaId={media.id}
+            mediaType={media.type}
+            initialIsWatched={media.isWatched}
+          />
+          {badgeLabel != null && (
+            <span
+              className={`badge absolute left-2 top-2 z-10 ${
+                media.topRank ? "badge-secondary" : "badge-accent"
+              }`}
+            >
+              {badgeLabel}
+            </span>
+          )}
+          <TypePictogram media={media} />
+          <img
+            src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
+            alt={`${media.name} poster`}
+            className="rounded-box"
+          />
+        </div>
         <h4
           className="line-clamp-2 min-h-12 content-center"
           title={`${media.name}`}

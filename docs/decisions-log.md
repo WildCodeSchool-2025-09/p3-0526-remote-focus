@@ -32,22 +32,28 @@ de chaque point dans la section correspondante plus bas dans ce fichier.
   (`/actors/:id`) plutôt que d'ouvrir un panneau expansible inline — la maquette
   wireframe suggère un panneau inline ; l'implémentation actuelle est fonctionnelle et
   testée, non reconstruite (voir repasse visuelle ci-dessous).
-- **Repasse visuelle (2026-09-12)** : filtre de genre du Catalogue affiché à plat
-  (jusqu'à 27 pills, ~9 lignes sur mobile) — proposition de refonte documentée, non
-  implémentée. Bannière hero + bandeau CTA visiteur de l'Accueil absents (prévus par
-  la maquette wireframe). En-tête (barre de recherche + Connexion/Inscription) se
-  chevauche sous ~400px de large. Détail complet dans la section dédiée en fin de
-  fichier.
+- **Repasse visuelle (2026-09-12)** : filtre de genre du Catalogue — présentation
+  corrigée (défilement horizontal, mêmes flèches que les carrousels de médias),
+  mais le passage en sélection unique ("un seul genre actif à la fois", annoté par
+  le styleguide) reste une proposition ouverte, non implémentée (changerait le
+  contrat de l'API). Bannière hero + bandeau CTA visiteur de l'Accueil absents
+  (prévus par la maquette wireframe), non implémentés. En-tête (barre de recherche
+  + Connexion/Inscription) se chevauche sous ~400px de large, non résolu (un
+  correctif d'une ligne a été tenté puis reverté, aggravait le symptôme). Détail
+  complet dans la section dédiée en fin de fichier.
 
 ### Corrections apportées lors de la repasse visuelle du 2026-09-12
 
 Badges Nouveau/Top corrigés (mauvaises couleurs), tags PEGI retirés des cards
-Accueil/Catalogue et remplacés par le pictogramme de type prévu par le styleguide,
-boutons d'action des cards repassés en disposition verticale, icône Watchlist
-corrigée (+/− blanc cassé au lieu d'un signet jaune), biographie du comédien
-repositionnée à côté de la photo, 5ᵉ carte "En cours" ajoutée au dashboard Profil
-(gap de découvrabilité sur US-PRO-05, qui était sinon déjà terminée et testée).
-Détail complet plus bas.
+Accueil/Catalogue et remplacés par le pictogramme de type prévu par le styleguide
+(repositionné sur l'affiche après un premier essai mal placé), boutons d'action
+des cards repassés en disposition verticale avec un fond plein fixe par bouton
+(corail/blanc cassé/teal), icône Watchlist corrigée (+/− au lieu d'un signet
+jaune), biographie du comédien repositionnée à côté de la photo, filtre de genre
+du Catalogue passé en défilement horizontal (mêmes flèches que les carrousels de
+médias, une seule ligne au lieu de 3), 5ᵉ carte "En cours" ajoutée au dashboard
+Profil (gap de découvrabilité sur US-PRO-05, qui était sinon déjà terminée et
+testée). Détail complet plus bas.
 
 ---
 
@@ -1653,40 +1659,75 @@ déplacés dans un menu, plutôt qu'un correctif d'une ligne) — non traité ic
 ne pas se précipiter sur un correctif cosmétique qui masquerait le problème sans
 le régler.
 
-### 3. Constats documentés, non implémentés (nécessitent réflexion produit)
+### 3. Corrections supplémentaires (2026-09-12, suite à retour direct)
 
-**Filtre de genre du Catalogue — proposition de refonte.** Constat : la table
-`genre` contient 27 entrées (fusion des taxonomies TMDB film/série sans
-déduplication : "Action" et "Action & Adventure" coexistent, de même
-"Science-Fiction" et "Science-Fiction & Fantastique") ; affichées à plat
-(`flex-wrap`) dans `FilterBar.tsx`, elles remplissent la quasi-totalité de
-l'écran sur mobile avant tout contenu (9 lignes de pills capturées en réel avant
-la première card). La colorimétrie des pills elle-même est déjà conforme au
-styleguide (contour neutre au repos, plein jaune `#F2B705` pour l'actif) — le
-problème est uniquement la présentation/le nombre, pas la couleur.
+**Couleurs des boutons d'action des cards (favoris/watchlist/vu).** La première
+passe de la repasse visuelle (section 1 ci-dessus) avait corrigé l'icône et le
+sens de la couleur active de la watchlist, mais gardait un fond neutre
+(`bg-black/60`, chip translucide) pour les trois boutons au repos — sur demande
+explicite, remplacé par un fond plein et fixe par bouton, conforme aux couleurs
+du styleguide : cercle corail `#E83658` (cœur/favoris), cercle blanc cassé
+`#F5F5F0` (tiret/plus, watchlist), cercle teal `#17B890` (check/vu). Choix
+explicitement simplifié à la demande de l'utilisateur : ces couleurs de fond
+sont maintenant fixes, pas conditionnées par l'état actif/inactif (ce n'est plus
+le fond qui distingue les deux états mais le glyphe lui-même, déjà correct :
+cœur plein/vide, `Plus`/`Minus`, épaisseur du check) — l'état réel restera de
+toute façon piloté par les vraies données utilisateur déjà branchées
+(`useMediaTrack`/`useWatchedStatus`), la couleur de fond n'a plus besoin de le
+répéter. Modifié dans `MediaCardActions.tsx`.
 
-Deux éléments de spec trouvés dans les maquettes qui n'avaient pas été identifiés
-avant cette repasse :
-1. Le styleguide annote explicitement les pills de genre : *"Un seul genre actif
-   à la fois sur le catalogue"* — un sélecteur à choix unique, pas le multi-sélect
-   actuel (`selectedGenres: number[]`, plusieurs genres cumulables).
-2. La maquette wireframe montre, sur la variante mobile du Catalogue, la même
-   rangée de pills avec une **barre de défilement horizontale visible** sous la
-   rangée — confirmant qu'un défilement horizontal (pas un accordéon, pas une
-   modale) est le pattern d'interaction prévu pour un grand nombre de genres.
+**Pictogramme de type mal positionné.** Ajouté lors de la première passe
+(section 1) avec un positionnement `absolute` relatif au conteneur englobant
+tout le `<Link>` de la card (affiche + titre + ligne genre/année/note) plutôt
+qu'à l'affiche seule — il atterrissait donc visuellement dans la ligne de texte
+sous la card, pas sur l'affiche comme prévu par le styleguide. Corrigé en
+isolant l'affiche dans son propre conteneur `relative` (`MediaCard.tsx`), qui
+sert maintenant de repère de positionnement pour le pictogramme ET pour
+`MediaCardActions` (qui n'avait pas ce problème par accident : `top-2`
+coïncidait déjà avec le haut de l'affiche, celle-ci étant le premier élément).
+Vérifié visuellement (capture Catalogue réelle) : le pictogramme apparaît
+maintenant bien en bas à gauche de l'affiche.
 
-**Proposition** (non implémentée — changement de comportement, pas seulement de
-style, donc documentée plutôt que précipitée comme demandé) : convertir
-`FilterBar` en sélection unique (un seul `selectedGenre: number | null` au lieu
-d'un tableau), rangée en défilement horizontal (`overflow-x-auto`, `flex-nowrap`,
-`scrollbar-none` — classe déjà utilisée ailleurs dans le projet pour les
-carrousels) plutôt qu'en `flex-wrap`. Impact à anticiper si validé : la route
-`GET /api/medias?genre=...` accepte aujourd'hui une liste d'IDs
-(`catalogRepository.buildFilterClause`, `ID_genre IN (?)`) — passer à un seul
-genre simplifie cette clause mais change le contrat de l'API (paramètre
-`genre` singulier). Éventuellement dédupliquer aussi les genres quasi-identiques
-côté seed (`Action`/`Action & Adventure`, etc.) plutôt que de les afficher tous.
-À trancher avec l'équipe avant implémentation.
+**Filtre de genre du Catalogue — refonte de la présentation.** Constat de la
+première passe : la table `genre` contient 27 entrées (fusion des taxonomies
+TMDB film/série sans déduplication : "Action" et "Action & Adventure"
+coexistent, de même "Science-Fiction" et "Science-Fiction & Fantastique") ;
+affichées à plat (`flex-wrap`) dans `FilterBar.tsx`, elles remplissaient la
+quasi-totalité de l'écran sur mobile avant tout contenu (9 lignes de pills
+capturées en réel avant la première card). La maquette wireframe montrait par
+ailleurs, sur la variante mobile du Catalogue, la même rangée de pills avec une
+barre de défilement horizontale visible sous la rangée.
+
+**Corrigé** : la rangée de pills est maintenant enveloppée dans le composant
+`Carousel` déjà utilisé par tous les carrousels de médias de l'app (`Populaires`,
+`Nouveautés`, etc.) — mêmes flèches gauche/droite (masquées sur mobile, tactile
+au doigt), même fondu en dégradé sur le bord droit tant qu'il reste du contenu à
+faire défiler, une seule ligne au lieu de 3. Zéro nouveau code de défilement
+écrit : réutilisation directe du composant existant (`FilterBar.tsx` importe
+`Carousel`), cohérent avec la demande explicite de reprendre "les mêmes
+flèches... que les carrousels de médias déjà présents". La colorimétrie des
+pills (contour neutre au repos, plein jaune `#F2B705` pour l'actif) et la
+logique de sélection restent strictement inchangées.
+
+**Point non traité, toujours ouvert** : le styleguide annote par ailleurs les
+pills de genre *"Un seul genre actif à la fois sur le catalogue"* — un
+sélecteur à choix unique, alors que le comportement actuel reste multi-sélect
+(`selectedGenres: number[]`, plusieurs genres cumulables), inchangé par cette
+correction (qui ne portait que sur la présentation, pas le comportement,
+conformément à la demande). Basculer en sélection unique changerait le contrat
+de l'API (`GET /api/medias?genre=...` accepte aujourd'hui une liste d'IDs via
+`catalogRepository.buildFilterClause`, `ID_genre IN (?)`) — à trancher avec
+l'équipe avant toute implémentation. Éventuellement dédupliquer aussi les
+genres quasi-identiques côté seed (`Action`/`Action & Adventure`, etc.) plutôt
+que de les afficher tous.
+
+Vérification : typecheck + Biome clean sur les 3 fichiers touchés
+(`MediaCardActions.tsx`, `MediaCard.tsx`, `FilterBar.tsx`) ; les trois
+corrections vérifiées visuellement par capture réelle du Catalogue après
+correction (boutons colorés corrects, pictogramme sur l'affiche, genres en une
+seule ligne avec flèches).
+
+### 4. Constats documentés, non implémentés (nécessitent réflexion produit)
 
 **Bannière d'accueil et bandeau CTA visiteur absents.** La maquette wireframe
 montre systématiquement, en haut de l'Accueil (visiteur ET connecté), une
@@ -1709,7 +1750,7 @@ en panneau inline, qui serait une refonte UX plus large hors du périmètre
 "correction rapide sans risque" de cette repasse — à évaluer avec l'équipe si le
 comportement inline est réellement souhaité.
 
-### 4. Vérifié conforme (pas d'écart trouvé)
+### 5. Vérifié conforme (pas d'écart trouvé)
 
 - **Genres affichés en tags pleins sur les fiches détail** (film/série, tous
   colorés en jaune) : ne contredit aucune spec — le styleguide ne documente que
@@ -1725,7 +1766,7 @@ comportement inline est réellement souhaité.
   personnage), toggle thème/PEGI, tabs catalogue/recherche** : conformes au
   styleguide, aucun écart trouvé.
 
-### 5. Périmètre de cette repasse
+### 6. Périmètre de cette repasse
 
 Comparaison pixel par pixel effectuée avec captures réelles pour : Accueil
 (visiteur, desktop), Catalogue (desktop et mobile), fiche film, fiche comédien.

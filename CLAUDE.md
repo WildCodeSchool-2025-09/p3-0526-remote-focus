@@ -152,13 +152,17 @@ Chaque US suit ce format :
   maquettes StyleGuide/Wireframe (capture headless via Edge, contournement
   documenté dans `docs/decisions-log.md`). Corrections appliquées : couleurs
   des badges Nouveau/Top, tags PEGI retirés des cards (remplacés par le
-  pictogramme de type), boutons d'action des cards repassés en vertical, icône
-  Watchlist corrigée, biographie du comédien repositionnée, 5ᵉ carte "En cours"
+  pictogramme de type, repositionné sur l'affiche après un premier essai mal
+  placé), boutons d'action des cards en vertical avec fond plein fixe par
+  bouton (corail/blanc cassé/teal), icône Watchlist corrigée, biographie du
+  comédien repositionnée, filtre de genre du Catalogue passé en défilement
+  horizontal (mêmes flèches que les carrousels de médias), 5ᵉ carte "En cours"
   ajoutée au dashboard (gap de découvrabilité sur PRO-05, sinon déjà terminée).
-  Constats documentés sans correction immédiate : refonte du filtre de genre du
-  Catalogue (proposition dans le journal), bannière d'accueil manquante,
-  chevauchement de l'en-tête sous ~400px de large. Détail complet dans
-  `docs/decisions-log.md`, section "Repasse visuelle (2026-09-12)".
+  Constats documentés sans correction immédiate : passage du filtre de genre en
+  sélection unique (changerait le contrat de l'API, proposition dans le
+  journal), bannière d'accueil manquante, chevauchement de l'en-tête sous
+  ~400px de large. Détail complet dans `docs/decisions-log.md`, section
+  "Repasse visuelle (2026-09-12)".
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.

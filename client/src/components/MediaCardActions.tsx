@@ -49,13 +49,10 @@ function MediaCardActions({
         onClick={(event) => stopAndRun(event, handleToggleFavorite)}
         aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
         aria-pressed={isFavorite}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+        className="flex h-7 w-7 items-center justify-center rounded-full text-white"
+        style={{ backgroundColor: "#E83658" }}
       >
-        <Heart
-          size={14}
-          fill={isFavorite ? "#E83658" : "none"}
-          color={isFavorite ? "#E83658" : "currentColor"}
-        />
+        <Heart size={14} fill={isFavorite ? "#FFFFFF" : "none"} />
       </button>
       <button
         type="button"
@@ -64,12 +61,8 @@ function MediaCardActions({
           isInWatchlist ? "Retirer de la watchlist" : "Ajouter à la watchlist"
         }
         aria-pressed={isInWatchlist}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-        style={
-          isInWatchlist
-            ? { backgroundColor: "#F5F5F0", color: "#0D1117" }
-            : undefined
-        }
+        className="flex h-7 w-7 items-center justify-center rounded-full"
+        style={{ backgroundColor: "#F5F5F0", color: "#0D1117" }}
       >
         <WatchlistIcon size={14} />
       </button>
@@ -78,13 +71,10 @@ function MediaCardActions({
         onClick={(event) => stopAndRun(event, handleToggleWatched)}
         aria-label={isWatched ? "Marquer comme non vu" : "Marquer comme vu"}
         aria-pressed={isWatched}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+        className="flex h-7 w-7 items-center justify-center rounded-full text-white"
+        style={{ backgroundColor: "#17B890" }}
       >
-        <Check
-          size={14}
-          color={isWatched ? "#17B890" : "currentColor"}
-          strokeWidth={isWatched ? 3 : 2}
-        />
+        <Check size={14} strokeWidth={isWatched ? 3 : 2} />
       </button>
     </div>
   );
