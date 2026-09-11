@@ -1,3 +1,10 @@
+-- ATTENTION (2026-09-11) : la base partagée "Focus" avait dérivé de ce fichier avant
+-- US-AUTH-01 — password en VARCHAR(50) (trop court pour un hash bcrypt), et
+-- role/dark_theme/avatar sans DEFAULT alors qu'ils en ont un ici. Corrigé en direct
+-- sur la base partagée via ALTER TABLE (table user_ vide à ce moment-là, aucune
+-- donnée perdue), PAS via `npm run db:migrate` qui DROP + recrée toute la base.
+-- Si tu vois une erreur d'insertion sur user_ qui ne colle pas à ce fichier, lance
+-- `DESCRIBE user_` sur la vraie base avant de relancer db:migrate en local.
 CREATE TABLE user_(
    ID INT AUTO_INCREMENT,
    firstname VARCHAR(100) NOT NULL,

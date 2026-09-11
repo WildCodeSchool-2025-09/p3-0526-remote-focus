@@ -89,6 +89,10 @@ Chaque US suit ce format :
 - Phase 0 (branche locale `ClaudeApp`, non poussée sur `dev`) : US-DET-01 + US-CAT-01 +
   US-REC-01 mergés (conflits Header/Navbar/App.tsx/router.ts/api.ts résolus à la main).
   US-ACC-01 à réécrire entièrement (pattern `Homepage/` non conforme aux conventions).
+- Phase 1 (même branche `ClaudeApp`) : US-AUTH-01/02/03/04 implémentées et testées
+  contre la base réelle. **Équipe pas encore informée** que la base partagée a été
+  corrigée en direct (voir ci-dessous) — à faire avant que quelqu'un relance
+  `db:migrate` en local sur un schema.sql désynchronisé.
 
 ## Décisions tranchées
 
@@ -107,3 +111,16 @@ Chaque US suit ce format :
 - **Format d'affichage des notes** : `overallRating` (DECIMAL SQL, remonte en string type
   `"8.90"`) s'affiche toujours `X.X/10` (ex. `8.9/10`), jamais la valeur brute. Utilitaire
   partagé : `client/src/utils/formatRating.ts`.
+- **Pas de route `POST /api/auth/logout`** : JWT stateless en `localStorage`, rien à
+  invalider côté serveur. L'étape technique d'US-AUTH-03 qui la demande est explicitement
+  conditionnelle ("si gestion de session/token côté serveur, ex: invalidation ou
+  blacklist du token/refresh token") — aucune autre carte (V1 ou V2) ne prévoit de
+  blacklist/refresh token à ce jour. Si l'équipe introduit cette stratégie plus tard,
+  revoir cette étape technique d'US-AUTH-03 à ce moment-là.
+- **Drift base partagée corrigé sur `user_` (2026-09-11)** : la base partagée avait
+  `password` en `VARCHAR(50)` (trop court pour un hash bcrypt) et `role`/`dark_theme`/
+  `avatar` sans `DEFAULT`, alors que `schema.sql` déclarait déjà les bonnes valeurs.
+  Corrigé par `ALTER TABLE` ciblé (table vide, aucune donnée perdue) — détail dans le
+  commentaire au-dessus de `CREATE TABLE user_` dans `schema.sql`. **Le reste de
+  l'équipe n'a pas été prévenu par ce biais** : à signaler pour qu'un `db:migrate`
+  local sur un schema.sql désynchronisé ne surprenne personne.
