@@ -5,6 +5,7 @@ type SearchMedia = {
   poster: string | null;
   releasedAt: string | null;
   type: "movie" | "tv";
+  pegi?: string | null;
 };
 
 type SearchPerson = {

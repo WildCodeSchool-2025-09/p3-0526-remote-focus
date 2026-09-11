@@ -10,6 +10,7 @@ interface MediaDto {
   poster: string | null;
   releasedAt: Date | null;
   type: "movie" | "tv";
+  pegi: string | null;
 }
 
 interface PersonDto {
@@ -29,15 +30,16 @@ export interface SearchResult {
 export async function browseResults(
   q: string,
   type: string | undefined,
+  hidePegi16: boolean,
   page: number,
   limit: number,
 ): Promise<SearchResult> {
   const offset = (page - 1) * limit;
 
   const [mediaRows, personRows, totalMedia] = await Promise.all([
-    findMediaByTitle(q, type, limit, offset),
+    findMediaByTitle(q, type, hidePegi16, limit, offset),
     findPersonByName(q, limit, offset),
-    countMediaByTitle(q, type),
+    countMediaByTitle(q, type, hidePegi16),
   ]);
 
   const films: MediaDto[] = [];
@@ -51,6 +53,7 @@ export async function browseResults(
       poster: row.poster,
       releasedAt: row.released_at,
       type: row.type,
+      pegi: row.pegi,
     };
 
     // is_anime prime sur type : un anime reste un anime, qu'il soit "movie" ou "tv"

@@ -30,9 +30,14 @@ function SearchResultCard({ media }: SearchResultCardProps) {
 
       <div className="flex flex-col gap-0.5">
         <span className="text-base font-semibold">{media.name}</span>
-        {year != null && (
-          <span className="text-focus-muted-dark text-sm">{year}</span>
-        )}
+        <span className="text-focus-muted-dark flex items-center gap-1 text-sm">
+          {year != null && <span>{year}</span>}
+          {media.pegi != null && (
+            <span className="badge badge-outline badge-sm">
+              PEGI {media.pegi}
+            </span>
+          )}
+        </span>
       </div>
     </Link>
   );

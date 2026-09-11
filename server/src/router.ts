@@ -35,15 +35,20 @@ router.patch(
   avatarUpload,
   userActions.uploadAvatar,
 );
+router.patch("/api/me/pegi-filter", verifyToken, userActions.updatePegiFilter);
 
-router.get("/api/medias/search", searchRoutes.browse);
+router.get("/api/medias/search", optionalAuth, searchRoutes.browse);
 
 // Define item-related routes
 /* import itemActions from "./modules/item/itemActions.old";*/
 import catalogActions from "./modules/catalog/catalogActions";
 
-router.get("/api/medias/discover", catalogActions.readDiscoverSections);
-router.get("/api/medias", catalogActions.browse);
+router.get(
+  "/api/medias/discover",
+  optionalAuth,
+  catalogActions.readDiscoverSections,
+);
+router.get("/api/medias", optionalAuth, catalogActions.browse);
 
 /*
 router.get("/api/items", itemActions.browse);

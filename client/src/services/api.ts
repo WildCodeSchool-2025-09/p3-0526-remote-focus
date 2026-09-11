@@ -102,9 +102,13 @@ export async function fetchActorFilmography(
   return response.json();
 }
 
-export async function searchMedias(query: string): Promise<SearchResults> {
+export async function searchMedias(
+  query: string,
+  token?: string,
+): Promise<SearchResults> {
   const response = await fetch(
     `${API_URL}/api/medias/search?q=${encodeURIComponent(query)}`,
+    { headers: authHeaders(token) },
   );
 
   if (!response.ok) {
@@ -388,6 +392,28 @@ export async function updatePassword(
       ),
     );
   }
+}
+
+export async function updatePegiFilter(
+  isPegi16: boolean,
+  token: string,
+): Promise<User> {
+  const response = await fetch(`${API_URL}/api/me/pegi-filter`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ isPegi16 }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(
+        response,
+        "Impossible de mettre à jour le filtre PEGI",
+      ),
+    );
+  }
+
+  return response.json();
 }
 
 export async function uploadAvatar(file: File, token: string): Promise<User> {

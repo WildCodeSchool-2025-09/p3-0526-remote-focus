@@ -5,6 +5,10 @@ import { buildPaginationMeta } from "../../utils/pagination";
 import userRepository from "../user/userRepository";
 import catalogRepository from "./catalogRepository";
 
+async function resolveHidePegi16(userId: number | undefined): Promise<boolean> {
+  return userId != null ? userRepository.readIsPegi16(userId) : false;
+}
+
 const DEFAULT_PAGE_SIZE = 15;
 
 const isMediaNew = (releasedAt: Date | string | null): boolean => {
@@ -59,16 +63,20 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
     const type = requestedType ? requestedType : null;
 
     const userId = req.user?.id;
+    const hidePegi16 = await resolveHidePegi16(userId);
 
-    const topRated = await catalogRepository.readTopRated(type);
+    const topRated = await catalogRepository.readTopRated(type, hidePegi16);
 
-    const newReleases = await catalogRepository.readLatest30Days(type);
+    const newReleases = await catalogRepository.readLatest30Days(
+      type,
+      hidePegi16,
+    );
 
     const likedGenres = await userRepository.readRandomGenres(userId);
 
     const topGenres = await Promise.all(
       likedGenres.map((likedGenre) =>
-        catalogRepository.readTopByGenre(likedGenre.id, type),
+        catalogRepository.readTopByGenre(likedGenre.id, type, hidePegi16),
       ),
     );
 
@@ -138,10 +146,17 @@ const browse: RequestHandler = async (req, res, next) => {
     const limit = requestedLimit > 0 ? requestedLimit : DEFAULT_PAGE_SIZE;
 
     const offset = (page - 1) * limit;
+    const hidePegi16 = await resolveHidePegi16(req.user?.id);
 
     const [medias, total] = await Promise.all([
-      catalogRepository.readByFilters(type, genreIds, offset, limit),
-      catalogRepository.countByFilters(type, genreIds),
+      catalogRepository.readByFilters(
+        type,
+        genreIds,
+        hidePegi16,
+        offset,
+        limit,
+      ),
+      catalogRepository.countByFilters(type, genreIds, hidePegi16),
     ]);
 
     res.json({

@@ -6,7 +6,6 @@ import { generateToken } from "../../utils/generateToken";
 import authRepository from "./authRepository";
 
 const SALT_ROUNDS = 10;
-const PEGI16_AGE = 16;
 
 const registerSchema = z
   .object({
@@ -30,23 +29,6 @@ const loginSchema = z.object({
   email: z.string().trim().email(),
   password: z.string().min(1),
 });
-
-function isPegi16FromBirthDate(bornAt: string): boolean {
-  const birthDate = new Date(bornAt);
-  const now = new Date();
-
-  let age = now.getFullYear() - birthDate.getFullYear();
-  const hasHadBirthdayThisYear =
-    now.getMonth() > birthDate.getMonth() ||
-    (now.getMonth() === birthDate.getMonth() &&
-      now.getDate() >= birthDate.getDate());
-
-  if (!hasHadBirthdayThisYear) {
-    age -= 1;
-  }
-
-  return age >= PEGI16_AGE;
-}
 
 export function toPublicUser(user: Rows[number]) {
   return {
@@ -95,7 +77,7 @@ const register: RequestHandler = async (req, res, next) => {
       bornAt,
       login,
       password: hashedPassword,
-      isPegi16: isPegi16FromBirthDate(bornAt),
+      isPegi16: false,
     });
 
     const user = await authRepository.read(userId);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import MediaList from "../components/Search/MediaList";
+import { useAuth } from "../contexts/AuthContext";
 import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
 import { searchMedias } from "../services/api";
@@ -19,6 +20,7 @@ const emptyResults: SearchResultsType = {
 };
 
 const SearchResults = () => {
+  const { token } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const { searchQuery, setSearchQuery } = useSearch();
   const [searchResults, setSearchResults] =
@@ -51,7 +53,7 @@ const SearchResults = () => {
     setLoading(true);
     setError(false);
 
-    searchMedias(trimmedQuery)
+    searchMedias(trimmedQuery, token ?? undefined)
       .then((results) => {
         if (!cancelled) {
           setSearchResults(results);
@@ -71,7 +73,7 @@ const SearchResults = () => {
     return () => {
       cancelled = true;
     };
-  }, [trimmedQuery]);
+  }, [trimmedQuery, token]);
 
   const hasResults =
     searchResults.films.length > 0 ||

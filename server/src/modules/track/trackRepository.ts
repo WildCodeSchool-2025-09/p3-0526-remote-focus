@@ -1,5 +1,6 @@
 import databaseClient, { type Rows } from "../../../database/client";
 import type { Media } from "../../types/Media/Media.types";
+import { PEGI16_VALUES, pegiFilterClause } from "../../utils/applyPegiFilter";
 
 type MediaTypeFilter = "movie" | "tv" | "anime" | null;
 type WatchedFilter = "watched" | "to-watch" | null;
@@ -14,6 +15,8 @@ const TYPE_FILTER_CLAUSE = `(? IS NULL
   OR (? = 'anime' AND m.is_anime = TRUE)
   OR (? = 'movie' AND m.type = 'movie' AND m.is_anime = FALSE)
   OR (? = 'tv' AND m.type = 'tv' AND m.is_anime = FALSE))`;
+
+const PEGI_FILTER_CLAUSE = pegiFilterClause();
 
 const GENRE_NAME_SUBQUERY = `(SELECT genre.name FROM classify_as
   JOIN genre ON genre.ID = classify_as.ID_genre
@@ -87,6 +90,7 @@ class TrackRepository {
   async browseFavorites(
     userId: number,
     type: MediaTypeFilter,
+    hidePegi16: boolean,
     offset: number,
     limit: number,
   ): Promise<TrackedMedia[]> {
@@ -99,9 +103,22 @@ class TrackRepository {
        FROM track AS t
        JOIN media AS m ON m.ID = t.ID_media
        WHERE t.ID_user = ? AND t.favorite_media = TRUE AND ${TYPE_FILTER_CLAUSE}
+         AND ${PEGI_FILTER_CLAUSE}
        ORDER BY t.favorited_at DESC
        LIMIT ? OFFSET ?`,
-      [userId, userId, userId, type, type, type, type, limit, offset],
+      [
+        userId,
+        userId,
+        userId,
+        type,
+        type,
+        type,
+        type,
+        hidePegi16,
+        PEGI16_VALUES,
+        limit,
+        offset,
+      ],
     );
     return (rows as unknown as TrackedMedia[]).map((row) => ({
       ...row,
@@ -109,13 +126,18 @@ class TrackRepository {
     }));
   }
 
-  async countFavorites(userId: number, type: MediaTypeFilter): Promise<number> {
+  async countFavorites(
+    userId: number,
+    type: MediaTypeFilter,
+    hidePegi16: boolean,
+  ): Promise<number> {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT COUNT(*) AS total
        FROM track AS t
        JOIN media AS m ON m.ID = t.ID_media
-       WHERE t.ID_user = ? AND t.favorite_media = TRUE AND ${TYPE_FILTER_CLAUSE}`,
-      [userId, type, type, type, type],
+       WHERE t.ID_user = ? AND t.favorite_media = TRUE AND ${TYPE_FILTER_CLAUSE}
+         AND ${PEGI_FILTER_CLAUSE}`,
+      [userId, type, type, type, type, hidePegi16, PEGI16_VALUES],
     );
     return Number((rows as { total: number }[])[0].total);
   }
@@ -123,6 +145,7 @@ class TrackRepository {
   async browseWatchlist(
     userId: number,
     type: MediaTypeFilter,
+    hidePegi16: boolean,
     watchedFilter: WatchedFilter,
     offset: number,
     limit: number,
@@ -138,6 +161,7 @@ class TrackRepository {
          FROM track AS t
          JOIN media AS m ON m.ID = t.ID_media
          WHERE t.ID_user = ? AND t.watchlist = TRUE AND ${TYPE_FILTER_CLAUSE}
+           AND ${PEGI_FILTER_CLAUSE}
        ) AS w
        WHERE (? IS NULL OR (? = 'watched' AND isWatched = 1) OR (? = 'to-watch' AND isWatched = 0))
        ORDER BY watchlistAddedAt DESC
@@ -150,6 +174,8 @@ class TrackRepository {
         type,
         type,
         type,
+        hidePegi16,
+        PEGI16_VALUES,
         watchedFilter,
         watchedFilter,
         watchedFilter,
@@ -166,6 +192,7 @@ class TrackRepository {
   async countWatchlist(
     userId: number,
     type: MediaTypeFilter,
+    hidePegi16: boolean,
     watchedFilter: WatchedFilter,
   ): Promise<number> {
     const [rows] = await databaseClient.query<Rows>(
@@ -175,6 +202,7 @@ class TrackRepository {
          FROM track AS t
          JOIN media AS m ON m.ID = t.ID_media
          WHERE t.ID_user = ? AND t.watchlist = TRUE AND ${TYPE_FILTER_CLAUSE}
+           AND ${PEGI_FILTER_CLAUSE}
        ) AS w
        WHERE (? IS NULL OR (? = 'watched' AND isWatched = 1) OR (? = 'to-watch' AND isWatched = 0))`,
       [
@@ -185,6 +213,8 @@ class TrackRepository {
         type,
         type,
         type,
+        hidePegi16,
+        PEGI16_VALUES,
         watchedFilter,
         watchedFilter,
         watchedFilter,

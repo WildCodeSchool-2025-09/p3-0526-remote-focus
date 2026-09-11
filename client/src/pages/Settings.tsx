@@ -19,7 +19,7 @@ function Settings() {
           email={user.email}
           avatar={user.avatar}
         />
-        <PreferencesSection />
+        <PreferencesSection initialIsPegi16={user.isPegi16} />
       </div>
     </div>
   );

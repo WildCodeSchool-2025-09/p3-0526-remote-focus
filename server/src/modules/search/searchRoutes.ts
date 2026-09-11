@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import userRepository from "../user/userRepository";
 import type { SearchResult } from "./searchActions";
 import { browseResults } from "./searchActions";
 
@@ -35,7 +36,11 @@ export async function browse(
   }
 
   try {
-    const data = await browseResults(q, type, page, limit);
+    const userId = req.user?.id;
+    const hidePegi16 =
+      userId != null ? await userRepository.readIsPegi16(userId) : false;
+
+    const data = await browseResults(q, type, hidePegi16, page, limit);
     res.status(200).json(data);
   } catch (err) {
     next(err);

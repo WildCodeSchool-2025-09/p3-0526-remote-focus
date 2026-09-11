@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { buildPaginationMeta } from "../../utils/pagination";
+import userRepository from "../user/userRepository";
 import trackRepository from "./trackRepository";
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -93,10 +94,11 @@ const browseFavorites: RequestHandler = async (req, res, next) => {
 
     const type = parseTypeFilter(req.query.type);
     const { page, limit, offset } = parsePagination(req.query);
+    const hidePegi16 = await userRepository.readIsPegi16(userId);
 
     const [data, total] = await Promise.all([
-      trackRepository.browseFavorites(userId, type, offset, limit),
-      trackRepository.countFavorites(userId, type),
+      trackRepository.browseFavorites(userId, type, hidePegi16, offset, limit),
+      trackRepository.countFavorites(userId, type, hidePegi16),
     ]);
 
     res.json({ data, pagination: buildPaginationMeta(page, limit, total) });
@@ -121,16 +123,18 @@ const browseWatchlist: RequestHandler = async (req, res, next) => {
     const type = parseTypeFilter(req.query.type);
     const watchedFilter = parseWatchedFilter(req.query.watched);
     const { page, limit, offset } = parsePagination(req.query);
+    const hidePegi16 = await userRepository.readIsPegi16(userId);
 
     const [data, total] = await Promise.all([
       trackRepository.browseWatchlist(
         userId,
         type,
+        hidePegi16,
         watchedFilter,
         offset,
         limit,
       ),
-      trackRepository.countWatchlist(userId, type, watchedFilter),
+      trackRepository.countWatchlist(userId, type, hidePegi16, watchedFilter),
     ]);
 
     res.json({ data, pagination: buildPaginationMeta(page, limit, total) });

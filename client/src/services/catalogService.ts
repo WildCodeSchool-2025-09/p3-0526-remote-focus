@@ -4,19 +4,26 @@ import type {
   Format,
 } from "../types/Catalog";
 
+function authHeaders(token?: string): HeadersInit {
+  return token != null ? { Authorization: `Bearer ${token}` } : {};
+}
+
 function fetchDiscover(
   type?: "movie" | "tv" | "anime",
+  token?: string,
 ): Promise<DiscoverResponse> {
   const urlRequestedType = type
     ? `${import.meta.env.VITE_API_URL}/api/medias/discover?type=${type}`
     : `${import.meta.env.VITE_API_URL}/api/medias/discover`;
 
-  return fetch(urlRequestedType).then((response) => {
-    if (!response.ok) {
-      throw new Error(`${response.status}`);
-    }
-    return response.json();
-  });
+  return fetch(urlRequestedType, { headers: authHeaders(token) }).then(
+    (response) => {
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+      return response.json();
+    },
+  );
 }
 
 export function fetchCatalog(
@@ -24,6 +31,7 @@ export function fetchCatalog(
   genreIds: number[],
   page: number,
   limit = 15,
+  token?: string,
 ): Promise<CatalogResponse> {
   const params = new URLSearchParams();
 
@@ -40,6 +48,9 @@ export function fetchCatalog(
 
   return fetch(
     `${import.meta.env.VITE_API_URL}/api/medias?${params.toString()}`,
+    {
+      headers: authHeaders(token),
+    },
   ).then((response) => {
     if (!response.ok) {
       throw new Error(`${response.status}`);

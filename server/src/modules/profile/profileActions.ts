@@ -20,10 +20,12 @@ const readDashboard: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    const hidePegi16 = Boolean(user.is_pegi16);
+
     const [favorites, watchlist, favoriteActors, watchedTitles] =
       await Promise.all([
-        trackRepository.countFavorites(userId, null),
-        trackRepository.countWatchlist(userId, null, null),
+        trackRepository.countFavorites(userId, null, hidePegi16),
+        trackRepository.countWatchlist(userId, null, hidePegi16, null),
         personRepository.countFavorites(userId),
         profileRepository.countWatchedTitles(userId),
       ]);

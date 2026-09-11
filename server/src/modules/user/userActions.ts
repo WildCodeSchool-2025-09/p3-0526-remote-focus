@@ -197,6 +197,41 @@ const updatePassword: RequestHandler = async (req, res, next) => {
   }
 };
 
+const pegiFilterSchema = z.object({
+  isPegi16: z.boolean(),
+});
+
+const updatePegiFilter: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const parsed = pegiFilterSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.flatten() });
+      return;
+    }
+
+    await userRepository.updateIsPegi16(userId, parsed.data.isPegi16);
+
+    const user = await authRepository.read(userId);
+
+    if (user == null) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json(toPublicUser(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
 const uploadAvatar: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?.id;
@@ -260,5 +295,6 @@ export default {
   updateLogin,
   updateEmail,
   updatePassword,
+  updatePegiFilter,
   uploadAvatar,
 };

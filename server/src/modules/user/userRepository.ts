@@ -39,6 +39,21 @@ class UserRepository {
     ]);
   }
 
+  async updateIsPegi16(userId: number, isPegi16: boolean) {
+    await databaseClient.query("UPDATE user_ SET is_pegi16 = ? WHERE ID = ?", [
+      isPegi16,
+      userId,
+    ]);
+  }
+
+  async readIsPegi16(userId: number): Promise<boolean> {
+    const [rows] = await databaseClient.query<Rows>(
+      "SELECT is_pegi16 FROM user_ WHERE ID = ?",
+      [userId],
+    );
+    return Boolean(rows[0]?.is_pegi16);
+  }
+
   async readRandomGenres(
     userId: number | undefined,
     count = 3,

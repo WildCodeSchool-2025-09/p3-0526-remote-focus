@@ -35,6 +35,11 @@ function MediaCard({ media, className }: MediaCardProps) {
             {badgeLabel}
           </span>
         )}
+        {media.pegi != null && (
+          <span className="badge badge-outline badge-sm absolute bottom-2 left-2 z-10 bg-base-100">
+            PEGI {media.pegi}
+          </span>
+        )}
         <img
           src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
           alt={`${media.name} poster`}

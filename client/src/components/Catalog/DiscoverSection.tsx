@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useAuth } from "../../contexts/AuthContext";
 import fetchDiscover from "../../services/catalogService";
 import type { DiscoverResponse } from "../../types/Catalog";
 import MediaSection from "./MediaSection";
 
 function DiscoverSection() {
+  const { token } = useAuth();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const requestedType =
@@ -19,12 +21,12 @@ function DiscoverSection() {
   // const [error, setError] = useState(false);
   const [discover, setDiscover] = useState<DiscoverResponse>();
   useEffect(() => {
-    fetchDiscover(requestedType)
+    fetchDiscover(requestedType, token ?? undefined)
       .then((data) => {
         setDiscover(data);
       })
       .catch((error) => console.log("Erreur", error));
-  }, [requestedType]);
+  }, [requestedType, token]);
   return (
     <>
       {discover ? (

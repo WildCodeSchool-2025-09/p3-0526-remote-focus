@@ -136,3 +136,14 @@ Chaque US suit ce format :
   commentaire au-dessus de `CREATE TABLE user_` dans `schema.sql`. **Le reste de
   l'équipe n'a pas été prévenu par ce biais** : à signaler pour qu'un `db:migrate`
   local sur un schema.sql désynchronisé ne surprenne personne.
+- **Bug corrigé (2026-09-11, US-PRO-10) : `is_pegi16` n'était pas désactivé par
+  défaut à l'inscription** — US-AUTH-01 le calculait selon l'âge (`age >= 16`), ce
+  qui activait le filtre PEGI pour tout adulte et le désactivait pour tout mineur,
+  l'inverse de l'usage attendu. `register` fixe désormais `isPegi16: false` pour
+  tout le monde, sans lien avec la date de naissance. Détail complet dans
+  `docs/decisions-log.md`, section US-PRO-10.
+- **Bug corrigé (2026-09-11, US-PRO-10) : `/api/medias/discover`, `/api/medias` et
+  `/api/medias/search` n'avaient aucun middleware d'auth**, alors que
+  `readDiscoverSections` lit `req.user?.id` pour personnaliser les sections par
+  genre — la personnalisation n'a donc jamais fonctionné pour un utilisateur
+  connecté depuis sa mise en place. `optionalAuth` ajouté sur les 3 routes.

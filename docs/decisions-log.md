@@ -728,3 +728,78 @@ redimensionné à ≤1024×1024 et réencodé en WEBP, second upload JPEG qui re
 premier (ancien fichier confirmé supprimé du disque), type de fichier invalide → 400,
 fichier > 5 Mo → 400, requête sans fichier → 400, sans token → 401. Utilisateur,
 fichiers uploadés et script de test temporaire nettoyés après coup.
+
+## US-PRO-10
+
+**US-PRO-10 — Bug réel trouvé et corrigé : `is_pegi16` était positionné selon l'âge
+à l'inscription (`isPegi16FromBirthDate`, US-AUTH-01/02, déjà commité et testé plus
+tôt dans cette session), pas désactivé par défaut comme l'exige explicitement cette
+carte ("désactivé par défaut à l'inscription"). Conséquence concrète : tout
+utilisateur de 16 ans ou plus se retrouvait avec le filtre "actif" dès l'inscription
+(masquant le contenu 16+ sans l'avoir demandé), et un utilisateur de moins de 16 ans
+avec le filtre "inactif" (montrant du contenu 16+/18) — l'inverse de l'usage attendu
+d'un filtre de ce type. Corrigé : `register` fixe désormais `isPegi16: false` pour
+tout le monde, sans lien avec la date de naissance ; la fonction
+`isPegi16FromBirthDate` et son usage ont été supprimés (plus aucun appelant).
+Impact : les 2 utilisateurs présents sur la base partagée au moment de la
+découverte étaient tous les deux des comptes de test que j'avais moi-même créés
+plus tôt dans la session (un oubli de nettoyage après US-DET-07) — supprimés,
+aucun compte réel d'un membre de l'équipe n'était affecté à ce stade.
+
+**US-PRO-10 — `optionalAuth` ajouté sur `/api/medias/discover`, `/api/medias` et
+`/api/medias/search`**, qui n'avaient jusqu'ici AUCUN middleware d'auth alors que
+`readDiscoverSections` lisait déjà `req.user?.id` pour les sections par genre
+personnalisées (US-ACC-02/CAT-01). Sans `optionalAuth`, `req.user` était toujours
+`undefined` sur ces routes : la personnalisation par genre n'a donc jamais
+fonctionné en pratique pour un utilisateur connecté, depuis sa mise en place — bug
+préexistant, corrigé ici comme effet de bord nécessaire (ces routes ont de toute
+façon besoin de `req.user` pour appliquer le filtre PEGI). À signaler à l'équipe :
+si quelqu'un a déjà vérifié "à l'œil" que les sections par genre semblaient
+pertinentes sans être connecté, c'est un hasard (mêmes genres pour tout le monde).
+
+**US-PRO-10 — Filtre appliqué aussi sur Favoris/Watchlist (US-PRO-02/03) et pas
+seulement Catalogue/Recherche/Accueil**, conformément à la formulation "TOUTES les
+pages et sections listant des médias" de la carte. Concrètement : un média déjà
+mis en favori/watchlist reste cependant masqué de ces listes tant que le filtre est
+actif, même si l'utilisateur l'a lui-même ajouté avant d'activer le filtre — lecture
+littérale retenue plutôt qu'une exception "mes propres choix restent visibles", qui
+n'est écrite nulle part dans la carte.
+
+**US-PRO-10 — Détection d'un accès direct aux fiches détail non traitée ici** : la
+carte scope explicitement le filtre aux pages/sections qui LISTENT des médias, pas
+à l'accès direct à une fiche (US-DET-01 à 07) via son URL. Un utilisateur avec le
+filtre actif peut donc toujours ouvrir directement la fiche d'un média 16+ (il n'est
+juste plus listé nulle part). Note pour la suite : le fichier de convention de
+nommage partagé par l'équipe (carte Trello "Convention de nommage") documente un
+code retour `403` explicitement prévu pour "interdit (PEGI, média non vu)" — un
+futur US pourrait donc vouloir bloquer l'accès direct en 403, mais ce n'est écrit
+dans aucune carte US actuelle : non implémenté, à netraiter que si une US le demande
+explicitement.
+
+**US-PRO-10 — Utilitaire `applyPegiFilter.ts` extrait dans `server/src/utils/`**
+(`pegiFilterClause(alias)` + constante `PEGI16_VALUES` partagée) après avoir
+remarqué que le fichier de convention de nommage de l'équipe nomme explicitement
+cet utilitaire ("apply : utilitaire transverse appliqué à une requête —
+`applyPegiFilter`") — remplace 3 définitions dupliquées de la même constante/clause
+dans `catalogRepository`, `searchRepository` et `trackRepository`.
+
+**US-PRO-10 — Badge PEGI ajouté sur les cards** (`MediaCard`, réutilisé par
+Catalogue/Favoris/Watchlist, et `SearchResultCard`) — n'existait auparavant que sur
+les fiches détail (film/série, depuis Phase 2). Conforme à "affichée en permanence
+sur chaque card et fiche détaillée, indépendamment du filtre" : le badge reste
+visible que le filtre soit actif ou non, seule la présence du média dans la liste
+change.
+
+**US-PRO-10 — PEGI reste en VARCHAR** (`'TP'|'10'|'12'|'16'|'18'`), conforme à la
+décision déjà actée (voir CLAUDE.md et US-CAT-02) — la carte mentionne à nouveau une
+colonne "en INT", non suivi ici pour la même raison qu'alors. Le filtre compare
+directement aux valeurs `'16'`/`'18'` (pas de conversion numérique nécessaire).
+
+Testé en réel avec un utilisateur temporaire, un média PEGI 16 et un média PEGI 18
+existants en base : filtre désactivé par défaut à l'inscription (bug ci-dessus
+confirmé corrigé), contenu 16+/18 visible partout filtre coupé, masqué partout
+(Catalogue, Recherche, Favoris, Watchlist) filtre actif — y compris un média déjà
+favori/watchlist avant l'activation — visiteur non connecté jamais filtré, contenu
+qui réapparaît à la désactivation, 401 sans token et 400 sur payload invalide sur
+la route de toggle. Utilisateurs de test nettoyés après coup ; base partagée
+vérifiée à 0 utilisateur restant après cette phase.

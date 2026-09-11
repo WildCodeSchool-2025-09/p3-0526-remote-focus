@@ -1,5 +1,6 @@
 import client from "../../../database/client";
 import type { Rows } from "../../../database/client";
+import { PEGI16_VALUES } from "../../utils/applyPegiFilter";
 
 //recherche par média
 export interface MediaSearchRow extends Rows {
@@ -9,11 +10,13 @@ export interface MediaSearchRow extends Rows {
   is_anime: number | boolean;
   poster: string | null;
   released_at: Date | null;
+  pegi: string | null;
 }
 
 export async function findMediaByTitle(
   q: string,
   type: string | undefined,
+  hidePegi16: boolean,
   limit: number,
   offset: number,
 ): Promise<MediaSearchRow[]> {
@@ -28,12 +31,18 @@ export async function findMediaByTitle(
     params.push(type);
   }
 
+  let pegiClause = "";
+  if (hidePegi16) {
+    pegiClause = "AND (m.pegi IS NULL OR m.pegi NOT IN (?))";
+    params.push(PEGI16_VALUES);
+  }
+
   params.push(limit, offset);
 
   const [rows] = await client.query<MediaSearchRow[]>(
-    `SELECT m.id, m.name, m.type, m.is_anime, m.poster, m.released_at
+    `SELECT m.id, m.name, m.type, m.is_anime, m.poster, m.released_at, m.pegi
       FROM media m
-      WHERE m.name LIKE ? ${typeClause}
+      WHERE m.name LIKE ? ${typeClause} ${pegiClause}
       ORDER BY m.name ASC
       LIMIT ? OFFSET ?`,
     params,
@@ -70,6 +79,7 @@ export async function findPersonByName(
 export async function countMediaByTitle(
   q: string,
   type: string | undefined,
+  hidePegi16: boolean,
 ): Promise<number> {
   const params: unknown[] = [`%${q}%`];
   let typeClause = "";
@@ -81,8 +91,14 @@ export async function countMediaByTitle(
     params.push(type);
   }
 
+  let pegiClause = "";
+  if (hidePegi16) {
+    pegiClause = "AND (m.pegi IS NULL OR m.pegi NOT IN (?))";
+    params.push(PEGI16_VALUES);
+  }
+
   const [rows] = await client.query<Rows>(
-    `SELECT COUNT(*) as total FROM media m WHERE m.name LIKE ? ${typeClause}`,
+    `SELECT COUNT(*) as total FROM media m WHERE m.name LIKE ? ${typeClause} ${pegiClause}`,
     params,
   );
 

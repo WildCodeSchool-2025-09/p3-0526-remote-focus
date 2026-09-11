@@ -4,6 +4,7 @@ import CatalogGrid from "../components/Catalog/CatalogGrid";
 import DiscoverSection from "../components/Catalog/DiscoverSection";
 import FilterBar from "../components/Catalog/FilterBar";
 import Pagination from "../components/Catalog/Pagination";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchGenres } from "../services/api";
 import { fetchCatalog } from "../services/catalogService";
 import type { CatalogResponse, Format } from "../types/Catalog";
@@ -27,6 +28,7 @@ function parseGenres(value: string | null): number[] {
 }
 
 function Catalog() {
+  const { token } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedFormat = parseFormat(searchParams.get("type"));
@@ -54,7 +56,13 @@ function Catalog() {
     let active = true;
     setLoading(true);
 
-    fetchCatalog(selectedFormat, selectedGenres, page)
+    fetchCatalog(
+      selectedFormat,
+      selectedGenres,
+      page,
+      undefined,
+      token ?? undefined,
+    )
       .then((data) => {
         if (active) {
           setCatalog(data);
@@ -69,7 +77,7 @@ function Catalog() {
     return () => {
       active = false;
     };
-  }, [searchParams.toString()]);
+  }, [searchParams.toString(), token]);
 
   const updateParams = (next: {
     type?: Format;
