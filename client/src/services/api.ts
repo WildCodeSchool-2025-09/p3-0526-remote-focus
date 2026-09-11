@@ -1,4 +1,4 @@
-import type { SearchResults } from "../types/Media";
+import type { SearchResults } from "../types/Media-search";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

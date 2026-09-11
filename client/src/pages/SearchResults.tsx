@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 //a voir avec les composants extérieur
-import MediaList from "../components/MediaList";
+import MediaList from "../components/Search/MediaList";
 import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
 import { searchMedias } from "../services/api";
-import type { SearchResults as SearchResultsType } from "../types/Media";
+import type { SearchResults as SearchResultsType } from "../types/Media-search";
 
 const DEBOUNCE_DELAY_MS = 400;
 const MIN_QUERY_LENGTH = 2;
@@ -30,7 +30,7 @@ const SearchResults = () => {
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate le contexte depuis l'URL une seule fois au montage, pas à chaque frappe
+  // biome-ignore lint/correctness/useExhaustiveDependencies:
   useEffect(() => {
     const queryFromUrl = searchParams.get("q");
     if (queryFromUrl && queryFromUrl !== searchQuery) {
