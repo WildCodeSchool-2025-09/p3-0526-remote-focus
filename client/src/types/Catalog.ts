@@ -1,3 +1,5 @@
+import type { ActorWithSeenCount } from "./Profile";
+
 export type Media = {
   id: number;
   tmdbId: number;
@@ -64,4 +66,5 @@ export type HomepageResponse = {
 export type SuggestionsResponse = {
   genreBased: Media[];
   actorBased: Media[];
+  mostViewedActors: ActorWithSeenCount[];
 };

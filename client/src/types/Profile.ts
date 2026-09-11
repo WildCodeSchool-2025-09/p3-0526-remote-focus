@@ -11,3 +11,23 @@ export type DashboardData = {
     watchedTitles: number;
   };
 };
+
+export type ActorWithSeenCount = {
+  id: number;
+  name: string;
+  photo: string | null;
+  seenCount: number;
+};
+
+export type MyActorsResponse = {
+  favorites: {
+    data: ActorWithSeenCount[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+  mostViewed: ActorWithSeenCount[];
+};

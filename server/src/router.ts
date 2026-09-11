@@ -73,13 +73,19 @@ router.get(
   optionalAuth,
   episodeActions.read,
 );
-router.get("/api/actors/:id", actorActions.read);
+router.get("/api/actors/:id", optionalAuth, actorActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 router.get(
   "/api/persons/:id/known-for",
   optionalAuth,
   personActions.readKnownFor,
 );
+router.patch(
+  "/api/me/actors/:id/favorite",
+  verifyToken,
+  personActions.toggleFavorite,
+);
+router.get("/api/me/actors", verifyToken, personActions.readMyActors);
 
 router.patch(
   "/api/me/medias/:id/favorite",

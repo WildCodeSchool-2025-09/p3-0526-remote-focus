@@ -133,9 +133,9 @@ CREATE TABLE like_(
    CONSTRAINT FK_like__genre FOREIGN KEY(ID_genre) REFERENCES genre(ID)
 );
 
--- ATTENTION (2026-09-11) : la base partagée a aussi dérivé ici — user_rating y est en
--- DECIMAL(15,2) au lieu de DECIMAL(2,1). Pas corrigé pour l'instant (hors scope
--- US-DET-08), à traiter avant US-DET-10 (notation).
+-- Corrigé (2026-09-11, US-DET-10) : la base partagée avait dérivé sur user_rating
+-- (DECIMAL(15,2) au lieu de DECIMAL(2,1) déclaré ici). ALTER TABLE ciblé appliqué
+-- (table vide au moment du correctif, aucune donnée perdue).
 CREATE TABLE track(
    ID_user INT,
    ID_media INT,

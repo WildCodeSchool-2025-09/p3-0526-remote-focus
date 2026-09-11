@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import personRepository from "../person/personRepository";
 import actorRepository from "./actorRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -17,11 +18,16 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    const userId = req.user?.id;
+    const isFavorite =
+      userId != null ? await personRepository.readFavorite(userId, id) : false;
+
     res.json({
       id: actor.ID,
       name: actor.name,
       photo: actor.photo,
       biography: actor.biography,
+      isFavorite,
     });
   } catch (err) {
     next(err);

@@ -38,30 +38,6 @@ class SuggestionRepository {
     return rows.map((row) => row.id as number);
   }
 
-  async readMostViewedActorIds(
-    userId: number,
-    limit: number,
-  ): Promise<number[]> {
-    const [rows] = await databaseClient.query<Rows>(
-      `SELECT actorId AS id, COUNT(*) AS total FROM (
-         SELECT mp.ID_person AS actorId
-         FROM media_person AS mp
-         JOIN media_user AS mu ON mu.ID_media = mp.ID_media AND mu.ID_user = ?
-         WHERE mp.role = 'actor'
-         UNION ALL
-         SELECT ep.ID_person AS actorId
-         FROM episode_person AS ep
-         JOIN episode_user AS eu ON eu.ID_episode = ep.ID_episode AND eu.ID_user = ?
-         WHERE ep.role = 'actor'
-       ) AS appearances
-       GROUP BY actorId
-       ORDER BY total DESC
-       LIMIT ?`,
-      [userId, userId, limit],
-    );
-    return rows.map((row) => row.id as number);
-  }
-
   async readByGenres(
     userId: number,
     genreIds: number[],

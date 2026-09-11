@@ -1,12 +1,15 @@
 import type { RequestHandler } from "express";
 import { resolveHidePegi16 } from "../../utils/applyPegiFilter";
+import personRepository from "../person/personRepository";
 import userRepository from "../user/userRepository";
 import suggestionRepository from "./suggestionRepository";
 
 const BLOCK_SIZE = 6;
 const WATCHED_MOVIES_THRESHOLD = 20;
 const MOST_WATCHED_GENRES_LIMIT = 5;
-const MOST_VIEWED_ACTORS_LIMIT = 10;
+// 12 correspond au carrousel "comédiens les plus vus" (US-ACC-06/US-PRO-06,
+// qui réutilisent explicitement cette même logique avec limit=12)
+const MOST_VIEWED_ACTORS_LIMIT = 12;
 const GENRE_BLOCK_MIN_RATING = 6;
 const ACTOR_BLOCK_MIN_RATING = 7;
 
@@ -34,10 +37,11 @@ const readSuggestions: RequestHandler = async (req, res, next) => {
             (genre) => genre.id,
           );
 
-    const actorIds = await suggestionRepository.readMostViewedActorIds(
+    const mostViewedActors = await personRepository.readMostViewedActors(
       userId,
       MOST_VIEWED_ACTORS_LIMIT,
     );
+    const actorIds = mostViewedActors.map((actor) => actor.id);
 
     const [genreBased, actorBased] = await Promise.all([
       genreIds.length > 0
@@ -60,7 +64,7 @@ const readSuggestions: RequestHandler = async (req, res, next) => {
         : [],
     ]);
 
-    res.json({ genreBased, actorBased });
+    res.json({ genreBased, actorBased, mostViewedActors });
   } catch (err) {
     next(err);
   }

@@ -1,5 +1,5 @@
 import type { CatalogResponse, Format } from "../types/Catalog";
-import type { DashboardData } from "../types/Profile";
+import type { DashboardData, MyActorsResponse } from "../types/Profile";
 import type {
   KnownForResponse,
   SearchResults,
@@ -101,11 +101,32 @@ export async function fetchEpisode(
   return response.json();
 }
 
-export async function fetchActor(id: number): Promise<Actor> {
-  const response = await fetch(`${API_URL}/api/actors/${id}`);
+export async function fetchActor(id: number, token?: string): Promise<Actor> {
+  const response = await fetch(`${API_URL}/api/actors/${id}`, {
+    headers: authHeaders(token),
+  });
 
   if (!response.ok) {
     throw new Error(`Comédien ${id} introuvable`);
+  }
+
+  return response.json();
+}
+
+export async function toggleActorFavorite(
+  personId: number,
+  token: string,
+): Promise<{ isFavorite: boolean }> {
+  const response = await fetch(
+    `${API_URL}/api/me/actors/${personId}/favorite`,
+    {
+      method: "PATCH",
+      headers: authHeaders(token),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de mettre à jour les favoris");
   }
 
   return response.json();
@@ -301,6 +322,30 @@ export async function fetchDashboard(token: string): Promise<DashboardData> {
 
   if (!response.ok) {
     throw new Error("Impossible de récupérer votre tableau de bord");
+  }
+
+  return response.json();
+}
+
+export async function fetchMyActors(
+  token: string,
+  page: number,
+  limit: number,
+): Promise<MyActorsResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  const response = await fetch(
+    `${API_URL}/api/me/actors?${params.toString()}`,
+    {
+      headers: authHeaders(token),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer vos acteurs");
   }
 
   return response.json();

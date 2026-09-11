@@ -123,6 +123,7 @@ export type Actor = {
   name: string;
   photo: string | null;
   biography: string | null;
+  isFavorite: boolean;
 };
 
 export type Series = {

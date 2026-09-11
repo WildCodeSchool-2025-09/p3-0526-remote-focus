@@ -16,6 +16,7 @@ import Favorites from "./pages/Favorites";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
+import MyActors from "./pages/MyActors";
 import NotFound from "./pages/NotFound";
 import Preferences from "./pages/Preferences";
 import Profile from "./pages/Profile";
@@ -75,6 +76,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Settings />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/actors",
+        element: (
+          <PrivateRoute>
+            <MyActors />
           </PrivateRoute>
         ),
       },

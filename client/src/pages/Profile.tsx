@@ -92,6 +92,7 @@ function Profile() {
           icon={User}
           label="Mes acteurs favoris"
           count={dashboard.counts.favoriteActors}
+          to="/profile/actors"
         />
         <DashboardCard
           icon={BarChart3}

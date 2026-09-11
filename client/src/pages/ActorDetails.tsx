@@ -4,11 +4,13 @@ import ActorFilmography from "../components/ActorFilmography";
 import ActorHeader from "../components/ActorHeader";
 import ActorInfo from "../components/ActorInfo";
 import BackButton from "../components/BackButton";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchActor } from "../services/api";
 import type { Actor } from "../types/media";
 
 function ActorDetails() {
   const { id } = useParams();
+  const { token } = useAuth();
 
   const [actor, setActor] = useState<Actor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ function ActorDetails() {
     setLoading(true);
     setError(null);
 
-    fetchActor(Number(id))
+    fetchActor(Number(id), token ?? undefined)
       .then((data) => {
         if (active) {
           setActor(data);
@@ -44,7 +46,7 @@ function ActorDetails() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, token]);
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;

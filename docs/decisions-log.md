@@ -1096,3 +1096,75 @@ toujours actif en combinaison avec le tri (contenu 16+ absent quel que soit le
 tri demandé). Frontend vérifié par transformation Vite sans erreur sur
 `SortMenu.tsx`, `SearchResults.tsx` et `SearchResultCard.tsx`. Utilisateur de
 test nettoyé après coup.
+
+## Phase 6 — Migration DET-10 appliquée en préalable
+
+**Migration `track.user_rating` DECIMAL(15,2) → DECIMAL(2,1) appliquée**, annoncée
+dès US-DET-08 comme "à corriger avant US-DET-10" (voir sa section plus haut).
+Vérifié avant modification : table `track` toujours vide sur la base partagée
+(aucune ligne, tous les tests précédents nettoyés) — `ALTER TABLE track MODIFY
+user_rating DECIMAL(2,1)` appliqué sans risque de perte de données ni d'erreur
+de troncature (les notes 0–5 par demi-point tiennent largement dans
+DECIMAL(2,1)). Commentaire de dérive mis à jour dans `schema.sql`.
+
+## US-PRO-04 / US-PRO-06 / US-ACC-06
+
+**Traitées ensemble** : PRO-04 dit explicitement "cette US pose également la page
+et la route partagées avec la section 'Les plus vus'" (PRO-06) ; PRO-06 dit
+explicitement "réutilise la logique de l'US 'acteurs les plus vus' de l'Accueil
+(`readMostViewedActors`)" (ACC-06, déjà anticipée dans le plan de cette session
+comme "build once, reuse for both"). Les trois n'ont de sens qu'ensemble.
+
+**US-PRO-04 — Gap comblé : aucune fonctionnalité de favori-acteur n'existait**
+avant cette US (la table `favorite` existait depuis le début du projet, son
+compteur pour le dashboard depuis US-PRO-01, mais rien ne permettait de la
+remplir). Ajout d'un bouton "Favoris" sur `ActorHeader` (fiche comédien,
+US-DET-06), même pattern `ActionButton` + hook dédié (`useActorFavorite`, calque
+exact de `useWatchedStatus`) que partout ailleurs dans l'app. `PATCH
+/api/me/actors/:id/favorite`, 401/404 gérés. Sans ce bouton, la liste "Favoris"
+de PRO-04 aurait été structurellement toujours vide.
+
+**US-PRO-06/ACC-06 — `readMostViewedActors` factorisé dans `personRepository`**
+(pas dans `suggestionRepository`, où j'avais initialement écrit une version
+"IDs seulement" pour US-ACC-05) : la version complète (nom, photo, nombre de
+titres vus) sert maintenant aux 3 US (ACC-05 n'a besoin que des IDs, extraits
+via `.map(a => a.id)` sur le même résultat). Limite unifiée à 12 partout
+(`MOST_VIEWED_ACTORS_LIMIT`), correspondant exactement à ce que demandent
+ACC-06/PRO-06 ; ACC-05 utilisait auparavant 10, changé à 12 pour n'avoir qu'un
+seul appel de requête à faire pour les trois besoins.
+
+**US-PRO-04 — Tri par nombre de titres vus décroissant appliqué en mémoire, pas
+en SQL avec LIMIT/OFFSET direct** : `countSeenMediaByActor` (déjà existant,
+réutilisé tel quel avec `excludeMediaId=0` comme sentinelle "pas d'exclusion",
+pattern déjà en place depuis US-DET-07) est appelé une fois par acteur favori.
+Nécessaire car trier puis paginer correctement exige de connaître le classement
+complet avant de découper une page — paginer d'abord (arbitrairement) puis trier
+seulement la page aurait cassé le tri global. Acceptable à l'échelle du jeu de
+données actuel (un utilisateur ne favorite réalistement pas des centaines
+d'acteurs).
+
+**US-ACC-06 — Section "Vos acteurs les plus vus" ajoutée à `PersonalizedSection`**
+(conteneur US-ACC-04), pas à `/api/medias/home` : la carte ACC-04 nomme
+explicitement "comédiens les plus vus" comme une des sous-sections regroupées
+par le conteneur "Accueil personnalisé", au même titre que les blocs
+genres/acteurs d'US-ACC-05. Réutilise `/api/me/suggestions` (déjà "connecté
+uniquement") plutôt que d'ajouter un champ à l'endpoint public `/api/medias/home`.
+
+**US-PRO-04/ACC-06 — Message d'invitation identique dans les deux emplacements**
+("Ajoutez des médias à votre liste 'vu' pour voir apparaître vos acteurs les
+plus vus ici"), conforme à ACC-06 ("même logique que sur l'Accueil" pour ce
+message, appliqué en miroir sur la page Mes Acteurs).
+
+**US-PRO-04 — Aucune déduplication entre Favoris et Les plus vus**, conforme à
+la carte PRO-06 ("un acteur peut apparaître à la fois dans 'Favoris' et 'Les
+plus vus'") — aucun filtre d'exclusion mutuelle ajouté.
+
+Testé en réel avec un utilisateur temporaire : fiche comédien en visiteur →
+`isFavorite` toujours `false` ; 401 sans token sur le toggle et sur
+`GET /api/me/actors` ; 404 sur un acteur inexistant ; nouvel utilisateur → listes
+favoris et plus-vus vides des deux côtés (`/api/me/actors` et
+`/api/me/suggestions`) ; ajout d'un favori → apparaît avec `seenCount: 0` ;
+3 films regardés mettant en scène le même acteur → `seenCount: 3` cohérent entre
+`/api/me/actors` (PRO-06) et `/api/me/suggestions` (ACC-06, même acteur, même
+compte) ; retrait du favori → liste vide à nouveau. Frontend vérifié par
+transformation Vite sans erreur. Utilisateur de test nettoyé après coup.
