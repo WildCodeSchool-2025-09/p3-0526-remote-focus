@@ -1,5 +1,5 @@
-import type { FilmographyItem, Media } from "../types/media";
 import type { SearchResults } from "../types/Search";
+import type { FilmographyItem, Media } from "../types/media";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
