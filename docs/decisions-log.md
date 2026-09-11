@@ -1332,3 +1332,66 @@ compteur de titres n'augmente pas par épisode). Frontend vérifié par
 transformation Vite sans erreur sur les fichiers touchés (pas de vérification
 visuelle en navigateur). Utilisateur de test nettoyé après coup, base vérifiée
 revenue à 0 utilisateur de test.
+
+## US-CAL-01
+
+**US-CAL-01 — Fenêtre temporelle : 90 jours en arrière / 365 jours en avant**,
+choix numérique laissé libre par la carte ("ex: sorties des X derniers jours +
+à venir dans les X prochains mois"). Vérifié contre les données réelles avant
+de choisir : aucun film du seed n'a de date de sortie future (max
+`2026-08-21`, jour de test `2026-09-12`), mais 18 épisodes ont une date de
+diffusion future (jusqu'à `2027-01-01`, séries "en cours" comme House of the
+Dragon/Rick et Morty/Mushoku Tensei) — une fenêtre trop courte aurait rendu
+l'onglet Films quasi vide et n'aurait montré aucune "sortie à venir" réelle.
+90 jours en arrière capture tout l'historique récent du seed sans device
+supplémentaire.
+
+**US-CAL-01 — Trois onglets (Films/Séries/Animés), pas deux** : la description
+narrative de la carte ne mentionne que "Films / Séries", mais sa propre
+checklist "Critères de validation" (items 3-5) demande explicitement un
+troisième onglet Animés distinct — cohérent avec le découpage `movie`/`tv`/
+`anime` déjà utilisé partout ailleurs dans l'app (Catalogue, Recherche,
+Accueil) où `is_anime` prime sur `type` pour le classement. Implémenté avec le
+même découpage, `CalendarTabs` ne proposant pas d'option "Tous" (contrairement
+à `TypeFilterTabs`) car la route backend exige toujours un `type` précis.
+
+**US-CAL-01 — Valeurs de type `movie`/`tv`/`anime` (pas `film`/`serie` comme
+suggéré littéralement par la carte)**, pour rester cohérent avec la convention
+déjà en place sur toutes les autres routes de médias (`/api/medias`,
+`/api/medias/discover`, `/api/medias/home`) plutôt que d'introduire une
+nomenclature différente sur une seule route.
+
+**US-CAL-01 — Nouveau module dédié `calendar/` (repository + actions)**, plutôt
+que de réutiliser littéralement `CatalogRepository`/`CatalogActions`/
+`EpisodeRepository` comme suggéré par les étapes techniques de la carte : choix
+cohérent avec le pattern déjà suivi cette session pour toute fonctionnalité
+transverse (`homepage/`, `suggestion/`, `statistic/`) plutôt que de mélanger la
+logique de fenêtre temporelle du calendrier dans les modules catalogue/épisode
+existants.
+
+**US-CAL-01 — Bouton "+" watchlist sans état réel affiché** (`useMediaTrack`
+avec `initialIsInWatchlist=false` systématique, comme déjà le cas pour
+`MediaCardActions` sur le Catalogue/la Recherche) : la route calendrier ne
+fait pas de jointure `track` par utilisateur (hors périmètre de la carte, qui
+ne demande qu'un bouton d'ajout, pas un indicateur d'état). Limitation
+préexistante dans l'app, pas une régression introduite par cette US.
+
+**US-CAL-01 — Clic sur une ligne "épisode" ouvre la fiche de la série**
+(`/series/:id`), pas une fiche épisode dédiée — conforme à l'exemple donné par
+l'étape technique de la carte elle-même ("/media/:id ou /serie/:id").
+
+**US-CAL-01 — Champ "année" d'une ligne épisode = année de sortie originale de
+la série** (`media.released_at`), pas la date de diffusion de l'épisode (déjà
+utilisée comme date de regroupement/en-tête de section) — cohérent avec la
+façon dont `SerieHeader` affiche déjà l'année d'une série ailleurs dans l'app.
+
+Testé en réel : validation 400 sur `type` manquant/invalide ; onglet Films
+groupé par date croissante ; onglet Séries avec plusieurs épisodes le même jour
+correctement regroupés sous une seule date ; onglet Animés fusionnant
+correctement films et épisodes anime (aucun film anime dans le seed actuel,
+mais requête générique déjà prête) ; visiteur (sans compte) voit du contenu
+PEGI 16/18 sur les trois onglets ; utilisateur connecté avec filtre PEGI
+inactif voit aussi tout ; filtre activé → films et épisodes PEGI 16/18 exclus
+des trois onglets, contenu non classé 16+/18 toujours visible. Frontend
+vérifié par transformation Vite sans erreur sur les 5 fichiers touchés (pas de
+vérification visuelle en navigateur). Utilisateur de test nettoyé après coup.

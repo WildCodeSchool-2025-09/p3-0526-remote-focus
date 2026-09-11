@@ -4,6 +4,7 @@ import { optionalAuth } from "./middlewares/optionalAuth";
 import { verifyToken } from "./middlewares/verifyToken";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
+import calendarActions from "./modules/calendar/calendarActions";
 import episodeActions from "./modules/episode/episodeActions";
 import genreActions from "./modules/genre/genreActions";
 import homepageActions from "./modules/homepage/homepageActions";
@@ -54,6 +55,11 @@ router.get(
 );
 router.get("/api/medias", optionalAuth, catalogActions.browse);
 router.get("/api/medias/home", optionalAuth, homepageActions.readSections);
+router.get(
+  "/api/medias/calendar",
+  optionalAuth,
+  calendarActions.browseCalendar,
+);
 
 /*
 router.get("/api/items", itemActions.browse);

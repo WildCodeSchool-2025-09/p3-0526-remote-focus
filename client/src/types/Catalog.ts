@@ -69,3 +69,22 @@ export type SuggestionsResponse = {
   actorBased: Media[];
   mostViewedActors: ActorWithSeenCount[];
 };
+
+export type CalendarFormat = "movie" | "tv" | "anime";
+
+export type CalendarItem = {
+  id: number;
+  title: string;
+  episodeName: string | null;
+  poster: string | null;
+  year: number | null;
+  releasedAt: string;
+  genreName: string | null;
+  seasonNumber: number | null;
+  episodeNumber: number | null;
+};
+
+export type CalendarGroup = {
+  date: string;
+  items: CalendarItem[];
+};
