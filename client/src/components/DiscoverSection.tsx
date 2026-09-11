@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import fetchDiscover from "../services/catalogService";
-import Carousel from "./Carousel";
-import MediaCard from "./MediaCard";
 import type { DiscoverResponse } from "../types/Catalog";
+import MediaSection from "./MediaSection";
 
 function DiscoverSection() {
   const [searchParams] = useSearchParams();
@@ -16,8 +15,8 @@ function DiscoverSection() {
         : type === "anime"
           ? type
           : undefined;
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState(false);
   const [discover, setDiscover] = useState<DiscoverResponse>();
   useEffect(() => {
     fetchDiscover(requestedType)
@@ -28,32 +27,23 @@ function DiscoverSection() {
   }, [requestedType]);
   return (
     <>
-      {console.log(discover)}
-      <h2>Populaires</h2>
       {discover ? (
-        <Carousel>
-          {discover?.topRated.map((media) => (
-            <MediaCard
-              key={media.id}
-              media={media}
-              className="catalog-carousel-item"
-            />
-          ))}
-        </Carousel>
-      ) : (
-        <p>Chargement ...</p>
-      )}
-      <h2>Nouveautés</h2>
-      {discover ? (
-        <Carousel>
-          {discover?.topRated.map((media) => (
-            <MediaCard
-              key={media.id}
-              media={media}
-              className="catalog-carousel-item"
-            />
-          ))}
-        </Carousel>
+        <>
+          <MediaSection title="Populaires" medias={discover.topRated} />
+          <MediaSection title="Nouveautés" medias={discover.latest} />
+          <MediaSection
+            title={`${discover.genreSections[0].name}`}
+            medias={discover.genreSections[0].medias}
+          />
+          <MediaSection
+            title={`${discover.genreSections[1].name}`}
+            medias={discover.genreSections[1].medias}
+          />
+          <MediaSection
+            title={`${discover.genreSections[2].name}`}
+            medias={discover.genreSections[2].medias}
+          />
+        </>
       ) : (
         <p>Chargement ...</p>
       )}
