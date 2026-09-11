@@ -52,3 +52,10 @@ export type CatalogResponse = {
 };
 
 export type Format = "movie" | "tv" | "anime" | null;
+
+export type HomepageResponse = {
+  popular: EnrichedMedia[];
+  movies: EnrichedMedia[];
+  series: EnrichedMedia[];
+  animes: EnrichedMedia[];
+};

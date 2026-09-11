@@ -6,6 +6,7 @@ import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
 import episodeActions from "./modules/episode/episodeActions";
 import genreActions from "./modules/genre/genreActions";
+import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import personActions from "./modules/person/personActions";
 import profileActions from "./modules/profile/profileActions";
@@ -50,6 +51,7 @@ router.get(
   catalogActions.readDiscoverSections,
 );
 router.get("/api/medias", optionalAuth, catalogActions.browse);
+router.get("/api/medias/home", optionalAuth, homepageActions.readSections);
 
 /*
 router.get("/api/items", itemActions.browse);

@@ -2,6 +2,7 @@ import type {
   CatalogResponse,
   DiscoverResponse,
   Format,
+  HomepageResponse,
 } from "../types/Catalog";
 
 function authHeaders(token?: string): HeadersInit {
@@ -52,6 +53,17 @@ export function fetchCatalog(
       headers: authHeaders(token),
     },
   ).then((response) => {
+    if (!response.ok) {
+      throw new Error(`${response.status}`);
+    }
+    return response.json();
+  });
+}
+
+export function fetchHomepage(token?: string): Promise<HomepageResponse> {
+  return fetch(`${import.meta.env.VITE_API_URL}/api/medias/home`, {
+    headers: authHeaders(token),
+  }).then((response) => {
     if (!response.ok) {
       throw new Error(`${response.status}`);
     }

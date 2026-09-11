@@ -890,3 +890,60 @@ transformation Vite sans erreur sur `ThemeContext.tsx`, `main.tsx` et
 `PreferencesSection.tsx` (pas de vérification visuelle en navigateur, comme pour
 US-PRO-07 — aucun outil de navigation automatisée disponible dans cette session).
 Utilisateur de test nettoyé après coup.
+
+## US-ACC-01 / US-ACC-02
+
+**Point bloquant remonté immédiatement (2026-09-11)** : en préparant la Phase 5
+(ACC-04/05/03 planifiés), j'ai constaté que `Homepage.tsx` était toujours un stub
+(`<h1>WORK IN PROGRESS</h1>`) — US-ACC-01 (page d'accueil de base, 3 carrousels)
+n'avait en réalité jamais été reconstruite, malgré la note de `CLAUDE.md`
+("US-ACC-01 à réécrire entièrement") datant de la Phase 0. La carte Trello
+US-ACC-01 est d'ailleurs toujours listée "En cours" côté équipe. Or US-ACC-03/04/05
+supposent toutes une page d'Accueil déjà fonctionnelle sur laquelle se greffer
+(US-ACC-04 : "une section apparaît sur la page d'Accueil"). Remonté au produit
+avant d'avancer plutôt que de décider seul comment traiter ce trou : réponse reçue
+— construire US-ACC-01 + US-ACC-02 d'abord, puis enchaîner sur ACC-03/04/05 dans
+la même phase.
+
+**US-ACC-01 — Card vague ("trois grandes catégories: film, série" — n'en cite que
+deux sur trois) et US-ACC-02 sans description du tout.** Interprétation retenue,
+basée sur le titre + les branches existantes : 3 carrousels par catégorie
+(Films/Séries/Animés — la 3e catégorie manquante dans la formulation de la carte
+est très probablement "Animés", cohérent avec la taxonomie déjà utilisée partout
+ailleurs dans l'app), plus 1 carrousel "Populaires" (US-ACC-02, top noté toutes
+catégories confondues) — même page, même utilisateur connecté ou non (aucune
+personnalisation à ce stade, qui est le rôle d'ACC-03/04/05). Un ancien module
+`Homepage/` existait sur la branche non mergée `origin/US-ACC-01` (jamais
+mergée, nommage non conforme comme documenté en Phase 0, colonnes SQL exposées en
+snake_case au lieu de camelCase) — consulté pour la forme générale (`{films,
+series, animes}`, tri par note, badges top3/top10/nouveau) mais pas réutilisé tel
+quel : nouveau module `homepage/` (conventions correctes), réutilise directement
+`catalogRepository.readTopRated` (déjà filtré PEGI depuis US-PRO-10, déjà avec
+`genreName`) plutôt que dupliquer une requête SQL.
+
+**US-ACC-01/02 — Utilitaires `enrichRanking`/`isMediaNew` extraits de
+`catalogActions.ts` vers `server/src/utils/enrichRanking.ts`**, et
+`resolveHidePegi16` vers `applyPegiFilter.ts` (déjà le foyer des utilitaires PEGI) —
+réutilisés à l'identique par `catalogActions` et le nouveau `homepageActions`, pas
+de duplication entre Catalogue et Accueil pour ces deux préoccupations transverses.
+
+**US-ACC-01/02 — Un seul endpoint `GET /api/medias/home`** (protégé par
+`optionalAuth`, nécessaire pour le filtre PEGI par utilisateur) renvoyant les 4
+sections en un aller-retour (`{popular, movies, series, animes}`), plutôt que 4
+appels séparés au Catalogue — évite 4 requêtes réseau au chargement de l'Accueil.
+Limite de 20 éléments par section (aucune limite précisée par les cartes, valeur
+alignée sur celle déjà utilisée par les sections "Populaires"/"Nouveautés" du
+Catalogue).
+
+**US-ACC-01/02 — Frontend réutilise `MediaSection`/`Carousel`/`MediaCard` du
+Catalogue tels quels**, aucun nouveau composant de présentation nécessaire — les
+badges Top 3/Top 10/Nouveau et le badge PEGI (US-PRO-10) apparaissent donc aussi
+sur l'Accueil par simple réutilisation, cohérent avec le Catalogue.
+
+Testé en réel : `GET /api/medias/home` en visiteur (4 sections peuplées, animés
+correctement détectés via `is_anime` même si `type` reste `'tv'` en base) et avec
+un utilisateur temporaire filtre PEGI actif/inactif (un film PEGI 16 disparaît de
+`popular`/`movies` filtre actif, réapparaît filtre coupé — cohérent avec
+US-PRO-10). Frontend vérifié par transformation Vite sans erreur sur
+`Homepage.tsx` et `catalogService.ts` (pas de vérification visuelle en
+navigateur). Utilisateur de test nettoyé après coup.
