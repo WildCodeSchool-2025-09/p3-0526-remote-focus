@@ -237,3 +237,18 @@ Impact : aucun effet de bord, correction pure. `MovieDetail.tsx` (US-DET-01) n'a
 toujours pas ce bouton — sa checklist ne le demande pas explicitement (contrairement
 à DET-02/03/04), donc non ajouté pour rester dans le périmètre de chaque carte,
 mais à noter comme incohérence UX potentielle entre fiches film/série/saison.
+
+---
+
+## US-DET-01
+
+**US-DET-01** — Ajout du composant partagé `BackButton` (`navigate(-1)`) sur
+`MovieDetail.tsx`.
+Pourquoi : ce n'était pas demandé explicitement dans les étapes techniques de la
+carte US-DET-01 (contrairement à US-DET-02/03/04, qui le demandent toutes
+explicitement). Ajouté a posteriori pour la cohérence UX entre fiches film/série/
+saison — **décision validée côté produit**, pas une improvisation : demandé
+explicitement par l'utilisateur après constat de l'incohérence notée dans l'entrée
+US-DET-02 ci-dessus.
+Impact : aucun effet de bord ; réutilise le composant déjà créé pour US-DET-02/03.
+Testé en réel (page `/movies/:id` toujours fonctionnelle) avant commit.

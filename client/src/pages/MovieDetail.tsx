@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
@@ -61,7 +62,10 @@ function MovieDetail() {
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
-      <Breadcrumb currentLabel={mediaDetail.name} />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Breadcrumb currentLabel={mediaDetail.name} />
+        <BackButton />
+      </div>
       <MediaHeader media={mediaDetail} />
       <CastList
         cast={mediaDetail.cast}
