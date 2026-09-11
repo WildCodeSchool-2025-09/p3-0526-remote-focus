@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Clapperboard, Star } from "lucide-react";
 import type { Media } from "../../types/Catalog";
 import { Link } from "react-router";
 
@@ -16,6 +16,7 @@ function MediaCard({ media, className }: MediaCardProps) {
           alt={`${media.name} poster`}
           className="rounded-box"
         />
+        <span className="rounded-badge badge-primary flex justify-center absolute max-w-8 p-1"><Clapperboard size={24}/></span>
         <h4
           className="line-clamp-2 min-h-12 content-center"
           title={`${media.name}`}
