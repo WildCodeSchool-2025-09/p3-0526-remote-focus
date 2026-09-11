@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Media } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
@@ -79,10 +81,10 @@ function MediaHeader({ media }: MediaHeaderProps) {
                 <MediaInfo media={media} />
 
                 <div className="flex flex-wrap items-start gap-4">
-                    <ActionButton label="Favoris" color="#E83658" icon="♡" />
-                    <ActionButton label="Watchlist" color="#F5F5F0" icon="+" />
-                    <ActionButton label="Vu" color="#17B890" icon="✓" />
-                    <ActionButton label="Noter" color="#F2B705" icon="☆" />
+                    <ActionButton label="Favoris" color="#E83658" icon={Heart} />
+                    <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
+                    <ActionButton label="Vu" color="#17B890" icon={Check} />
+                    <ActionButton label="Noter" color="#F2B705" icon={Star} />
 
                     {media.platforms.length > 0 && (
                         <>
@@ -108,19 +110,19 @@ function MediaHeader({ media }: MediaHeaderProps) {
 type ActionButtonProps = {
     label: string;
     color: string;
-    icon: string;
+    icon: LucideIcon;
 };
 
-function ActionButton({ label, color, icon }: ActionButtonProps) {
+function ActionButton({ label, color, icon: Icon }: ActionButtonProps) {
     return (
         <div className="flex flex-col items-center gap-2">
             <button
                 type="button"
                 disabled
-                className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 text-xl md:h-12 md:w-12"
+                className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12"
                 style={{ borderColor: color, color }}
             >
-                {icon}
+                <Icon size={22} strokeWidth={1.8} />
             </button>
             <span className="text-sm text-white/60">{label}</span>
         </div>

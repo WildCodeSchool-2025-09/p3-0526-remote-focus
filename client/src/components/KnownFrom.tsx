@@ -24,7 +24,7 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
     }, [personId, mediaId]);
 
     return (
-        <div className="flex flex-col gap-4 rounded-xl border border-white/10 bg-[#0F242F] p-4 md:gap-5 md:p-6">
+        <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-white/10 bg-[#0F242F] p-4 md:gap-5 md:p-6">
             <h3 className="text-base font-semibold md:text-lg">
                 Vous le connaissez déjà dans :
             </h3>
