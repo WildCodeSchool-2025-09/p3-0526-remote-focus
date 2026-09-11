@@ -14,13 +14,31 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
+
     setLoading(true);
     setError(null);
 
     fetchFilmography(personId, mediaId)
-      .then((data) => setItems(data))
-      .catch(() => setError("Filmographie indisponible."))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (active) {
+          setItems(data);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setError("Filmographie indisponible.");
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, [personId, mediaId]);
 
   return (
