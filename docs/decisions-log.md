@@ -1055,3 +1055,44 @@ top 6) ; film regardé (acteur commun avec un autre titre non vu noté > 7) → 
 second titre apparaît dans le bloc acteurs, le titre déjà vu n'y apparaît jamais ;
 filtre PEGI actif → contenu 16+/18 exclu des deux blocs. Utilisateurs de test
 nettoyés après coup ; base partagée revérifiée à 0 utilisateur restant.
+
+## US-REC-02
+
+**US-REC-02 — Carte sans description**, seul le titre ("trier le résultat de
+recherche") existait. Interprétation retenue à partir du titre et de la
+convention déjà documentée par l'équipe elle-même (fichier "Convention de
+nommage" : `sortBy`/`sortOrder` cités en exemple de query params, et `SortMenu`
+cité en exemple de nom de composant — cette US semble avoir été anticipée dans
+cette convention) : tri par nom (défaut, comportement actuel inchangé), note, ou
+date, chacun avec un ordre asc/desc. Query params `GET /api/medias/search?...
+&sortBy=name|rating|date&sortOrder=asc|desc`, 400 si valeur hors de cette liste.
+
+**US-REC-02 — Tri appliqué par la requête SQL globale, pas par catégorie** : la
+recherche renvoie 3 tableaux distincts (films/séries/animés, déjà affichés
+séparément dans l'UI) — le tri porte sur la requête unique qui les précède, donc
+chaque tableau se retrouve trié correctement en conservant l'ordre relatif
+d'origine une fois répartis par catégorie. Vérifié explicitement en testant
+chaque tableau séparément plutôt qu'un tableau concaténé (piège rencontré dans
+mon propre script de test au premier essai — la concaténation de 3 tableaux déjà
+triés indépendamment donne une apparence de désordre qui n'existe pas dans
+l'affichage réel, où chaque catégorie a sa propre liste).
+
+**US-REC-02 — `overallRating` ajouté au DTO de recherche** (absent jusqu'ici) et
+affiché sur `SearchResultCard` (étoile + note, même utilitaire `formatRating` que
+`MediaCard`) — nécessaire pour que trier par note ait un sens visible à
+l'utilisateur, pas seulement un effet invisible sur l'ordre.
+
+**US-REC-02 — Choix des ordres par défaut par critère** : nom → ascendant
+(alphabétique, comportement déjà en place), note → descendant (les mieux notés
+en premier, ce qu'on attend d'un tri "par note"), date → descendant (les plus
+récents en premier). Convention usuelle (Netflix/IMDB), rien d'écrit dans la
+carte vide pour trancher autrement.
+
+Testé en réel : les 5 combinaisons tri×ordre vérifiées séparément sur chaque
+catégorie (films/séries/animés) contre l'ordre attendu calculé directement en
+base ; tri par défaut (aucun paramètre) inchangé par rapport au comportement
+existant ; requête invalide sur `sortBy`/`sortOrder` → 400 chacune ; filtre PEGI
+toujours actif en combinaison avec le tri (contenu 16+ absent quel que soit le
+tri demandé). Frontend vérifié par transformation Vite sans erreur sur
+`SortMenu.tsx`, `SearchResults.tsx` et `SearchResultCard.tsx`. Utilisateur de
+test nettoyé après coup.

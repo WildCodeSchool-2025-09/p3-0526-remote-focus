@@ -1,6 +1,11 @@
 import type { CatalogResponse, Format } from "../types/Catalog";
 import type { DashboardData } from "../types/Profile";
-import type { KnownForResponse, SearchResults } from "../types/Search";
+import type {
+  KnownForResponse,
+  SearchResults,
+  SearchSortBy,
+  SearchSortOrder,
+} from "../types/Search";
 import type { User } from "../types/User";
 import type {
   Actor,
@@ -124,9 +129,19 @@ export async function fetchActorFilmography(
 export async function searchMedias(
   query: string,
   token?: string,
+  sortBy?: SearchSortBy,
+  sortOrder?: SearchSortOrder,
 ): Promise<SearchResults> {
+  const params = new URLSearchParams({ q: query });
+  if (sortBy != null) {
+    params.set("sortBy", sortBy);
+  }
+  if (sortOrder != null) {
+    params.set("sortOrder", sortOrder);
+  }
+
   const response = await fetch(
-    `${API_URL}/api/medias/search?q=${encodeURIComponent(query)}`,
+    `${API_URL}/api/medias/search?${params.toString()}`,
     { headers: authHeaders(token) },
   );
 

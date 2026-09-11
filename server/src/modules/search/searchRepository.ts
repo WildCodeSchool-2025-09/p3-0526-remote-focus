@@ -2,6 +2,19 @@ import client from "../../../database/client";
 import type { Rows } from "../../../database/client";
 import { PEGI16_VALUES } from "../../utils/applyPegiFilter";
 
+export type SortBy = "name" | "rating" | "date";
+export type SortOrder = "asc" | "desc";
+
+const SORT_COLUMNS: Record<SortBy, string> = {
+  name: "m.name",
+  rating: "m.overall_rating",
+  date: "m.released_at",
+};
+
+function buildOrderByClause(sortBy: SortBy, sortOrder: SortOrder): string {
+  return `${SORT_COLUMNS[sortBy]} ${sortOrder.toUpperCase()}`;
+}
+
 //recherche par média
 export interface MediaSearchRow extends Rows {
   id: number;
@@ -11,12 +24,15 @@ export interface MediaSearchRow extends Rows {
   poster: string | null;
   released_at: Date | null;
   pegi: string | null;
+  overall_rating: number | string | null;
 }
 
 export async function findMediaByTitle(
   q: string,
   type: string | undefined,
   hidePegi16: boolean,
+  sortBy: SortBy,
+  sortOrder: SortOrder,
   limit: number,
   offset: number,
 ): Promise<MediaSearchRow[]> {
@@ -40,10 +56,10 @@ export async function findMediaByTitle(
   params.push(limit, offset);
 
   const [rows] = await client.query<MediaSearchRow[]>(
-    `SELECT m.id, m.name, m.type, m.is_anime, m.poster, m.released_at, m.pegi
+    `SELECT m.id, m.name, m.type, m.is_anime, m.poster, m.released_at, m.pegi, m.overall_rating
       FROM media m
       WHERE m.name LIKE ? ${typeClause} ${pegiClause}
-      ORDER BY m.name ASC
+      ORDER BY ${buildOrderByClause(sortBy, sortOrder)}
       LIMIT ? OFFSET ?`,
     params,
   );

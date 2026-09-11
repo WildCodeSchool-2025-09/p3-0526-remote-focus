@@ -1,5 +1,7 @@
+import { Star } from "lucide-react";
 import { Link } from "react-router";
 import type { SearchMedia } from "../../types/Search";
+import { formatRating } from "../../utils/formatRating";
 import { getMediaPath } from "../../utils/mediaPath";
 import MediaCardActions from "../MediaCardActions";
 
@@ -32,6 +34,12 @@ function SearchResultCard({ media }: SearchResultCardProps) {
         <span className="text-base font-semibold">{media.name}</span>
         <span className="text-focus-muted-dark flex items-center gap-1 text-sm">
           {year != null && <span>{year}</span>}
+          {media.overallRating != null && (
+            <span className="flex items-center gap-1">
+              <Star fill="#F2B705" color="#F2B705" size={12} />
+              {formatRating(media.overallRating)}
+            </span>
+          )}
           {media.pegi != null && (
             <span className="badge badge-outline badge-sm">
               PEGI {media.pegi}

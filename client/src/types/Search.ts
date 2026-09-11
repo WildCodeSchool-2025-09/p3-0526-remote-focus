@@ -6,7 +6,11 @@ type SearchMedia = {
   releasedAt: string | null;
   type: "movie" | "tv";
   pegi?: string | null;
+  overallRating?: number | string | null;
 };
+
+type SearchSortBy = "name" | "rating" | "date";
+type SearchSortOrder = "asc" | "desc";
 
 type SearchPerson = {
   id: number;
@@ -37,6 +41,8 @@ type KnownForResponse = {
 
 export type {
   SearchMedia,
+  SearchSortBy,
+  SearchSortOrder,
   SearchPerson,
   SearchResults,
   KnownForMode,

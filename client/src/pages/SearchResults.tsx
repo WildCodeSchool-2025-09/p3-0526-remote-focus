@@ -2,14 +2,27 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import MediaList from "../components/Search/MediaList";
+import SortMenu from "../components/SortMenu";
 import { useAuth } from "../contexts/AuthContext";
 import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
 import { searchMedias } from "../services/api";
-import type { SearchResults as SearchResultsType } from "../types/Search";
+import type {
+  SearchResults as SearchResultsType,
+  SearchSortBy,
+  SearchSortOrder,
+} from "../types/Search";
 
 const DEBOUNCE_DELAY_MS = 400;
 const MIN_QUERY_LENGTH = 2;
+
+function parseSortBy(value: string | null): SearchSortBy {
+  return value === "rating" || value === "date" ? value : "name";
+}
+
+function parseSortOrder(value: string | null): SearchSortOrder {
+  return value === "desc" ? "desc" : "asc";
+}
 
 const emptyResults: SearchResultsType = {
   films: [],
@@ -30,6 +43,19 @@ const SearchResults = () => {
 
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
+
+  const sortBy = parseSortBy(searchParams.get("sortBy"));
+  const sortOrder = parseSortOrder(searchParams.get("sortOrder"));
+
+  const handleSortChange = (
+    nextSortBy: SearchSortBy,
+    nextSortOrder: SearchSortOrder,
+  ) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("sortBy", nextSortBy);
+    params.set("sortOrder", nextSortOrder);
+    setSearchParams(params, { replace: true });
+  };
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate le contexte depuis l'URL une seule fois au montage, pas à chaque frappe
   useEffect(() => {
@@ -53,7 +79,7 @@ const SearchResults = () => {
     setLoading(true);
     setError(false);
 
-    searchMedias(trimmedQuery, token ?? undefined)
+    searchMedias(trimmedQuery, token ?? undefined, sortBy, sortOrder)
       .then((results) => {
         if (!cancelled) {
           setSearchResults(results);
@@ -73,17 +99,26 @@ const SearchResults = () => {
     return () => {
       cancelled = true;
     };
-  }, [trimmedQuery, token]);
+  }, [trimmedQuery, token, sortBy, sortOrder]);
 
-  const hasResults =
+  const hasMediaResults =
     searchResults.films.length > 0 ||
     searchResults.series.length > 0 ||
-    searchResults.animes.length > 0 ||
-    searchResults.actors.length > 0;
+    searchResults.animes.length > 0;
+  const hasResults = hasMediaResults || searchResults.actors.length > 0;
 
   return (
     <div className="min-h-screen bg-base-100 p-8 space-y-6">
-      <h1>Recherche</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1>Recherche</h1>
+        {!loading && !error && hasMediaResults && (
+          <SortMenu
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onChange={handleSortChange}
+          />
+        )}
+      </div>
 
       {loading && <span className="loading loading-spinner text-primary" />}
 
