@@ -1,8 +1,10 @@
+import { Fragment } from "react";
 import { Link } from "react-router";
 
 type BreadcrumbProps = {
   currentLabel: string;
   format?: "movie" | "tv";
+  trail?: { label: string; to: string }[];
 };
 
 const FORMAT_LABEL: Record<"movie" | "tv", string> = {
@@ -10,7 +12,11 @@ const FORMAT_LABEL: Record<"movie" | "tv", string> = {
   tv: "Séries",
 };
 
-function Breadcrumb({ currentLabel, format = "movie" }: BreadcrumbProps) {
+function Breadcrumb({
+  currentLabel,
+  format = "movie",
+  trail = [],
+}: BreadcrumbProps) {
   return (
     <nav
       aria-label="Fil d'Ariane"
@@ -27,6 +33,14 @@ function Breadcrumb({ currentLabel, format = "movie" }: BreadcrumbProps) {
       <Link to={`/catalog?type=${format}`} className="hover:text-[#F5F5F0]">
         {FORMAT_LABEL[format]}
       </Link>
+      {trail.map((item) => (
+        <Fragment key={item.to}>
+          <span className="text-[#5E7079]">›</span>
+          <Link to={item.to} className="hover:text-[#F5F5F0]">
+            {item.label}
+          </Link>
+        </Fragment>
+      ))}
       <span className="text-[#5E7079]">›</span>
       <span className="font-medium text-[#F2B705]">{currentLabel}</span>
     </nav>

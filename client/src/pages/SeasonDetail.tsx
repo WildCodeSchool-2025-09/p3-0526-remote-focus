@@ -3,22 +3,24 @@ import { useParams } from "react-router";
 import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
+import EpisodeDetailList from "../components/EpisodeDetailList";
 import KnownFrom from "../components/KnownFrom";
-import SeasonList from "../components/SeasonList";
-import SerieHeader from "../components/SerieHeader";
-import { fetchSeries } from "../services/api";
-import type { Series } from "../types/media";
+import SeasonHeader from "../components/SeasonHeader";
+import { fetchSeason } from "../services/api";
+import type { SeasonDetail as SeasonDetailData } from "../types/media";
 
-function SerieDetail() {
-  const { id } = useParams();
+function SeasonDetail() {
+  const { serieId, seasonId } = useParams();
 
-  const [seriesDetail, setSeriesDetail] = useState<Series | null>(null);
+  const [seasonDetail, setSeasonDetail] = useState<SeasonDetailData | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (id == null) {
+    if (serieId == null || seasonId == null) {
       return;
     }
 
@@ -27,15 +29,15 @@ function SerieDetail() {
     setLoading(true);
     setError(null);
 
-    fetchSeries(Number(id))
+    fetchSeason(Number(serieId), Number(seasonId))
       .then((data) => {
         if (active) {
-          setSeriesDetail(data);
+          setSeasonDetail(data);
         }
       })
       .catch(() => {
         if (active) {
-          setError("Cette série est introuvable.");
+          setError("Cette saison est introuvable.");
         }
       })
       .finally(() => {
@@ -47,7 +49,7 @@ function SerieDetail() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [serieId, seasonId]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);
@@ -57,29 +59,44 @@ function SerieDetail() {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
 
-  if (error != null || seriesDetail == null) {
+  if (error != null || seasonDetail == null) {
     return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
   }
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Breadcrumb currentLabel={seriesDetail.name} format="tv" />
+        <Breadcrumb
+          currentLabel={seasonDetail.name ?? `Saison ${seasonDetail.number}`}
+          format="tv"
+          trail={[
+            {
+              label: seasonDetail.series.name,
+              to: `/series/${seasonDetail.series.id}`,
+            },
+          ]}
+        />
         <BackButton />
       </div>
-      <SerieHeader series={seriesDetail} />
-      <SeasonList seriesId={seriesDetail.id} seasons={seriesDetail.seasons} />
+      <SeasonHeader season={seasonDetail} />
+      <EpisodeDetailList
+        episodes={seasonDetail.episodes}
+        fallbackPoster={seasonDetail.poster}
+      />
       <CastList
-        cast={seriesDetail.cast}
-        castTotal={seriesDetail.castTotal}
+        cast={seasonDetail.cast}
+        castTotal={seasonDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={seriesDetail.id} />
+        <KnownFrom
+          personId={selectedPersonId}
+          mediaId={seasonDetail.series.id}
+        />
       )}
     </div>
   );
 }
 
-export default SerieDetail;
+export default SeasonDetail;

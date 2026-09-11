@@ -5,6 +5,7 @@ import authActions from "./modules/auth/authActions";
 import genreActions from "./modules/genre/genreActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
+import seasonActions from "./modules/season/seasonActions";
 import seriesActions from "./modules/series/seriesActions";
 import userActions from "./modules/user/userActions";
 
@@ -37,6 +38,7 @@ router.post("/api/items", itemActions.add);
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/series/:id", seriesActions.read);
+router.get("/api/series/:serieId/seasons/:seasonId", seasonActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
 export default router;

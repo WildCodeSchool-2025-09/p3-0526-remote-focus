@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Preferences from "./pages/Preferences";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
 
 const router = createBrowserRouter([
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
       {
         path: "series/:id",
         element: <SerieDetail />,
+      },
+      {
+        path: "series/:serieId/seasons/:seasonId",
+        element: <SeasonDetail />,
       },
     ],
   },

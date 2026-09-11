@@ -56,6 +56,38 @@ export type Season = {
   episodeCount: number;
 };
 
+export type Episode = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  releasedAt: string | null;
+  synopsis: string | null;
+  duration: number | null;
+};
+
+export type SeasonDetail = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  poster: string | null;
+  synopsis: string | null;
+  releasedAt: string | null;
+  isFinished: boolean;
+  overallRating: string | null;
+  totalDuration: number;
+  series: {
+    id: number;
+    name: string;
+  };
+  genres: Genre[];
+  platforms: Platform[];
+  episodes: Episode[];
+  cast: CastMember[];
+  castTotal: number;
+  userStatus: string | null;
+  userRating: number | null;
+};
+
 export type Series = {
   id: number;
   name: string;

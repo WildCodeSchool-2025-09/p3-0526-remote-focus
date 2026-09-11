@@ -198,3 +198,42 @@ de recherche cliquables vers les fiches série, ce qui a nécessité de vérifie
 séries remontaient bien dans les résultats.
 Impact : bug réel corrigé, présent depuis la livraison initiale d'US-REC-01 ; sans
 correction, la fonctionnalité de recherche de séries était silencieusement cassée.
+
+---
+
+## US-DET-03
+
+**US-DET-03** — "Comédiens qui jouent un rôle dans la saison" dérivés de
+`episode_person` (jointure `episode_person` → `episode` → filtre `ID_season`), et non
+d'une table `season_person` (qui n'existe pas dans le schéma).
+Pourquoi : le schéma ne modélise le casting qu'au niveau média (`media_person`, pour
+toute la série) ou épisode (`episode_person`) — rien au niveau saison. Vérifié que
+`episode_person` est bien peuplé (~19 000 lignes) avant de choisir cette approche.
+Impact : le casting affiché sur une fiche saison est réellement propre à cette
+saison (testé : 45 comédiens sur la Saison 1 de Rick et Morty, contre 200 pour la
+série entière), pas juste une redite du casting de la série.
+
+**US-DET-03** — Genres, plateformes et note globale de la saison réutilisent ceux de
+la série parente (`media`) plutôt que d'être calculés au niveau saison.
+Pourquoi : aucune de ces trois informations n'existe à la granularité saison dans le
+schéma (`classify_as`, `available_on` et `overall_rating` sont tous liés à `ID_media`,
+pas à une saison) — la carte les demande ("Afficher les genres de la saison", "note"
+dans les étapes techniques) sans que la donnée sous-jacente existe à ce niveau.
+Impact : une saison affiche donc les mêmes genres/plateformes/note que sa série ;
+c'est un choix d'affichage, pas un bug, mais ça vaut le coup de le savoir si
+quelqu'un s'attend à des valeurs différenciées par saison.
+
+**US-DET-04 (à anticiper)** — Confirmé : `episode` n'a pas de colonne image, donc
+`EpisodeDetailList` affiche la vignette de la saison en fallback pour chaque épisode
+(pas d'image différenciée par épisode). Cohérent avec l'observation déjà notée sous
+US-DET-04 plus haut dans ce fichier.
+
+**US-DET-02 — gap corrigé rétroactivement** : le bouton retour (`navigate(-1)`),
+explicitement demandé par la checklist d'US-DET-02 elle-même, avait été oublié sur
+`SerieDetail.tsx`. Ajouté maintenant (composant partagé `BackButton.tsx`, réutilisé
+aussi sur `SeasonDetail.tsx`).
+Pourquoi manqué initialement : simple oubli en construisant la fiche série.
+Impact : aucun effet de bord, correction pure. `MovieDetail.tsx` (US-DET-01) n'a
+toujours pas ce bouton — sa checklist ne le demande pas explicitement (contrairement
+à DET-02/03/04), donc non ajouté pour rester dans le périmètre de chaque carte,
+mais à noter comme incohérence UX potentielle entre fiches film/série/saison.
