@@ -3,6 +3,7 @@ import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Media } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
+import { formatRating } from "../utils/formatRating";
 import MediaInfo from "./MediaInfo";
 
 type MediaHeaderProps = {
@@ -68,7 +69,9 @@ function MediaHeader({ media }: MediaHeaderProps) {
               <span className={PILL}>{formatDuration(media.duration)}</span>
             )}
             {media.overallRating != null && (
-              <span className={PILL}>★ {media.overallRating}</span>
+              <span className={PILL}>
+                ★ {formatRating(media.overallRating)}
+              </span>
             )}
             {media.pegi != null && (
               <span className={PILL}>PEGI {media.pegi}</span>

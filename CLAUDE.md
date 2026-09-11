@@ -100,13 +100,10 @@ Chaque US suit ce format :
 - `track.favorited_at`/`watchlist_added_at` (`DATETIME`), `user_.created_at` (`DATETIME`) :
   pas encore appliqués — à faire au fil de l'eau (avec US-DET-08 et US-AUTH-01
   respectivement), pas de conflit connu
-
-## Décision à reconfirmer avant la Phase 2
-
-- **`media.pegi`** : le pipeline TMDB déjà écrit (`server/bin/tmdbFetch.ts`,
-  `pegiFromMovie`/`pegiFromTv`), le seed (30 médias) et les 4 branches CAT-01/DET-01/
-  REC-01/Presentation_branch traitent tous `pegi` comme `VARCHAR(50)` avec l'ensemble
-  fermé `'TP'|'10'|'12'|'16'|'18'` — avec un commentaire d'équipe explicite justifiant ce
-  choix plutôt qu'un INT. La conversion en INT (`TP = 0`) initialement envisagée
-  demanderait de réécrire ce pipeline + le seed + les types dans 4 branches. À trancher
-  avant d'implémenter le filtre PEGI de US-CAT-02.
+- **`media.pegi`** : reste en `VARCHAR(50)` (`'TP'|'10'|'12'|'16'|'18'`), pas de conversion
+  en INT. Confirmé par l'équipe (données reçues telles quelles, ex. `"16"`, `"TP"`) et
+  cohérent avec le pipeline TMDB déjà écrit (`pegiFromMovie`/`pegiFromTv`), le seed et
+  les 4 branches CAT-01/DET-01/REC-01/Presentation_branch qui l'utilisent déjà ainsi.
+- **Format d'affichage des notes** : `overallRating` (DECIMAL SQL, remonte en string type
+  `"8.90"`) s'affiche toujours `X.X/10` (ex. `8.9/10`), jamais la valeur brute. Utilitaire
+  partagé : `client/src/utils/formatRating.ts`.
