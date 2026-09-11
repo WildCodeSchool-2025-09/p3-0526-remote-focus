@@ -59,6 +59,10 @@ function MovieDetail() {
     return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
   }
 
+  if (mediaDetail.type !== "movie") {
+    return <p className="p-8 text-focus-muted">Ce média n'est pas un film.</p>;
+  }
+
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
       <Breadcrumb currentLabel={mediaDetail.name} />

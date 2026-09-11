@@ -27,6 +27,7 @@ const read: RequestHandler = async (req, res, next) => {
     res.json({
       id: movie.ID,
       name: movie.name,
+      type: movie.type,
       originalName: movie.original_name,
       poster: movie.poster,
       synopsis: movie.synopsis,

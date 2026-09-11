@@ -3,11 +3,11 @@ import databaseClient, { type Rows } from "../../../database/client";
 class MediaRepository {
   async read(id: number) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT ID, name, original_name, poster, synopsis, duration,
+      `SELECT ID, name, type, original_name, poster, synopsis, duration,
               released_at, overall_rating, original_language, pegi
        FROM media
-       WHERE ID = ? AND type = ?`,
-      [id, "movie"],
+       WHERE ID = ?`,
+      [id],
     );
     return rows[0] ?? null;
   }

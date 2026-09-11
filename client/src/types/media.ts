@@ -21,6 +21,7 @@ export type CastMember = {
 export type Media = {
   id: number;
   name: string;
+  type: string;
   originalName: string | null;
   poster: string | null;
   synopsis: string | null;
