@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import type { EnrichedMedia, Media } from "../../types/Media/Media.types";
 
-import HomepageRepository from "./homepageRepository";
+import homepageRepository from "./homepageRepository";
 
 const isMediaNew = (releasedAt: Date | string | null): boolean => {
   if (releasedAt == null) {
@@ -23,7 +23,7 @@ const enrichMedias = (medias: Media[]): EnrichedMedia[] => {
     return {
       ...media,
       topRank: position <= 3 ? "top3" : position <= 10 ? "top10" : null,
-      isNew: isMediaNew(media.released_at),
+      isNew: isMediaNew(media.releasedAt),
     };
   });
 };
@@ -31,9 +31,9 @@ const enrichMedias = (medias: Media[]): EnrichedMedia[] => {
 const browseByCategory: RequestHandler = async (_req, res, next) => {
   try {
     const [films, series, animes] = await Promise.all([
-      HomepageRepository.readByCategory("movie"),
-      HomepageRepository.readByCategory("tv"),
-      HomepageRepository.readByCategory("anime"),
+      homepageRepository.readByCategory("movie"),
+      homepageRepository.readByCategory("tv"),
+      homepageRepository.readByCategory("anime"),
     ]);
 
     res.json({

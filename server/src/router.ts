@@ -1,7 +1,7 @@
 import express from "express";
 import actorActions from "./modules/actor/actorActions";
 import mediaActions from "./modules/media/mediaActions";
-import homepageActions from "./modules/Homepage/homepageActions";
+import homepageActions from "./modules/homepage/homepageActions";
 
 const router = express.Router();
 

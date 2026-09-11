@@ -1,18 +1,18 @@
 export type HomepageMedia = {
-  ID: number;
-  tmdb_id: number;
+  id: number;
+  tmdbId: number;
   name: string;
   type: string;
-  released_at: string | null;
+  releasedAt: string | null;
   duration: number | null;
   poster: string | null;
   synopsis: string | null;
-  overall_rating: number | string | null;
+  overallRating: number | string | null;
   status: string | null;
-  original_name: string | null;
-  original_language: string | null;
+  originalName: string | null;
+  originalLanguage: string | null;
   pegi: string | null;
-  is_anime: number | boolean;
+  isAnime: number | boolean;
   topRank: "top3" | "top10" | null;
   isNew: boolean;
 };

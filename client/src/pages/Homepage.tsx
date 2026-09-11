@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { fetchHomepage } from "../services/homepageApi";
-import type { HomepageData } from "../types/homepage";
+import type { HomepageData } from "../types/Homepage";
 
 function Homepage() {
   const [homepageData, setHomepageData] = useState<HomepageData | null>(null);
