@@ -102,6 +102,13 @@ Chaque US suit ce format :
   `tracking/`) implémentées et testées contre la base réelle. Branche `ClaudeApp`
   poussée (sans PR) sur une branche distante `ClaudeEquipe` pour permettre à
   l'équipe de tester visuellement sans toucher à `dev`.
+- Phase 4 (même branche `ClaudeApp`) : US-PRO-01 (dashboard), US-PRO-02/03
+  (favoris/watchlist), US-PRO-07 (paramètres, structure), US-PRO-08 (pseudo/email/
+  mot de passe), US-PRO-09 (photo de profil), US-PRO-10 (filtre PEGI 16+),
+  US-PRO-11 (mécanique de thème) implémentées et testées contre la base réelle.
+  Deux bugs préexistants trouvés et corrigés au passage (voir "Décisions
+  tranchées" ci-dessous) : `is_pegi16` non désactivé par défaut à l'inscription,
+  et absence de middleware d'auth sur les routes de liste de médias.
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.
