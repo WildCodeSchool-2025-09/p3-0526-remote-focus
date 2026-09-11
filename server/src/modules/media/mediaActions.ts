@@ -35,8 +35,16 @@ const read: RequestHandler = async (req, res, next) => {
       overallRating: movie.overall_rating,
       originalLanguage: movie.original_language,
       pegi: movie.pegi,
-      genres,
-      platforms,
+      genres: genres.map((genre) => ({
+        id: genre.ID,
+        name: genre.name,
+      })),
+      platforms: platforms.map((platform) => ({
+        id: platform.ID,
+        name: platform.name,
+        logo: platform.logo,
+        url: platform.url,
+      })),
       cast: cast.map((person) => ({
         id: person.ID,
         name: person.name,

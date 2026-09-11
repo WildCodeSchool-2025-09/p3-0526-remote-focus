@@ -1,10 +1,10 @@
 export type Genre = {
-  ID: number;
+  id: number;
   name: string;
 };
 
 export type Platform = {
-  ID: number;
+  id: number;
   name: string;
   logo: string | null;
   url: string | null;

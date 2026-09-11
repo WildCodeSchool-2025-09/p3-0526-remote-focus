@@ -39,7 +39,7 @@ function MediaHeader({ media }: MediaHeaderProps) {
 
         <div className="flex flex-wrap items-center gap-2">
           {media.genres.map((genre) => (
-            <span key={genre.ID} className={PILL_ACTIVE}>
+            <span key={genre.id} className={PILL_ACTIVE}>
               {genre.name}
             </span>
           ))}
@@ -92,7 +92,7 @@ function MediaHeader({ media }: MediaHeaderProps) {
               <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
                 {media.platforms.map((platform) => (
                   <img
-                    key={platform.ID}
+                    key={platform.id}
                     src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
                     alt={platform.name}
                     className="h-8 w-8 rounded object-contain"
