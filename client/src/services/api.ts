@@ -1,6 +1,7 @@
 import type { SearchResults } from "../types/Search";
 import type { User } from "../types/User";
 import type {
+  Actor,
   EpisodeDetail,
   FilmographyItem,
   Genre,
@@ -68,6 +69,31 @@ export async function fetchFilmography(
 ): Promise<FilmographyItem[]> {
   const response = await fetch(
     `${API_URL}/api/actors/${personId}/filmography?exclude=${excludeMediaId}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Filmographie indisponible");
+  }
+
+  return response.json();
+}
+
+export async function fetchActor(id: number): Promise<Actor> {
+  const response = await fetch(`${API_URL}/api/actors/${id}`);
+
+  if (!response.ok) {
+    throw new Error(`Comédien ${id} introuvable`);
+  }
+
+  return response.json();
+}
+
+export async function fetchActorFilmography(
+  actorId: number,
+  sortOrder: "asc" | "desc" = "desc",
+): Promise<FilmographyItem[]> {
+  const response = await fetch(
+    `${API_URL}/api/actors/${actorId}/filmography?sortBy=date-${sortOrder}`,
   );
 
   if (!response.ok) {

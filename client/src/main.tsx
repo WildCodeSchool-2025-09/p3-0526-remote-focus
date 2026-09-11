@@ -7,6 +7,7 @@ import { SearchProvider } from "./contexts/SearchContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
+import ActorDetails from "./pages/ActorDetails";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import EpisodeDetail from "./pages/EpisodeDetail";
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
       {
         path: "series/:serieId/seasons/:seasonId/episodes/:episodeId",
         element: <EpisodeDetail />,
+      },
+      {
+        path: "actors/:id",
+        element: <ActorDetails />,
       },
     ],
   },

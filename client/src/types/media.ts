@@ -112,6 +112,13 @@ export type EpisodeDetail = {
   userStatus: string | null;
 };
 
+export type Actor = {
+  id: number;
+  name: string;
+  photo: string | null;
+  biography: string | null;
+};
+
 export type Series = {
   id: number;
   name: string;

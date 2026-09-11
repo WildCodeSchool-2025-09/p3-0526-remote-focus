@@ -293,3 +293,64 @@ Impact : chaque ligne d'épisode dans `EpisodeDetailList` ouvre désormais
 `/series/:serieId/seasons/:seasonId/episodes/:episodeId` (pas `/serie/.../saison/...`
 de la carte) — même raisonnement que US-DET-02/03 (anglais, cohérent avec les
 conventions de nommage).
+
+---
+
+## US-DET-05 / US-DET-06
+
+**US-DET-05 — POINT REMONTÉ IMMÉDIATEMENT À L'UTILISATEUR AVANT DE CODER** (validé
+avant implémentation, pas une décision solo) : la table `person` n'a ni date de
+naissance, ni date de décès, ni profession — vérifié qu'aucune des trois n'existe
+dans le pipeline TMDB actuel (`tmdbFetch.ts` ne capture que `biography`) ni dans
+`media_person.role`/`episode_person.role` (uniquement la valeur `"actor"` sur toute
+la base seedée, pas une vraie profession variée). L'utilisateur a choisi l'option
+"fiche sans ces 3 champs" plutôt qu'une migration+reseed complet (chantier à part,
+nécessite la clé API TMDB et du temps).
+Impact : la fiche comédien affiche nom/photo/biographie/filmographie uniquement.
+Aucune date de naissance/décès/profession nulle part dans l'app tant que ce choix
+n'est pas révisé — à garder en tête pour toute future US touchant aux comédiens.
+
+**US-DET-05** — Deux endpoints distincts (`GET /api/actors/:id` pour les infos,
+`GET /api/actors/:id/filmography` étendu pour la filmographie), plutôt qu'une
+réponse unique `{ infos: {...}, filmography: [...] }` comme suggéré dans la carte.
+Pourquoi : US-DET-06 demande explicitement que `ActorFilmography` soit un composant
+indépendant avec son propre fetch et son propre state de tri — cohérent avec deux
+appels séparés plutôt qu'une réponse imbriquée unique.
+Impact : structure de réponse plate (`id`, `name`, `photo`, `biography` au premier
+niveau), cohérent avec le style déjà utilisé sur DET-01 à 04, plutôt que
+d'introduire une clé `infos` inédite.
+
+**US-DET-06** — Route `GET /api/actors/:id/filmography` étendue (pas dupliquée) pour
+servir à la fois le widget "Vous le connaissez déjà dans" (US-DET-01/07, avec
+`exclude`, limité à 6) et la filmographie complète de la fiche comédien (sans
+`exclude`, sans limite, avec tri `sortBy=date-asc|date-desc`). La limite de 6 ne
+s'applique que si un `exclude` est fourni.
+Pourquoi : éviter de dupliquer la logique de requête SQL entre deux méthodes quasi
+identiques ; le contrat d'URL existant (`?exclude=X`) reste inchangé, donc
+`KnownFrom.tsx` n'a nécessité aucune modification. Vérifié en réel que l'appel avec
+`exclude` reste bien limité à 6 après la modification.
+
+**US-DET-05 / US-DET-06** — Chaque œuvre de la filmographie (`components/MediaCard.tsx`,
+utilisé par `KnownFrom` ET par `ActorFilmography`) est maintenant cliquable vers sa
+fiche détaillée (`getMediaPath`), comme demandé explicitement par les deux cartes.
+Effet de bord positif : le widget `KnownFrom` (US-DET-01) en profite aussi, alors
+que ce n'était pas demandé par sa propre carte à l'époque.
+
+**US-DET-05** — Sur `ActorPortraitCard` (US-DET-01), séparation du clic photo
+(toggle du widget "connu pour/déjà vu", comportement existant) et du clic sur le nom
+(nouveau lien `<Link>` vers `/actors/:id`) — nécessaire pour ne pas imbriquer un
+`<a>` dans un `<button>` (HTML invalide) tout en satisfaisant les deux interactions
+demandées par des cartes différentes sur le même élément.
+Impact : cliquer sur la photo d'un comédien dans une fiche film/série ouvre toujours
+le widget inline ; cliquer sur son nom ouvre sa fiche dédiée.
+
+**US-DET-05** — Fil d'Ariane de la fiche comédien : simple "Accueil > NomDuComédien"
+écrit directement dans la page, plutôt que de réutiliser le composant `Breadcrumb`
+partagé (US-DET-01/02/03/04).
+Pourquoi : `Breadcrumb` est structurellement couplé à la navigation catalogue
+(format film/série + lien `/catalog?type=...`), qui n'a pas de sens pour un
+comédien. Étendre son API pour un cas très différent aurait risqué de complexifier
+ou casser son usage sur les 4 fiches déjà en place.
+Impact : aucun, fil d'Ariane minimal mais fonctionnel.
+
+**Route** : `/actors/:id` (déjà en anglais/pluriel dans la carte, aucun écart ici).

@@ -44,6 +44,7 @@ router.get(
   "/api/series/:serieId/seasons/:seasonId/episodes/:episodeId",
   episodeActions.read,
 );
+router.get("/api/actors/:id", actorActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
 export default router;

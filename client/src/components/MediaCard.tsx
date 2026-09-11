@@ -1,4 +1,6 @@
+import { Link } from "react-router";
 import type { FilmographyItem } from "../types/media";
+import { getMediaPath } from "../utils/mediaPath";
 
 type MediaCardProps = {
   item: FilmographyItem;
@@ -6,7 +8,10 @@ type MediaCardProps = {
 
 function MediaCard({ item }: MediaCardProps) {
   return (
-    <div className="flex w-[120px] shrink-0 flex-col gap-2 md:w-[170px]">
+    <Link
+      to={getMediaPath(item.type, item.id)}
+      className="flex w-[120px] shrink-0 flex-col gap-2 md:w-[170px]"
+    >
       {item.poster != null ? (
         <img
           src={`https://image.tmdb.org/t/p/w342${item.poster}`}
@@ -21,7 +26,7 @@ function MediaCard({ item }: MediaCardProps) {
         <span className="text-base font-semibold">{item.name}</span>
         <span className="text-sm text-[#F2B705]">{item.characterName}</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
