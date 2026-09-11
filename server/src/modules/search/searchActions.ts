@@ -9,6 +9,7 @@ interface MediaDto {
   name: string;
   poster: string | null;
   releasedAt: Date | null;
+  type: "movie" | "tv";
 }
 
 interface PersonDto {
@@ -49,12 +50,13 @@ export async function browseResults(
       name: row.name,
       poster: row.poster,
       releasedAt: row.released_at,
+      type: row.type,
     };
 
-    // is_anime prime sur type : un anime reste un anime, qu'il soit "movie" ou "series"
+    // is_anime prime sur type : un anime reste un anime, qu'il soit "movie" ou "tv"
     if (row.is_anime) animes.push(dto);
     else if (row.type === "movie") films.push(dto);
-    else if (row.type === "series") series.push(dto);
+    else if (row.type === "tv") series.push(dto);
   }
 
   const actors: PersonDto[] = personRows.map((p) => ({

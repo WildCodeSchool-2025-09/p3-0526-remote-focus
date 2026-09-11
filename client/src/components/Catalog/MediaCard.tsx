@@ -2,6 +2,7 @@ import { Star } from "lucide-react";
 import { Link } from "react-router";
 import type { EnrichedMedia } from "../../types/Catalog";
 import { formatRating } from "../../utils/formatRating";
+import { getMediaPath } from "../../utils/mediaPath";
 
 interface MediaCardProps {
   media: EnrichedMedia;
@@ -22,7 +23,7 @@ function MediaCard({ media, className }: MediaCardProps) {
 
   return (
     <div className={className}>
-      <Link to={`/${media.type}s/${media.id}`} className="relative block">
+      <Link to={getMediaPath(media.type, media.id)} className="relative block">
         {badgeLabel != null && (
           <span className="badge badge-primary absolute left-2 top-2 z-10">
             {badgeLabel}

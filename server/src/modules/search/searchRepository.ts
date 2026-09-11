@@ -5,7 +5,7 @@ import type { Rows } from "../../../database/client";
 export interface MediaSearchRow extends Rows {
   id: number;
   name: string;
-  type: "movie" | "series";
+  type: "movie" | "tv";
   is_anime: number | boolean;
   poster: string | null;
   released_at: Date | null;
@@ -20,10 +20,10 @@ export async function findMediaByTitle(
   const params: unknown[] = [`%${q}%`];
   let typeClause = "";
 
-  // "anime" n'est pas une valeur de la colonne type (movie/series) mais un flag séparé is_anime
+  // "anime" n'est pas une valeur de la colonne type (movie/tv) mais un flag séparé is_anime
   if (type === "anime") {
     typeClause = "AND m.is_anime = 1";
-  } else if (type === "movie" || type === "series") {
+  } else if (type === "movie" || type === "tv") {
     typeClause = "AND m.type = ? AND m.is_anime = 0";
     params.push(type);
   }
@@ -76,7 +76,7 @@ export async function countMediaByTitle(
 
   if (type === "anime") {
     typeClause = "AND m.is_anime = 1";
-  } else if (type === "movie" || type === "series") {
+  } else if (type === "movie" || type === "tv") {
     typeClause = "AND m.type = ? AND m.is_anime = 0";
     params.push(type);
   }

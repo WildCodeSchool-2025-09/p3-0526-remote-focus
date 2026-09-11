@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Preferences from "./pages/Preferences";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import SerieDetail from "./pages/SerieDetail";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: "movies/:id",
         element: <MovieDetail />,
+      },
+      {
+        path: "series/:id",
+        element: <SerieDetail />,
       },
     ],
   },
