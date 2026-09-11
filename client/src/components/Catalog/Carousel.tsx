@@ -41,7 +41,6 @@ function Carousel({ children }: CarouselProps) {
 
   return (
     <div className="flex items-center gap-4">
-<div className="flex items-center gap-4">
   <button
     type="button"
     className={`hidden ${isAtStart ? "md:carousel-nav-disabled" : "md:carousel-nav"}`}
@@ -62,7 +61,7 @@ function Carousel({ children }: CarouselProps) {
     </div>
 
     {!isAtEnd && (
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-r from-transparent to-base-100 lg:hidden" />
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-r from-transparent to-base-100" />
     )}
   </div>
 
@@ -76,7 +75,6 @@ function Carousel({ children }: CarouselProps) {
     <ChevronRight aria-hidden="true" />
   </button>
 </div>
-    </div>
   );
 }
 

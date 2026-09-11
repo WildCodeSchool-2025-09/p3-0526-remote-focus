@@ -113,9 +113,9 @@
     display: none;
   }
 
-  .carousel-container {
-    @apply carousel carousel-start gap-4 py-2 scrollbar-none snap-x touch-pan-x;
-  }
+.carousel-container {
+  @apply carousel carousel-start gap-4 py-2 scrollbar-none snap-x touch-pan-x w-full;
+}
 
   .catalog-carousel-item {
     @apply carousel-item w-40 shrink-0 card;
