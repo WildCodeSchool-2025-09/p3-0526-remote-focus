@@ -1269,3 +1269,66 @@ confidentialité vérifiée (un second utilisateur et un visiteur voient
 transformation Vite sans erreur sur les 5 fichiers touchés (pas de vérification
 visuelle en navigateur, comme pour les US précédentes sans US-spécifique
 concernée par cette limite). Utilisateurs de test nettoyés après coup.
+
+## US-PRO-12
+
+**US-PRO-12 — "Titres vus" repris tel quel de `profileRepository.countWatchedTitles`**
+(déjà construit pour le tableau de bord US-PRO-01) plutôt que réécrit : même
+définition qu'ailleurs dans l'app (film → présent dans `media_user`, série →
+entièrement vue via la même règle `HAVING COUNT = SUM(...)`). La carte dit
+"media_user uniquement" au pied de la lettre, ce qui rendrait structurellement
+impossible de compter une série vue (cf. même résolution déjà actée sur
+US-PRO-01/US-DET-10) — cohérence retenue plutôt que prise au pied de la lettre.
+
+**US-PRO-12 — Règle anti-double-comptage du temps de visionnage : no-op par
+construction, non implémentée.** La carte demande de sommer `media.duration`
+pour les films vus (`media_user`) + `episode.duration` pour les épisodes vus
+(`episode_user`), "uniquement pour les médias non encore marqués vus dans
+media_user" pour éviter un double comptage. Or `media_user` ne contient que des
+films et `episode_user` ne référence que des épisodes de séries — un film n'a
+jamais d'épisodes, une série n'est jamais insérée dans `media_user` (règle
+`CLAUDE.md`). Les deux ensembles sont donc disjoints par construction : la somme
+brute (films + épisodes) ne peut pas double-compter. Implémenté sans filtre
+d'exclusion supplémentaire ; raisonnement documenté ici plutôt qu'en commentaire
+de code pour ne pas laisser croire à une règle métier active.
+
+**US-PRO-12 — Nom de colonnes de la carte (`media.duration_minutes`,
+`episode.duration_minutes`) vs. schéma réel (`media.duration`,
+`episode.duration`, déjà en `INT` minutes depuis une décision de session
+antérieure)** : écart de nomenclature uniquement, pas fonctionnel — la carte a
+été écrite avant que ce renommage soit tranché. Requêtes écrites contre les
+colonnes réelles.
+
+**US-PRO-12 — Genre "principal" retenu pour la répartition par genre**, un média
+pouvant être classé sous plusieurs genres (`classify_as` est une table
+d'association). La carte ne précise pas comment agréger un média multi-genre
+dans un donut en pourcentages (qui doivent sommer à 100). Choix : un seul genre
+"représentatif" par média (premier retourné par `classify_as` pour ce média),
+pour garantir que chaque titre vu ne compte que dans un seul secteur du donut et
+que les pourcentages restent cohérents. Alternative rejetée : compter un média
+dans chacun de ses genres, qui aurait fait dépasser 100% au total et aurait
+nécessité une légende "peut compter plusieurs fois" non demandée par la carte.
+
+**US-PRO-12 — Histogramme mensuel calé sur l'année civile en cours (`YEAR(NOW())`,
+Jan→Déc)**, conforme au texte de la carte ; les mois sans visionnage
+apparaissent à 0 plutôt que d'être omis, pour garder un axe X à 12 barres fixes
+côté graphique (Recharts `BarChart`).
+
+**US-PRO-12 — Recharts confirmé comme bibliothèque de graphiques réellement
+installée** (`client/package.json` : `recharts@^3.10.1`), résolvant l'ambiguïté
+"Recharts/Chart.js" du `CLAUDE.md` — `chart.js` n'est pas présent dans les
+dépendances. Donut (`PieChart`/`Pie`/`Cell`) pour la répartition par genre, barres
+(`BarChart`/`Bar`) pour l'histogramme mensuel, palette limitée aux 3 couleurs du
+design system (jaune/teal/rouge) avec dégradés d'opacité pour les genres
+au-delà de 3, plutôt que d'introduire de nouvelles teintes hors charte.
+
+Testé en réel avec un utilisateur temporaire : 401 sans token ; utilisateur neuf
+→ toutes les statistiques à zéro (`watchedTitles=0`, `watchTimeMinutes=0`, 12
+mois à 0, répartition par genre vide) ; film marqué vu → `watchedTitles=1`,
+`watchTimeMinutes` = durée exacte du film, bucket du mois courant incrémenté du
+même montant, les 11 autres mois toujours à 0, genre principal du film présent
+dans la répartition à 100% ; série entièrement vue → `watchedTitles=2` (le
+compteur de titres n'augmente pas par épisode). Frontend vérifié par
+transformation Vite sans erreur sur les fichiers touchés (pas de vérification
+visuelle en navigateur). Utilisateur de test nettoyé après coup, base vérifiée
+revenue à 0 utilisateur de test.

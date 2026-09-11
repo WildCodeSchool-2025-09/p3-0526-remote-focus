@@ -118,6 +118,15 @@ Chaque US suit ce format :
   algorithme réutilisable tel quel pour US-ACC-06/US-PRO-06) + US-REC-02 (tri
   des résultats de recherche, carte vide). Implémentées et testées contre la
   base réelle.
+- Phase 6 (même branche `ClaudeApp`) : US-PRO-04 (mes films favoris avec nombre
+  de vues), US-PRO-06 (mes acteurs préférés), US-ACC-06 (accueil : carrousel
+  "acteurs les plus vus", `personRepository.readMostViewedActors` unifié et
+  réutilisé par ACC-05/ACC-06/PRO-06), US-PRO-05 (médias en cours de
+  visionnage), US-DET-10 (notation demi-étoile films/séries vus, migration
+  ciblée `track.user_rating` → `DECIMAL(2,1)` appliquée en préalable), US-PRO-12
+  (mes statistiques : titres vus, temps de visionnage total + histogramme
+  mensuel, répartition par genre en donut, graphiques Recharts). Implémentées et
+  testées contre la base réelle.
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.

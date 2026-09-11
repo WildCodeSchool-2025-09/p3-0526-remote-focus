@@ -1,5 +1,9 @@
 import type { CatalogResponse, Format } from "../types/Catalog";
-import type { DashboardData, MyActorsResponse } from "../types/Profile";
+import type {
+  DashboardData,
+  MyActorsResponse,
+  StatisticsData,
+} from "../types/Profile";
 import type {
   KnownForResponse,
   SearchResults,
@@ -352,6 +356,18 @@ export async function fetchDashboard(token: string): Promise<DashboardData> {
 
   if (!response.ok) {
     throw new Error("Impossible de récupérer votre tableau de bord");
+  }
+
+  return response.json();
+}
+
+export async function fetchStatistics(token: string): Promise<StatisticsData> {
+  const response = await fetch(`${API_URL}/api/me/statistics`, {
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer vos statistiques");
   }
 
   return response.json();

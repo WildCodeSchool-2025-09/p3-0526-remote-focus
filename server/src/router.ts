@@ -13,6 +13,7 @@ import profileActions from "./modules/profile/profileActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
 import seasonActions from "./modules/season/seasonActions";
 import seriesActions from "./modules/series/seriesActions";
+import statisticActions from "./modules/statistic/statisticActions";
 import suggestionActions from "./modules/suggestion/suggestionActions";
 import trackActions from "./modules/track/trackActions";
 import trackingActions from "./modules/tracking/trackingActions";
@@ -133,5 +134,6 @@ router.get(
   verifyToken,
   suggestionActions.readSuggestions,
 );
+router.get("/api/me/statistics", verifyToken, statisticActions.readStatistics);
 
 export default router;

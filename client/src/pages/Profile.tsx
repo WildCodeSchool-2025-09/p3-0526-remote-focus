@@ -98,6 +98,7 @@ function Profile() {
           icon={BarChart3}
           label="Statistiques"
           count={dashboard.counts.watchedTitles}
+          to="/profile/statistics"
         />
       </div>
     </div>

@@ -31,3 +31,17 @@ export type MyActorsResponse = {
   };
   mostViewed: ActorWithSeenCount[];
 };
+
+export type GenreBreakdownEntry = {
+  genreId: number;
+  genreName: string;
+  count: number;
+  percentage: number;
+};
+
+export type StatisticsData = {
+  watchedTitles: number;
+  watchTimeMinutes: number;
+  monthlyWatchTimeMinutes: number[];
+  genreBreakdown: GenreBreakdownEntry[];
+};

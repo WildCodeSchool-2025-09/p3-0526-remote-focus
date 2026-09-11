@@ -25,6 +25,7 @@ import Register from "./pages/Register";
 import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
 import Settings from "./pages/Settings";
+import Statistics from "./pages/Statistics";
 import Watchlist from "./pages/Watchlist";
 
 const router = createBrowserRouter([
@@ -93,6 +94,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <InProgress />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/statistics",
+        element: (
+          <PrivateRoute>
+            <Statistics />
           </PrivateRoute>
         ),
       },
