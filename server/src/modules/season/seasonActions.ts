@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import mediaRepository from "../media/mediaRepository";
+import trackingRepository from "../tracking/trackingRepository";
 import seasonRepository from "./seasonRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -18,15 +19,31 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const [episodes, cast, castTotal, totalDuration, genres, platforms] =
-      await Promise.all([
-        seasonRepository.readEpisodes(id),
-        seasonRepository.readCast(id),
-        seasonRepository.countCast(id),
-        seasonRepository.readDurationTotal(id),
-        mediaRepository.readGenres(season.mediaId),
-        mediaRepository.readPlatforms(season.mediaId),
-      ]);
+    const userId = req.user?.id;
+
+    const [
+      episodes,
+      cast,
+      castTotal,
+      totalDuration,
+      genres,
+      platforms,
+      isWatched,
+      watchedEpisodeIds,
+    ] = await Promise.all([
+      seasonRepository.readEpisodes(id),
+      seasonRepository.readCast(id),
+      seasonRepository.countCast(id),
+      seasonRepository.readDurationTotal(id),
+      mediaRepository.readGenres(season.mediaId),
+      mediaRepository.readPlatforms(season.mediaId),
+      userId != null
+        ? trackingRepository.isSeasonFullyWatched(userId, id)
+        : false,
+      userId != null
+        ? trackingRepository.readWatchedEpisodeIds(userId, id)
+        : new Set<number>(),
+    ]);
 
     res.json({
       id: season.ID,
@@ -59,6 +76,7 @@ const read: RequestHandler = async (req, res, next) => {
         releasedAt: episode.released_at,
         synopsis: episode.synopsis,
         duration: episode.duration,
+        isWatched: watchedEpisodeIds.has(episode.ID),
       })),
       cast: cast.map((person) => ({
         id: person.ID,
@@ -68,6 +86,7 @@ const read: RequestHandler = async (req, res, next) => {
         role: person.role,
       })),
       castTotal,
+      isWatched,
       userStatus: null,
       userRating: null,
     });

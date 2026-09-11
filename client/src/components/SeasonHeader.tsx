@@ -1,6 +1,7 @@
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { useWatchedStatus } from "../hooks/useWatchedStatus";
 import type { SeasonDetail } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
 import { formatRating } from "../utils/formatRating";
@@ -21,6 +22,12 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
     : null;
 
   const [isMetaOpen, setIsMetaOpen] = useState(false);
+
+  const { isWatched, handleToggleWatched } = useWatchedStatus(
+    "season",
+    season.id,
+    season.isWatched,
+  );
 
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
@@ -90,7 +97,13 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color="#17B890"
+            icon={Check}
+            onClick={handleToggleWatched}
+            active={isWatched}
+          />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
 
           {season.platforms.length > 0 && (

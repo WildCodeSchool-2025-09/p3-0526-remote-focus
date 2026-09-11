@@ -35,6 +35,7 @@ export type Media = {
   castTotal: number;
   isFavorite: boolean;
   isInWatchlist: boolean;
+  isWatched: boolean;
   userStatus: string | null;
   userRating: number | null;
 };
@@ -65,6 +66,7 @@ export type Episode = {
   releasedAt: string | null;
   synopsis: string | null;
   duration: number | null;
+  isWatched: boolean;
 };
 
 export type SeasonDetail = {
@@ -86,6 +88,7 @@ export type SeasonDetail = {
   episodes: Episode[];
   cast: CastMember[];
   castTotal: number;
+  isWatched: boolean;
   userStatus: string | null;
   userRating: number | null;
 };
@@ -111,6 +114,7 @@ export type EpisodeDetail = {
   platforms: Platform[];
   cast: CastMember[];
   castTotal: number;
+  isWatched: boolean;
   userStatus: string | null;
 };
 
@@ -141,6 +145,7 @@ export type Series = {
   seasons: Season[];
   isFavorite: boolean;
   isInWatchlist: boolean;
+  isWatched: boolean;
   userStatus: string | null;
   userRating: number | null;
 };

@@ -1,5 +1,6 @@
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { Link } from "react-router";
+import { useWatchedStatus } from "../hooks/useWatchedStatus";
 import type { EpisodeDetail } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
 import { formatRating } from "../utils/formatRating";
@@ -16,6 +17,12 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
   const year = episode.releasedAt
     ? new Date(episode.releasedAt).getFullYear()
     : null;
+
+  const { isWatched, handleToggleWatched } = useWatchedStatus(
+    "episode",
+    episode.id,
+    episode.isWatched,
+  );
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
@@ -68,7 +75,13 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color="#17B890"
+            icon={Check}
+            onClick={handleToggleWatched}
+            active={isWatched}
+          />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
 
           {episode.platforms.length > 0 && (

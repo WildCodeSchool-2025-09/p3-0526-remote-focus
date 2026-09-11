@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { Episode } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
+import EpisodeWatchToggle from "./EpisodeWatchToggle";
 
 type EpisodeDetailListProps = {
   seriesId: number;
@@ -64,6 +65,11 @@ function EpisodeDetailList({
                   </p>
                 )}
               </div>
+
+              <EpisodeWatchToggle
+                episodeId={episode.id}
+                initialIsWatched={episode.isWatched}
+              />
             </Link>
           );
         })}

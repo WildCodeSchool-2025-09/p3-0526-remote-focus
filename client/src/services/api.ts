@@ -43,9 +43,11 @@ export async function fetchSeries(id: number, token?: string): Promise<Series> {
 export async function fetchSeason(
   seriesId: number,
   seasonId: number,
+  token?: string,
 ): Promise<SeasonDetail> {
   const response = await fetch(
     `${API_URL}/api/series/${seriesId}/seasons/${seasonId}`,
+    { headers: authHeaders(token) },
   );
 
   if (!response.ok) {
@@ -59,9 +61,11 @@ export async function fetchEpisode(
   seriesId: number,
   seasonId: number,
   episodeId: number,
+  token?: string,
 ): Promise<EpisodeDetail> {
   const response = await fetch(
     `${API_URL}/api/series/${seriesId}/seasons/${seasonId}/episodes/${episodeId}`,
+    { headers: authHeaders(token) },
   );
 
   if (!response.ok) {
@@ -219,6 +223,32 @@ export async function toggleWatchlist(
 
   if (!response.ok) {
     throw new Error("Impossible de mettre à jour la watchlist");
+  }
+
+  return response.json();
+}
+
+export type WatchedScope = "movie" | "series" | "season" | "episode";
+
+const WATCHED_PATH: Record<WatchedScope, (id: number) => string> = {
+  movie: (id) => `/api/me/medias/${id}/watched`,
+  series: (id) => `/api/me/series/${id}/watched`,
+  season: (id) => `/api/me/seasons/${id}/watched`,
+  episode: (id) => `/api/me/episodes/${id}/watched`,
+};
+
+export async function toggleWatched(
+  scope: WatchedScope,
+  id: number,
+  token: string,
+): Promise<{ isWatched: boolean }> {
+  const response = await fetch(`${API_URL}${WATCHED_PATH[scope](id)}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de mettre à jour le statut vu");
   }
 
   return response.json();

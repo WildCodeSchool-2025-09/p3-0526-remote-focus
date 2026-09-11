@@ -5,11 +5,13 @@ import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeHeader from "../components/EpisodeHeader";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchEpisode } from "../services/api";
 import type { EpisodeDetail as EpisodeDetailData } from "../types/media";
 
 function EpisodeDetail() {
   const { serieId, seasonId, episodeId } = useParams();
+  const { token } = useAuth();
 
   const [episodeDetail, setEpisodeDetail] = useState<EpisodeDetailData | null>(
     null,
@@ -28,7 +30,12 @@ function EpisodeDetail() {
     setLoading(true);
     setError(null);
 
-    fetchEpisode(Number(serieId), Number(seasonId), Number(episodeId))
+    fetchEpisode(
+      Number(serieId),
+      Number(seasonId),
+      Number(episodeId),
+      token ?? undefined,
+    )
       .then((data) => {
         if (active) {
           setEpisodeDetail(data);
@@ -48,7 +55,7 @@ function EpisodeDetail() {
     return () => {
       active = false;
     };
-  }, [serieId, seasonId, episodeId]);
+  }, [serieId, seasonId, episodeId, token]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId((current) => (current === personId ? null : personId));

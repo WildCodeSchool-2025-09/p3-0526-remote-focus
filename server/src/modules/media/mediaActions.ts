@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import trackRepository from "../track/trackRepository";
+import trackingRepository from "../tracking/trackingRepository";
 import mediaRepository from "./mediaRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -20,13 +21,15 @@ const read: RequestHandler = async (req, res, next) => {
 
     const userId = req.user?.id;
 
-    const [genres, platforms, cast, castTotal, track] = await Promise.all([
-      mediaRepository.readGenres(id),
-      mediaRepository.readPlatforms(id),
-      mediaRepository.readCast(id),
-      mediaRepository.countCast(id),
-      userId != null ? trackRepository.readTrack(userId, id) : null,
-    ]);
+    const [genres, platforms, cast, castTotal, track, isWatched] =
+      await Promise.all([
+        mediaRepository.readGenres(id),
+        mediaRepository.readPlatforms(id),
+        mediaRepository.readCast(id),
+        mediaRepository.countCast(id),
+        userId != null ? trackRepository.readTrack(userId, id) : null,
+        userId != null ? trackingRepository.isMovieWatched(userId, id) : false,
+      ]);
 
     res.json({
       id: movie.ID,
@@ -59,6 +62,7 @@ const read: RequestHandler = async (req, res, next) => {
       castTotal,
       isFavorite: track != null && Boolean(track.favorite_media),
       isInWatchlist: track != null && Boolean(track.watchlist),
+      isWatched,
       userStatus: null,
       userRating: null,
     });

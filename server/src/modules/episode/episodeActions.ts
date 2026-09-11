@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import mediaRepository from "../media/mediaRepository";
+import trackingRepository from "../tracking/trackingRepository";
 import episodeRepository from "./episodeRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -18,10 +19,13 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const [cast, castTotal, platforms] = await Promise.all([
+    const userId = req.user?.id;
+
+    const [cast, castTotal, platforms, isWatched] = await Promise.all([
       episodeRepository.readCast(id),
       episodeRepository.countCast(id),
       mediaRepository.readPlatforms(episode.mediaId),
+      userId != null ? trackingRepository.isEpisodeWatched(userId, id) : false,
     ]);
 
     res.json({
@@ -56,6 +60,7 @@ const read: RequestHandler = async (req, res, next) => {
         role: person.role,
       })),
       castTotal,
+      isWatched,
       userStatus: null,
     });
   } catch (err) {

@@ -477,3 +477,63 @@ conforme au critère "affichées mais non interactives sur mobile" (pas "cachée
 Testé en réel : toggle favori (ajout/retrait), toggle watchlist, état reflété sur
 `GET /api/medias/:id` après coup, 401 sans token, 404 sur média inexistant. Données
 de test nettoyées après coup.
+
+## US-DET-09
+
+**US-DET-09 — Module séparé `tracking/` (au lieu d'étendre `track/` de DET-08)** —
+`track` gère favoris/watchlist (table `track`), `tracking` gère le statut "vu"
+(tables `media_user`/`episode_user`) : deux tables et deux préoccupations
+distinctes en base, et l'équipe elle-même a deux cartes Trello séparées avec des
+noms proches mais distincts ("track" vs "tracking"). Documenter explicitement ce
+choix de nommage pour éviter toute confusion future entre les deux modules.
+
+**US-DET-09 — 4 routes PATCH distinctes** (`/api/me/medias/:id/watched`,
+`/api/me/series/:id/watched`, `/api/me/seasons/:id/watched`,
+`/api/me/episodes/:id/watched`) plutôt qu'une route générique paramétrée par type —
+cohérent avec le pattern déjà en place pour les routes de lecture (`/api/medias/:id`,
+`/api/series/:id`, etc., chacune avec son action dédiée) et plus simple à valider
+(chaque route connaît exactement son type d'id).
+
+**US-DET-09 — Bascule "vu" en masse pour série et saison** — marquer une série ou
+une saison comme vue insère (`INSERT IGNORE`) une ligne `episode_user` pour chaque
+épisode concerné ; démarquer supprime toutes les lignes `episode_user`
+correspondantes. Pas de demi-mesure : on ne peut pas avoir une série "vue" avec des
+épisodes non vus dans l'état stocké, la case reflète toujours l'état réel des
+épisodes.
+
+**US-DET-09 — `isFullyWatched` recalculé à la volée, jamais stocké** — conforme à la
+convention déjà documentée dans `CLAUDE.md` ("Modèle de données — points
+critiques"). Implémenté via deux sous-requêtes `COUNT` (total d'épisodes vs
+épisodes vus) comparées, à la fois au niveau série (toutes saisons confondues) et
+au niveau saison (une seule saison) — `trackingRepository.isSeriesFullyWatched` /
+`isSeasonFullyWatched`.
+
+**US-DET-09 — Statut "vu" par épisode exposé sur l'endpoint saison** —
+`GET /api/series/:serieId/seasons/:seasonId` renvoie maintenant, pour un visiteur
+non connecté, `isWatched: false` sur la saison et sur chaque épisode de la liste
+(comportement par défaut, pas de calcul inutile) ; pour un utilisateur connecté
+(`optionalAuth`), le vrai statut par épisode via une seule requête
+`readWatchedEpisodeIds` (un `Set` d'IDs, pas N requêtes par épisode).
+
+**US-DET-09 — Toggle "vu" au niveau saison depuis une série partiellement vue** —
+comportement testé et confirmé : si certains épisodes d'une saison sont déjà vus et
+d'autres non, activer le bouton "Vu" au niveau saison marque *tous* les épisodes de
+la saison comme vus (pas seulement les manquants). Idem au niveau série avec les
+saisons. C'est le sens attendu d'un bouton bascule à ce niveau (pas de mode
+"complète ce qui manque").
+
+**US-DET-09 — Réutilisation de `optionalAuth` déjà introduit en DET-07** — les
+routes de lecture saison/épisode (`GET .../seasons/:seasonId`,
+`GET .../episodes/:episodeId`) sont passées de non protégées à `optionalAuth`, pour
+pouvoir calculer `isWatched` réel pour un utilisateur connecté tout en restant
+accessibles à un visiteur (qui reçoit `isWatched: false` par défaut). Aucun
+changement de comportement pour les visiteurs.
+
+Testé en réel avec un utilisateur temporaire : toggle film (marquer/démarquer,
+reflété sur `GET /api/medias/:id`), toggle épisode (reflété sur le tableau
+`episodes` de l'endpoint saison, sans affecter les autres épisodes), toggle saison
+depuis un état partiel (marque tous les épisodes) puis démarquage, toggle série
+(propage à toutes les saisons/épisodes, y compris une saison jamais touchée
+individuellement) puis démarquage, 401 sans token sur les 4 routes, 404 sur
+film/série/saison/épisode inexistant sur les 4 routes. Utilisateur et données de
+test nettoyés après coup.

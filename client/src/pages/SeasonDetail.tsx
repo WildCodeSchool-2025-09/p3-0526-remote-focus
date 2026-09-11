@@ -6,11 +6,13 @@ import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeDetailList from "../components/EpisodeDetailList";
 import SeasonHeader from "../components/SeasonHeader";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchSeason } from "../services/api";
 import type { SeasonDetail as SeasonDetailData } from "../types/media";
 
 function SeasonDetail() {
   const { serieId, seasonId } = useParams();
+  const { token } = useAuth();
 
   const [seasonDetail, setSeasonDetail] = useState<SeasonDetailData | null>(
     null,
@@ -29,7 +31,7 @@ function SeasonDetail() {
     setLoading(true);
     setError(null);
 
-    fetchSeason(Number(serieId), Number(seasonId))
+    fetchSeason(Number(serieId), Number(seasonId), token ?? undefined)
       .then((data) => {
         if (active) {
           setSeasonDetail(data);
@@ -49,7 +51,7 @@ function SeasonDetail() {
     return () => {
       active = false;
     };
-  }, [serieId, seasonId]);
+  }, [serieId, seasonId, token]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId((current) => (current === personId ? null : personId));

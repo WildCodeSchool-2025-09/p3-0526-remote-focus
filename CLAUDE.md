@@ -93,6 +93,18 @@ Chaque US suit ce format :
   contre la base réelle. **Équipe pas encore informée** que la base partagée a été
   corrigée en direct (voir ci-dessous) — à faire avant que quelqu'un relance
   `db:migrate` en local sur un schema.sql désynchronisé.
+- Phase 2 (même branche `ClaudeApp`) : US-DET-02/03/04/05/06/07 implémentées et
+  testées contre la base réelle (fiches détail série/saison/épisode, widget
+  "connu pour"). Rétro-fix US-DET-01 : ajout du `BackButton` partagé sur
+  MovieDetail (décision produit validée, voir `docs/decisions-log.md`).
+- Phase 3 (même branche `ClaudeApp`) : US-DET-08 (favoris/watchlist, module
+  `track/`) + US-DET-09 (statut "vu" film/série/saison/épisode, module
+  `tracking/`) implémentées et testées contre la base réelle. Branche `ClaudeApp`
+  poussée (sans PR) sur une branche distante `ClaudeEquipe` pour permettre à
+  l'équipe de tester visuellement sans toucher à `dev`.
+- Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
+  `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
+  équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.
 
 ## Décisions tranchées
 
