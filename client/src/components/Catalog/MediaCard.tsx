@@ -27,7 +27,10 @@ function MediaCard({ media, className }: MediaCardProps) {
           {media.releasedAt ? String(media.releasedAt).slice(0, 4) : "-"} ·
           <span className="flex gap-1 justify-start">
             <Star fill="#F2B705" color="#F2B705" size={12} className="mt-px" />
-            {media.overallRating}/10
+            {media.overallRating !== null
+              ? Number(media.overallRating)
+              : media.overallRating}
+            /10
           </span>
         </p>
       </Link>

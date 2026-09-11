@@ -68,7 +68,9 @@ function MediaHeader({ media }: MediaHeaderProps) {
                             <span className={PILL}>{formatDuration(media.duration)}</span>
                         )}
                         {media.overallRating != null && (
-                            <span className={PILL}>★ {media.overallRating}</span>
+                            <span className={PILL}>
+                                ★ {Number(media.overallRating)}
+                            </span>
                         )}
                         {media.pegi != null && (
                             <span className={PILL}>PEGI {media.pegi}</span>
