@@ -1168,3 +1168,46 @@ favoris et plus-vus vides des deux côtés (`/api/me/actors` et
 `/api/me/actors` (PRO-06) et `/api/me/suggestions` (ACC-06, même acteur, même
 compte) ; retrait du favori → liste vide à nouveau. Frontend vérifié par
 transformation Vite sans erreur. Utilisateur de test nettoyé après coup.
+
+## US-PRO-05
+
+**US-PRO-05 — "En cours" défini comme "au moins un épisode vu, mais pas tous"**,
+calculé dynamiquement (jamais stocké, même convention que `isFullyWatched`) —
+structurellement impossible pour un film (`media_user` est un flag binaire
+vu/non-vu, sans notion de progression), donc l'onglet "Films" de la carte est
+toujours vide par construction, pas par filtre explicite ajouté. Gardé quand
+même dans les 4 onglets Tous/Films/Séries/Animés pour la cohérence visuelle avec
+US-PRO-02/03 (Favoris/Watchlist), qui partagent le même composant `TypeFilterTabs`.
+
+**US-PRO-05 — Indépendant de `track` (favoris/watchlist)** : la liste "en cours"
+n'a aucune condition sur la présence en favoris ou watchlist — uniquement sur la
+progression `episode_user`. Conforme à la carte ("Watchlist et Favoris... US
+dédiée séparée"), qui distingue bien ce critère purement "progression" des deux
+autres pages déjà construites.
+
+**US-PRO-05 — Tri par dernière activité de visionnage décroissante**
+(`MAX(episode_user.viewed_at)` par média), aucun critère de tri précisé par la
+carte — choix cohérent avec l'intention "en cours" (remonter ce qu'on regarde
+activement en ce moment, pas un tri alphabétique ou par note).
+
+**US-PRO-05 — Nouvelles méthodes dans `trackingRepository`** (pas `trackRepository`,
+qui gère favoris/watchlist) : `browseInProgress`/`countInProgress`, cohérent
+avec la séparation déjà actée entre les deux modules depuis US-DET-08/09.
+
+**US-PRO-05 — Aucun point d'entrée de navigation ajouté** : la carte demande
+"une page dédiée" (`/profile/in-progress`) sans préciser d'où y accéder ; le
+dashboard US-PRO-01 ne liste que 4 cartes (Favoris/Watchlist/Acteurs/Statistiques),
+sans "En cours" — pas ajouté une 5e carte de mon propre chef, US-PRO-01 étant
+déjà livrée et validée avec ce périmètre précis. Page accessible directement par
+URL ; à rattacher à un point de navigation si l'équipe le souhaite (maquette
+visuelle probable avec des onglets partagés Favoris/Watchlist/En cours, non
+construits dans cette US).
+
+Testé en réel avec un utilisateur temporaire : 401 sans token ; liste vide pour
+un nouvel utilisateur ; un film entièrement vu n'apparaît jamais ; un épisode vu
+sur une série (progression partielle) → apparaît ; onglet Films toujours vide ;
+onglet Séries l'inclut, onglet Animés l'exclut (série non-anime) ; série
+entièrement vue → disparaît de la liste ; démarquée puis re-marquée
+partiellement → réapparaît ; filtre PEGI actif → contenu 16+/18 exclu même en
+cours. Frontend vérifié par transformation Vite sans erreur. Utilisateur de test
+nettoyé après coup.

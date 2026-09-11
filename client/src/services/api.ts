@@ -379,6 +379,32 @@ export async function fetchFavorites(
   return response.json();
 }
 
+export async function fetchInProgress(
+  token: string,
+  type: Format,
+  page: number,
+  limit: number,
+): Promise<CatalogResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (type != null) {
+    params.set("type", type);
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/me/in-progress?${params.toString()}`,
+    { headers: authHeaders(token) },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer vos médias en cours");
+  }
+
+  return response.json();
+}
+
 export async function fetchWatchlist(
   token: string,
   type: Format,

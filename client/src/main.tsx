@@ -14,6 +14,7 @@ import Catalog from "./pages/Catalog";
 import EpisodeDetail from "./pages/EpisodeDetail";
 import Favorites from "./pages/Favorites";
 import Homepage from "./pages/Homepage";
+import InProgress from "./pages/InProgress";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
 import MyActors from "./pages/MyActors";
@@ -84,6 +85,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <MyActors />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/in-progress",
+        element: (
+          <PrivateRoute>
+            <InProgress />
           </PrivateRoute>
         ),
       },

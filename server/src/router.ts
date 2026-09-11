@@ -122,6 +122,11 @@ router.get("/api/me/dashboard", verifyToken, profileActions.readDashboard);
 router.get("/api/me/favorites", verifyToken, trackActions.browseFavorites);
 router.get("/api/me/watchlist", verifyToken, trackActions.browseWatchlist);
 router.get(
+  "/api/me/in-progress",
+  verifyToken,
+  trackingActions.browseInProgress,
+);
+router.get(
   "/api/me/suggestions",
   verifyToken,
   suggestionActions.readSuggestions,
