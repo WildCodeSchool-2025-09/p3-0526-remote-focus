@@ -653,3 +653,33 @@ dans les logs Vite). Page purement statique (pas de nouvel endpoint, pas de
 mutation) — pas de vérification visuelle en navigateur cette fois (aucun outil de
 navigation automatisée disponible dans cette session) ; à confirmer visuellement par
 l'équipe.
+
+## US-PRO-08
+
+**US-PRO-08 — Contrainte UNIQUE sur `user_.email` déjà en place sur la base
+partagée**, vérifiée par `SHOW INDEXES` avant de coder (`AK_user_` sur `email`) —
+la carte demandait explicitement de l'ajouter si absente ; ce n'était pas
+nécessaire, `CLAUDE.md` le documentait déjà comme fait.
+
+**US-PRO-08 — Endpoints ajoutés au module `user/` existant** (pas un nouveau
+module) : `PATCH /api/me/login`, `/api/me/email`, `/api/me/password` — ce module
+gère déjà des mutations sur `user_` (préférences de genres), ces trois routes s'y
+intègrent naturellement. `toPublicUser` exporté depuis `authActions.ts` (au lieu
+d'être dupliqué) pour renvoyer un utilisateur au même format après modification.
+
+**US-PRO-08 — Vérification d'unicité excluant l'utilisateur courant** : pseudo/email
+peuvent être renvoyés inchangés (l'utilisateur "modifie" son pseudo pour la même
+valeur) sans déclencher un faux 409 — l'égalité d'ID avec l'utilisateur courant est
+explicitement autorisée.
+
+**US-PRO-08 — Composant `Modal` partagé** extrait du pattern déjà utilisé dans
+`Preferences.tsx` (`div.modal.modal-open` + `div.modal-box`), réutilisé pour les 3
+nouvelles modales (pseudo/email/mot de passe) et pour la future modale d'upload de
+photo (US-PRO-09).
+
+Testé en réel avec 2 utilisateurs temporaires : changement de pseudo (succès, trop
+court, doublon avec l'autre utilisateur, ré-écriture de sa propre valeur), changement
+d'email (succès, format invalide, doublon), changement de mot de passe (mauvais mot
+de passe actuel, nouveau trop court, confirmation différente, succès — puis connexion
+réussie avec le nouveau mot de passe et refusée avec l'ancien), 401 sans token sur
+les 3 routes. Utilisateurs de test nettoyés après coup.

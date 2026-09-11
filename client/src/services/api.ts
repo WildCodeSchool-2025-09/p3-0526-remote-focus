@@ -326,6 +326,70 @@ export async function fetchWatchlist(
   return response.json();
 }
 
+async function extractErrorMessage(
+  response: Response,
+  fallback: string,
+): Promise<string> {
+  const data = await response.json().catch(() => null);
+  return typeof data?.error === "string" ? data.error : fallback;
+}
+
+export async function updateLogin(login: string, token: string): Promise<User> {
+  const response = await fetch(`${API_URL}/api/me/login`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ login }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(response, "Impossible de modifier le pseudo"),
+    );
+  }
+
+  return response.json();
+}
+
+export async function updateEmail(email: string, token: string): Promise<User> {
+  const response = await fetch(`${API_URL}/api/me/email`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(response, "Impossible de modifier l'email"),
+    );
+  }
+
+  return response.json();
+}
+
+export async function updatePassword(
+  payload: {
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+  },
+  token: string,
+): Promise<void> {
+  const response = await fetch(`${API_URL}/api/me/password`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(
+        response,
+        "Impossible de modifier le mot de passe",
+      ),
+    );
+  }
+}
+
 export async function fetchKnownFor(
   personId: number,
   excludeMediaId: number,

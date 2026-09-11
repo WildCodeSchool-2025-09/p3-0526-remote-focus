@@ -1,8 +1,37 @@
-import databaseClient from "../../../database/client";
+import databaseClient, { type Rows } from "../../../database/client";
 
 import type { LikedGenre } from "../../types/Genre/Genre.types";
 
 class UserRepository {
+  async readPasswordHash(userId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      "SELECT password FROM user_ WHERE ID = ?",
+      [userId],
+    );
+    return (rows[0]?.password as string | undefined) ?? null;
+  }
+
+  async updateLogin(userId: number, login: string) {
+    await databaseClient.query("UPDATE user_ SET login = ? WHERE ID = ?", [
+      login,
+      userId,
+    ]);
+  }
+
+  async updateEmail(userId: number, email: string) {
+    await databaseClient.query("UPDATE user_ SET email = ? WHERE ID = ?", [
+      email,
+      userId,
+    ]);
+  }
+
+  async updatePassword(userId: number, hashedPassword: string) {
+    await databaseClient.query("UPDATE user_ SET password = ? WHERE ID = ?", [
+      hashedPassword,
+      userId,
+    ]);
+  }
+
   async readRandomGenres(
     userId: number | undefined,
     count = 3,

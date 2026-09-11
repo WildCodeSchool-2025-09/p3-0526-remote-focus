@@ -1,4 +1,8 @@
+import { useState } from "react";
 import Avatar from "../Avatar";
+import EditEmailModal from "./EditEmailModal";
+import EditLoginModal from "./EditLoginModal";
+import EditPasswordModal from "./EditPasswordModal";
 import SettingsRow from "./SettingsRow";
 
 type AccountSectionProps = {
@@ -7,7 +11,11 @@ type AccountSectionProps = {
   avatar: string;
 };
 
+type ActiveModal = "login" | "email" | "password" | null;
+
 function AccountSection({ login, email, avatar }: AccountSectionProps) {
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+
   return (
     <section className="card bg-base-200 p-6">
       <h2 className="text-lg font-semibold">Compte</h2>
@@ -20,10 +28,38 @@ function AccountSection({ login, email, avatar }: AccountSectionProps) {
       </div>
 
       <div className="mt-2">
-        <SettingsRow label="Pseudo" value={login} />
-        <SettingsRow label="Email" value={email} />
-        <SettingsRow label="Mot de passe" value="••••••••" />
+        <SettingsRow
+          label="Pseudo"
+          value={login}
+          onEdit={() => setActiveModal("login")}
+        />
+        <SettingsRow
+          label="Email"
+          value={email}
+          onEdit={() => setActiveModal("email")}
+        />
+        <SettingsRow
+          label="Mot de passe"
+          value="••••••••"
+          onEdit={() => setActiveModal("password")}
+        />
       </div>
+
+      {activeModal === "login" && (
+        <EditLoginModal
+          currentLogin={login}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === "email" && (
+        <EditEmailModal
+          currentEmail={email}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === "password" && (
+        <EditPasswordModal onClose={() => setActiveModal(null)} />
+      )}
     </section>
   );
 }

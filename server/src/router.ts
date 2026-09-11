@@ -25,6 +25,9 @@ router.post("/api/auth/login", authActions.login);
 
 router.get("/api/genres", genreActions.browse);
 router.post("/api/me/preferences", verifyToken, userActions.savePreferences);
+router.patch("/api/me/login", verifyToken, userActions.updateLogin);
+router.patch("/api/me/email", verifyToken, userActions.updateEmail);
+router.patch("/api/me/password", verifyToken, userActions.updatePassword);
 
 router.get("/api/medias/search", searchRoutes.browse);
 

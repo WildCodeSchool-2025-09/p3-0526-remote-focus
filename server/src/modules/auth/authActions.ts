@@ -48,7 +48,7 @@ function isPegi16FromBirthDate(bornAt: string): boolean {
   return age >= PEGI16_AGE;
 }
 
-function toPublicUser(user: Rows[number]) {
+export function toPublicUser(user: Rows[number]) {
   return {
     id: user.ID,
     firstname: user.firstname,
