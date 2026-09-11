@@ -21,6 +21,7 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
+import Settings from "./pages/Settings";
 import Watchlist from "./pages/Watchlist";
 
 const router = createBrowserRouter([
@@ -65,6 +66,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Watchlist />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/settings",
+        element: (
+          <PrivateRoute>
+            <Settings />
           </PrivateRoute>
         ),
       },

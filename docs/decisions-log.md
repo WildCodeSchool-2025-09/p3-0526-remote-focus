@@ -623,3 +623,33 @@ qu'une série passe de partiellement à entièrement vue), 401 sans token sur le
 nouvelles routes de lecture. Un bug réel trouvé et corrigé pendant ce test : `isWatched`
 remontait `0`/`1` bruts (issus du `CASE` SQL) au lieu d'un booléen JS — corrigé par un
 `.map()` de coercition dans `trackRepository`. Données de test nettoyées après coup.
+
+## US-PRO-07
+
+**US-PRO-07 — Boutons "Modifier"/"Changer la photo" et toggles Préférences
+volontairement inertes dans cette US** (pas de `onClick`, `disabled` sur les
+toggles) : la carte précise elle-même que cette US "pose la page et sa structure
+générale... le détail fonctionnel de chaque bloc est traité dans les US dédiées".
+Même pattern que les boutons "Vu"/"Noter" restés visibles mais désactivés avant
+leurs US dédiées (US-DET-01 à 09). Seront branchés par US-PRO-08 (pseudo/email/mdp),
+US-PRO-09 (photo) et US-PRO-10 (filtre PEGI).
+
+**US-PRO-07 — `AuthContext` étendu avec `updateUser(patch)`** (merge partiel +
+persistance `localStorage`), en prévision des US suivantes qui devront refléter côté
+client un changement de pseudo/email/avatar/pegi/thème sans repasser par un nouveau
+login. Ajouté maintenant plutôt que dans chaque US suivante, pour éviter de
+retoucher `AuthContext` quatre fois de suite.
+
+**US-PRO-07 — Boutons "Enregistrer"/"Annuler" positionnés au niveau de la section
+Préférences**, pas au niveau de la page entière : les champs de la section Compte
+(pseudo/email/mot de passe) ont chacun leur propre flux "Modifier" à sauvegarde
+immédiate (US-PRO-08, explicite sur ce point : "mise à jour immédiate, pas de
+confirmation"), alors que les deux toggles de Préférences (thème, PEGI) sont de
+simples booléons qui se prêtent à un enregistrement groupé différé.
+
+Vérifié : `tsc`/Biome propres sur les nouveaux fichiers, chaque module transformé
+sans erreur par Vite (`/src/pages/Settings.tsx` et sous-composants, 200 sans erreur
+dans les logs Vite). Page purement statique (pas de nouvel endpoint, pas de
+mutation) — pas de vérification visuelle en navigateur cette fois (aucun outil de
+navigation automatisée disponible dans cette session) ; à confirmer visuellement par
+l'équipe.

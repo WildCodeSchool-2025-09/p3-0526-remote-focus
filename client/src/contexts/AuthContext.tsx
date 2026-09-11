@@ -7,6 +7,7 @@ type AuthContextValue = {
   token: string | null;
   isAuthenticated: boolean;
   setAuth: (user: User, token: string) => void;
+  updateUser: (patch: Partial<User>) => void;
   logout: () => void;
 };
 
@@ -33,6 +34,18 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
   };
 
+  const updateUser = (patch: Partial<User>) => {
+    setUser((current) => {
+      if (current == null) {
+        return current;
+      }
+
+      const nextUser = { ...current, ...patch };
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+      return nextUser;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -42,7 +55,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isAuthenticated: user != null, setAuth, logout }}
+      value={{
+        user,
+        token,
+        isAuthenticated: user != null,
+        setAuth,
+        updateUser,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
