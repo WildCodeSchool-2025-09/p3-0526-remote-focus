@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeDetailList from "../components/EpisodeDetailList";
-import KnownFrom from "../components/KnownFrom";
 import SeasonHeader from "../components/SeasonHeader";
 import { fetchSeason } from "../services/api";
 import type { SeasonDetail as SeasonDetailData } from "../types/media";
@@ -52,7 +52,7 @@ function SeasonDetail() {
   }, [serieId, seasonId]);
 
   const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
+    setSelectedPersonId((current) => (current === personId ? null : personId));
   };
 
   if (loading) {
@@ -92,9 +92,9 @@ function SeasonDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom
+        <ActorKnownForWidget
           personId={selectedPersonId}
-          mediaId={seasonDetail.series.id}
+          excludeMediaId={seasonDetail.series.id}
         />
       )}
     </div>

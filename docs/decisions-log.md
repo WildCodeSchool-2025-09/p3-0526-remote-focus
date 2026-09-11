@@ -354,3 +354,67 @@ ou casser son usage sur les 4 fiches déjà en place.
 Impact : aucun, fil d'Ariane minimal mais fonctionnel.
 
 **Route** : `/actors/:id` (déjà en anglais/pluriel dans la carte, aucun écart ici).
+
+---
+
+## US-DET-07
+
+**US-DET-07** — L'Auth (US-AUTH-01/02) étant déjà livrée (Phase 1), implémenté
+directement le branchement réel `userId` depuis le JWT plutôt que le contournement à
+base d'id seedé en dur que la carte anticipait ("le branchement final sur
+l'authentification réelle... sera ajouté une fois l'Auth livrée en semaine 3-4").
+Pas de redéveloppement à prévoir plus tard, contrairement à ce que la planification
+d'origine supposait.
+Impact : aucun, plus simple que prévu par la carte.
+
+**US-DET-07** — Middleware `optionalAuth` créé (nouveau, distinct de `verifyToken`) :
+décode le token s'il est présent et valide, sinon continue sans bloquer (au lieu de
+retourner 401). Nécessaire car la route doit fonctionner pour un visiteur non
+connecté (mode "top-rated") ET un utilisateur connecté (mode "seen"), contrairement
+aux routes protégées existantes (`/api/me/preferences`) qui exigent un token valide.
+Testé : un token invalide/expiré bascule bien en mode visiteur plutôt que de
+renvoyer une erreur.
+
+**US-DET-07** — Testé le mode connecté avec des données insérées manuellement et
+nettoyées après coup (utilisateur temporaire + une ligne `episode_user`), plutôt que
+de lancer `npm run db:seed` (qui peuplerait `user_`/`media_user`/`episode_user` avec
+les fixtures de l'équipe entière sur la base partagée). `media_user`/`episode_user`
+sont vides sur la base partagée à ce jour (les seeders existent mais n'ont jamais été
+exécutés dessus) — vérifié avant de commencer.
+Impact : validé en réel que la jointure `episode_user` → `episode_person` → `season`
+→ `media` fonctionne (retrouve bien "Frieren" comme vu via un épisode spécifique où
+l'acteur apparaît), que l'exclusion du média courant s'applique, et que "aucun
+historique" affiche bien le message dédié sans repli sur le Top 5.
+
+**US-DET-07 — Remplacement complet de `KnownFrom.tsx` (US-DET-01)** sur les 4 fiches
+détail (film/série/saison/épisode) par `ActorKnownForWidget`. `KnownFrom.tsx`
+supprimé (plus aucune référence). Conséquence : l'ancien paramétrage
+`exclude`/`limit` de `GET /api/actors/:id/filmography` (ajouté pendant US-DET-06)
+n'avait plus qu'un seul appelant fantôme après ce remplacement — simplifié pour
+revenir à une méthode sans ces options, maintenant utilisée uniquement par
+`ActorFilmography` (US-DET-06, pas d'exclusion, tri seul).
+Pourquoi : correspond exactement à la chaîne de dépendances déjà anticipée dans le
+plan (DET-02→06 avant DET-07) — voir aussi la note de planification de la carte
+elle-même sur ce point.
+
+**US-DET-07** — Correction du toggle "un second clic sur le même comédien referme le
+widget" sur les 4 pages (`MovieDetail`/`SerieDetail`/`SeasonDetail`/`EpisodeDetail`) :
+`handleSelectPerson` ne faisait que `setSelectedPersonId(personId)` (jamais de
+fermeture au re-clic) depuis US-DET-01. Corrigé partout en `current === personId ?
+null : personId`.
+Pourquoi manqué initialement : ce comportement de toggle n'était pas explicitement
+demandé par US-DET-01/02/03/04, seulement par US-DET-07.
+Impact : comportement de fermeture au re-clic maintenant cohérent sur les 4 fiches.
+
+**US-DET-07** — Mini-cards du widget : réutilisation de `Search/SearchResultCard.tsx`
+(US-REC-01) plutôt que la création d'un nouveau composant de carte.
+Pourquoi : forme identique (affiche + titre + année, cliquable via `getMediaPath`) à
+ce que demande la carte ("mini-cards horizontales, sans regroupement par type").
+
+**US-DET-07** — `readSeenMediaByActor`/`countSeenMediaByActor` (`PersonRepository`)
+utilisent une sous-requête `UNION` (films vus via `media_user` + séries vues via au
+moins un épisode dans `episode_user` où le comédien apparaît spécifiquement dans
+`episode_person`), triée par `overall_rating` sur le résultat combiné.
+Impact : un média n'apparaît qu'une fois même s'il matchait les deux branches (cas
+impossible ici vu que `type='movie'` et `JOIN season` s'excluent mutuellement, mais
+`UNION` déduplique par sécurité).

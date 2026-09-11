@@ -1,10 +1,12 @@
 import express from "express";
+import { optionalAuth } from "./middlewares/optionalAuth";
 import { verifyToken } from "./middlewares/verifyToken";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
 import episodeActions from "./modules/episode/episodeActions";
 import genreActions from "./modules/genre/genreActions";
 import mediaActions from "./modules/media/mediaActions";
+import personActions from "./modules/person/personActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
 import seasonActions from "./modules/season/seasonActions";
 import seriesActions from "./modules/series/seriesActions";
@@ -46,5 +48,10 @@ router.get(
 );
 router.get("/api/actors/:id", actorActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get(
+  "/api/persons/:id/known-for",
+  optionalAuth,
+  personActions.readKnownFor,
+);
 
 export default router;

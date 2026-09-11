@@ -1,4 +1,4 @@
-import type { SearchResults } from "../types/Search";
+import type { KnownForResponse, SearchResults } from "../types/Search";
 import type { User } from "../types/User";
 import type {
   Actor,
@@ -58,21 +58,6 @@ export async function fetchEpisode(
 
   if (!response.ok) {
     throw new Error(`Épisode ${episodeId} introuvable`);
-  }
-
-  return response.json();
-}
-
-export async function fetchFilmography(
-  personId: number,
-  excludeMediaId: number,
-): Promise<FilmographyItem[]> {
-  const response = await fetch(
-    `${API_URL}/api/actors/${personId}/filmography?exclude=${excludeMediaId}`,
-  );
-
-  if (!response.ok) {
-    throw new Error("Filmographie indisponible");
   }
 
   return response.json();
@@ -194,4 +179,32 @@ export async function saveGenrePreferences(
   if (!response.ok) {
     throw new Error("Impossible d'enregistrer vos préférences");
   }
+}
+
+export async function fetchKnownFor(
+  personId: number,
+  excludeMediaId: number,
+  page: number,
+  token?: string,
+): Promise<KnownForResponse> {
+  const params = new URLSearchParams({
+    excludeMediaId: String(excludeMediaId),
+    page: String(page),
+  });
+
+  const headers: HeadersInit = {};
+  if (token != null) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/persons/${personId}/known-for?${params.toString()}`,
+    { headers },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer ce contenu");
+  }
+
+  return response.json();
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import KnownFrom from "../components/KnownFrom";
 import MediaHeader from "../components/MediaHeader";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
@@ -49,7 +49,7 @@ function MovieDetail() {
   }, [id]);
 
   const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
+    setSelectedPersonId((current) => (current === personId ? null : personId));
   };
 
   if (loading) {
@@ -74,7 +74,10 @@ function MovieDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={mediaDetail.id} />
+        <ActorKnownForWidget
+          personId={selectedPersonId}
+          excludeMediaId={mediaDetail.id}
+        />
       )}
     </div>
   );

@@ -21,4 +21,23 @@ type SearchResults = {
   hasMore: boolean;
 };
 
-export type { SearchMedia, SearchPerson, SearchResults };
+type KnownForMode = "top-rated" | "seen";
+
+type KnownForResponse = {
+  mode: KnownForMode;
+  data: SearchMedia[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+};
+
+export type {
+  SearchMedia,
+  SearchPerson,
+  SearchResults,
+  KnownForMode,
+  KnownForResponse,
+};
