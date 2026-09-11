@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
-import fetchDiscover from "../services/catalogService";
-import type { DiscoverResponse } from "../types/Catalog";
+import fetchDiscover from "../../services/catalogService";
+import type { DiscoverResponse } from "../../types/Catalog";
 import MediaSection from "./MediaSection";
 
 function DiscoverSection() {

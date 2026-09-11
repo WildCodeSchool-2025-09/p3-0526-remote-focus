@@ -1,4 +1,4 @@
-import type { Media } from "../types/Catalog";
+import type { Media } from "../../types/Catalog";
 import Carousel from "./Carousel";
 import MediaCard from "./MediaCard";
 

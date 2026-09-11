@@ -1,4 +1,4 @@
-import DiscoverSection from "../components/DiscoverSection";
+import DiscoverSection from "../components/Catalog/DiscoverSection";
 
 function Catalog() {
   return (

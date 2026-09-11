@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import type { Media } from "../types/Catalog";
+import type { Media } from "../../types/Catalog";
 import { Link } from "react-router";
 
 interface MediaCardProps {
