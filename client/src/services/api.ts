@@ -1,4 +1,5 @@
 import type { SearchResults } from "../types/Search";
+import type { User } from "../types/User";
 import type { FilmographyItem, Media } from "../types/media";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
@@ -38,4 +39,57 @@ export async function searchMedias(query: string): Promise<SearchResults> {
   }
 
   return response.json();
+}
+
+type AuthResponse = {
+  user: User;
+  token: string;
+};
+
+type RegisterPayload = {
+  firstname: string;
+  login: string;
+  email: string;
+  bornAt: string;
+  password: string;
+  confirmPassword: string;
+};
+
+type LoginPayload = {
+  email: string;
+  password: string;
+};
+
+async function handleAuthResponse(response: Response): Promise<AuthResponse> {
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const message =
+      typeof data?.error === "string" ? data.error : "Une erreur est survenue";
+    throw new Error(message);
+  }
+
+  return data;
+}
+
+export async function registerUser(
+  payload: RegisterPayload,
+): Promise<AuthResponse> {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  return handleAuthResponse(response);
+}
+
+export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  return handleAuthResponse(response);
 }
