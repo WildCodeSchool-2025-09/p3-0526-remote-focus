@@ -1,4 +1,5 @@
 import express from "express";
+import { avatarUpload } from "./middlewares/avatarUpload";
 import { optionalAuth } from "./middlewares/optionalAuth";
 import { verifyToken } from "./middlewares/verifyToken";
 import actorActions from "./modules/actor/actorActions";
@@ -28,6 +29,12 @@ router.post("/api/me/preferences", verifyToken, userActions.savePreferences);
 router.patch("/api/me/login", verifyToken, userActions.updateLogin);
 router.patch("/api/me/email", verifyToken, userActions.updateEmail);
 router.patch("/api/me/password", verifyToken, userActions.updatePassword);
+router.patch(
+  "/api/me/avatar",
+  verifyToken,
+  avatarUpload,
+  userActions.uploadAvatar,
+);
 
 router.get("/api/medias/search", searchRoutes.browse);
 

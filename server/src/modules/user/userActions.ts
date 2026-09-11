@@ -1,5 +1,9 @@
+import crypto from "node:crypto";
+import fs from "node:fs/promises";
+import path from "node:path";
 import bcrypt from "bcryptjs";
 import type { RequestHandler } from "express";
+import sharp from "sharp";
 import { z } from "zod";
 import { toPublicUser } from "../auth/authActions";
 import authRepository from "../auth/authRepository";
@@ -7,6 +11,9 @@ import genreRepository from "../genre/genreRepository";
 import userRepository from "./userRepository";
 
 const SALT_ROUNDS = 10;
+const AVATAR_MAX_DIMENSION = 1024;
+const AVATAR_DIR = path.join(__dirname, "../../../public/uploads/avatars");
+const AVATAR_URL_PREFIX = "/uploads/avatars/";
 
 const preferencesSchema = z.object({
   genreIds: z.array(z.number().int().positive()),
@@ -190,4 +197,68 @@ const updatePassword: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { savePreferences, updateLogin, updateEmail, updatePassword };
+const uploadAvatar: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    if (req.file == null) {
+      res.status(400).json({ error: "aucun fichier reçu" });
+      return;
+    }
+
+    const previousUser = await authRepository.read(userId);
+
+    await fs.mkdir(AVATAR_DIR, { recursive: true });
+
+    const filename = `${userId}-${crypto.randomUUID()}.webp`;
+
+    await sharp(req.file.buffer)
+      .resize(AVATAR_MAX_DIMENSION, AVATAR_MAX_DIMENSION, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp()
+      .toFile(path.join(AVATAR_DIR, filename));
+
+    await userRepository.updateAvatar(
+      userId,
+      `${AVATAR_URL_PREFIX}${filename}`,
+    );
+
+    if (
+      previousUser != null &&
+      typeof previousUser.avatar === "string" &&
+      previousUser.avatar.startsWith(AVATAR_URL_PREFIX)
+    ) {
+      const previousPath = path.join(
+        AVATAR_DIR,
+        path.basename(previousUser.avatar),
+      );
+      await fs.unlink(previousPath).catch(() => {});
+    }
+
+    const user = await authRepository.read(userId);
+
+    if (user == null) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json(toPublicUser(user));
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default {
+  savePreferences,
+  updateLogin,
+  updateEmail,
+  updatePassword,
+  uploadAvatar,
+};

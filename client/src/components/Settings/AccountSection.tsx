@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Avatar from "../Avatar";
+import EditAvatarModal from "./EditAvatarModal";
 import EditEmailModal from "./EditEmailModal";
 import EditLoginModal from "./EditLoginModal";
 import EditPasswordModal from "./EditPasswordModal";
@@ -11,7 +12,7 @@ type AccountSectionProps = {
   avatar: string;
 };
 
-type ActiveModal = "login" | "email" | "password" | null;
+type ActiveModal = "login" | "email" | "password" | "avatar" | null;
 
 function AccountSection({ login, email, avatar }: AccountSectionProps) {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -22,7 +23,11 @@ function AccountSection({ login, email, avatar }: AccountSectionProps) {
 
       <div className="mt-4 flex items-center gap-4 border-b border-base-300 pb-4">
         <Avatar avatarPath={avatar} alt={login} size={64} />
-        <button type="button" className="btn btn-ghost btn-sm" disabled>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => setActiveModal("avatar")}
+        >
           Changer la photo
         </button>
       </div>
@@ -59,6 +64,9 @@ function AccountSection({ login, email, avatar }: AccountSectionProps) {
       )}
       {activeModal === "password" && (
         <EditPasswordModal onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === "avatar" && (
+        <EditAvatarModal onClose={() => setActiveModal(null)} />
       )}
     </section>
   );

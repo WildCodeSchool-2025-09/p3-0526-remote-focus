@@ -683,3 +683,48 @@ d'email (succès, format invalide, doublon), changement de mot de passe (mauvais
 de passe actuel, nouveau trop court, confirmation différente, succès — puis connexion
 réussie avec le nouveau mot de passe et refusée avec l'ancien), 401 sans token sur
 les 3 routes. Utilisateurs de test nettoyés après coup.
+
+## US-PRO-09
+
+**US-PRO-09 — Stockage local sur le serveur, dans `server/public/uploads/avatars/`**
+(déjà servi statiquement via `express.static` sur `server/public`, voir `app.ts`) —
+c'est exactement ce que demande la carte ("stockage de fichier côté serveur, le champ
+avatar en base stocke le chemin/URL"). Nouveau dossier ajouté à `.gitignore`
+(`server/public/uploads/`) pour ne jamais committer de contenu uploadé par les
+utilisateurs.
+
+**US-PRO-09 — Toutes les photos sont ré-encodées en WEBP**, quel que soit le format
+d'origine (JPG/PNG/WEBP acceptés en entrée) — simplifie le code (un seul chemin
+d'encodage de sortie, pas de branchement par mimetype) et réduit le poids stocké.
+Rien dans la carte n'imposait de conserver le format d'origine.
+
+**US-PRO-09 — Redimensionnement via `sharp` `.resize(1024, 1024, { fit: "inside",
+withoutEnlargement: true })`** : respecte exactement la règle de la carte
+("redimensionnement automatique si l'image dépasse 1024×1024px"), sans jamais
+agrandir une image plus petite, et sans forcer un recadrage carré côté serveur (le
+recadrage carré reste une recommandation UI, pas une contrainte serveur, comme
+formulé dans la carte — "recadrage carré recommandé").
+
+**US-PRO-09 — Ancien fichier supprimé lors d'un remplacement**, uniquement s'il
+s'agit bien d'un fichier uploadé (préfixe `/uploads/avatars/`) — jamais l'avatar par
+défaut (`/assets/images/default-avatar.svg`, qui n'est pas un fichier géré par cette
+route). Évite une accumulation de fichiers orphelins à chaque changement de photo.
+
+**US-PRO-09 — Erreurs Multer traduites en 400 propres** (fichier trop lourd, type non
+supporté) via un middleware `avatarUpload` qui enveloppe `multer.single()` — sans ce
+wrapper, une erreur Multer remonte telle quelle au handler d'erreurs global de
+l'app (`logErrors`), qui répond en 500 générique, sémantiquement faux pour une
+erreur de saisie utilisateur.
+
+**US-PRO-09 — Fichier `server/public/assets/images/default-avatar.svg` toujours
+manquant sur disque** (écart déjà documenté : la base pointe vers ce chemin par
+défaut, mais le fichier n'existe pas). Non corrigé ici — hors périmètre de cette US,
+et sans impact fonctionnel puisque le composant `Avatar` (US-PRO-01) affiche déjà
+l'icône Lucide `User` en repli sur l'échec de chargement.
+
+Testé en réel avec un utilisateur temporaire et des images générées via `sharp`
+(pas de fichier statique versionné pour le test) : upload PNG 2000×1500 → vérifié
+redimensionné à ≤1024×1024 et réencodé en WEBP, second upload JPEG qui remplace le
+premier (ancien fichier confirmé supprimé du disque), type de fichier invalide → 400,
+fichier > 5 Mo → 400, requête sans fichier → 400, sans token → 401. Utilisateur,
+fichiers uploadés et script de test temporaire nettoyés après coup.

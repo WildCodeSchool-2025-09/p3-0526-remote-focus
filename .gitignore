@@ -6,3 +6,4 @@ node_modules
 !.vscode/settings.json
 !.vscode/extensions.json
 .env
+server/public/uploads/

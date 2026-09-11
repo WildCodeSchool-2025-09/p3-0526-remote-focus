@@ -390,6 +390,25 @@ export async function updatePassword(
   }
 }
 
+export async function uploadAvatar(file: File, token: string): Promise<User> {
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  const response = await fetch(`${API_URL}/api/me/avatar`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await extractErrorMessage(response, "Impossible de changer la photo"),
+    );
+  }
+
+  return response.json();
+}
+
 export async function fetchKnownFor(
   personId: number,
   excludeMediaId: number,

@@ -32,6 +32,13 @@ class UserRepository {
     ]);
   }
 
+  async updateAvatar(userId: number, avatarPath: string) {
+    await databaseClient.query("UPDATE user_ SET avatar = ? WHERE ID = ?", [
+      avatarPath,
+      userId,
+    ]);
+  }
+
   async readRandomGenres(
     userId: number | undefined,
     count = 3,
