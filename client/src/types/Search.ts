@@ -1,12 +1,17 @@
 //voir le typage de Media avec la cardMedia d'alex
 type SearchMedia = {
-  id: number;
+  id: number | null;
+  // tmdbId/imported : absents pour les endpoints qui ne renvoient que du
+  // contenu déjà local (ex: "connu pour" d'un acteur) — un média sans ces
+  // champs est traité comme déjà importé, cf. SearchResultCard.
+  tmdbId?: number;
   name: string;
   poster: string | null;
   releasedAt: string | null;
   type: "movie" | "tv";
   pegi?: string | null;
   overallRating?: number | string | null;
+  imported?: boolean;
 };
 
 type SearchSortBy = "name" | "rating" | "date";

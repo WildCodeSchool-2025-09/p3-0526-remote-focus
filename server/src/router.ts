@@ -9,6 +9,7 @@ import episodeActions from "./modules/episode/episodeActions";
 import genreActions from "./modules/genre/genreActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
+import mediaImportActions from "./modules/mediaImport/mediaImportActions";
 import personActions from "./modules/person/personActions";
 import profileActions from "./modules/profile/profileActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
@@ -60,6 +61,7 @@ router.get(
   optionalAuth,
   calendarActions.browseCalendar,
 );
+router.post("/api/medias/import/:type/:tmdbId", mediaImportActions.importMedia);
 
 /*
 router.get("/api/items", itemActions.browse);

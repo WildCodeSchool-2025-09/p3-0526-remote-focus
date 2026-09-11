@@ -18,6 +18,7 @@ function buildOrderByClause(sortBy: SortBy, sortOrder: SortOrder): string {
 //recherche par média
 export interface MediaSearchRow extends Rows {
   id: number;
+  tmdb_id: number;
   name: string;
   type: "movie" | "tv";
   is_anime: number | boolean;
@@ -56,7 +57,7 @@ export async function findMediaByTitle(
   params.push(limit, offset);
 
   const [rows] = await client.query<MediaSearchRow[]>(
-    `SELECT m.id, m.name, m.type, m.is_anime, m.poster, m.released_at, m.pegi, m.overall_rating
+    `SELECT m.id, m.tmdb_id, m.name, m.type, m.is_anime, m.poster, m.released_at, m.pegi, m.overall_rating
       FROM media m
       WHERE m.name LIKE ? ${typeClause} ${pegiClause}
       ORDER BY ${buildOrderByClause(sortBy, sortOrder)}
@@ -64,6 +65,21 @@ export async function findMediaByTitle(
     params,
   );
 
+  return rows;
+}
+
+// Table de petite taille : dédoublonnage des résultats TMDB contre TOUT
+// le catalogue local, indépendamment de la pagination/du filtre de type
+// appliqués à la recherche elle-même.
+export interface LocalTmdbIdRow extends Rows {
+  tmdb_id: number;
+  type: "movie" | "tv";
+}
+
+export async function findAllLocalTmdbIds(): Promise<LocalTmdbIdRow[]> {
+  const [rows] = await client.query<LocalTmdbIdRow[]>(
+    "SELECT tmdb_id, type FROM media",
+  );
   return rows;
 }
 

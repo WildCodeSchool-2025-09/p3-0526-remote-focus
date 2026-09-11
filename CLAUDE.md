@@ -131,6 +131,19 @@ Chaque US suit ce format :
   Navbar depuis Phase 0) : nouveau module `calendar/`, fenêtre 90 jours
   passés/365 jours à venir, 3 onglets Films/Séries/Animés, filtre PEGI
   appliqué. Implémentée et testée contre la base réelle.
+- US-APP-01 (import à la demande d'un média TMDB absent de la base) : nouveau
+  `server/src/utils/tmdbClient.ts` (client TMDB léger écrit de zéro, la
+  logique de `bin/tmdbFetch.ts` n'étant pas extractible sans refactorer le
+  script de seed de l'équipe), module `mediaImport/` (upsert par
+  `SELECT`/`INSERT` respectant `UNIQUE(tmdb_id)`), route
+  `POST /api/medias/import/:type/:tmdbId`. Recherche (`search/`) fusionne
+  désormais résultats locaux et suggestions TMDB non importées (page 1
+  uniquement), marquées `imported:false`. Limites connues documentées dans
+  `docs/decisions-log.md` (détection anime et filtre PEGI incomplets sur les
+  suggestions TMDB non importées, route d'import non authentifiée/sans rate
+  limiting). Testée en réel (import film/série/série anime volumineuse,
+  dédoublonnage, recherche fusionnée), base revérifiée à la baseline exacte du
+  seed après nettoyage.
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.

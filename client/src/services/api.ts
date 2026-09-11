@@ -177,6 +177,22 @@ export async function searchMedias(
   return response.json();
 }
 
+export async function importMedia(
+  type: "movie" | "tv",
+  tmdbId: number,
+): Promise<{ id: number; type: "movie" | "tv" }> {
+  const response = await fetch(
+    `${API_URL}/api/medias/import/${type}/${tmdbId}`,
+    { method: "POST" },
+  );
+
+  if (!response.ok) {
+    throw new Error("l'import a échoué");
+  }
+
+  return response.json();
+}
+
 type AuthResponse = {
   user: User;
   token: string;

@@ -17,7 +17,10 @@ function MediaList({ title, medias }: MediaListProps) {
       <h2>{title}</h2>
       <Carousel>
         {medias.map((media) => (
-          <SearchResultCard key={media.id} media={media} />
+          <SearchResultCard
+            key={media.id ?? `tmdb-${media.type}-${media.tmdbId}`}
+            media={media}
+          />
         ))}
       </Carousel>
     </section>

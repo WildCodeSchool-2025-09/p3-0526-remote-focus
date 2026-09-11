@@ -1395,3 +1395,118 @@ inactif voit aussi tout ; filtre activé → films et épisodes PEGI 16/18 exclu
 des trois onglets, contenu non classé 16+/18 toujours visible. Frontend
 vérifié par transformation Vite sans erreur sur les 5 fichiers touchés (pas de
 vérification visuelle en navigateur). Utilisateur de test nettoyé après coup.
+
+## US-APP-01
+
+**US-APP-01 — Nouveau client `server/src/utils/tmdbClient.ts` écrit de zéro,
+pas d'extraction littérale de `server/bin/tmdbFetch.ts`** comme le suggéraient
+les étapes techniques de la carte. Recherche préalable (agent dédié) : les
+fonctions de `tmdbFetch.ts` sont enfermées dans un script `bin/` non exporté,
+ferment sur de l'état mutable au niveau module (`Set`/`Map` accumulés sur tout
+un batch), et s'appuient sur un wrapper `tmdbGet` privé avec cache disque +
+limiteur de concurrence + retries pensés pour un job de seed, pas pour un appel
+unitaire en pleine requête HTTP. Extraire proprement aurait demandé de
+refactorer un script que le reste de l'équipe utilise déjà pour le seed —
+risque jugé disproportionné pour ce gain. À la place : `tmdbClient.ts` reprend
+à l'identique la logique validée (normalisation PEGI `pegiFromMovie`/
+`pegiFromTv`, `detectIsAnime`, extraction du casting) mais en fonctions pures
+exportées, sans cache ni limiteur (un import = une poignée d'appels, pas un
+batch de centaines). `tmdbFetch.ts`/`tmdbSeed.ts` ne sont pas touchés.
+
+**US-APP-01 — Upsert par `SELECT` puis `INSERT`** (pas de transaction
+explicite) pour `genre`/`person`, respectant les contraintes `UNIQUE(tmdb_id)`
+existantes. Suffisant à l'échelle du projet (un seul utilisateur déclenche un
+import à la fois en pratique) ; une vraie condition de course est possible en
+théorie mais hors de portée réaliste pour un projet école sans trafic
+concurrent. Vérifié en réel que la dédoublication fonctionne : sur 3 imports de
+test (Fight Club, Chernobyl, One Piece), 6 des 45 liens de casting ont
+correctement réutilisé des `person` déjà seedés plutôt que d'en recréer.
+
+**US-APP-01 — Casting limité à 15 acteurs par média** (`CAST_LIMIT` dans
+`tmdbClient.ts`), et **aucun casting par épisode importé** (contrairement au
+seed qui fait un appel TMDB par épisode en mode `EPISODE_CAST_MODE="all"`) :
+pour une série à beaucoup d'épisodes, un appel par épisode au moment de
+l'import rendrait la requête HTTP beaucoup trop longue (testé en réel : One
+Piece, 1181 épisodes, aurait représenté 1181 appels TMDB supplémentaires rien
+que pour le casting invité). La carte ne demande que "casting" au niveau média,
+pas un casting exhaustif par épisode.
+
+**US-APP-01 — Plateformes de streaming (`available_on`) non importées à la
+demande**, hors périmètre des critères de la carte ("détails, casting,
+saisons/épisodes" uniquement). Un média importé à la demande n'aura pas de
+logos de plateformes tant qu'un reseed complet ne passe pas dessus.
+
+**US-APP-01 — Route `POST /api/medias/import/:type/:tmdbId`** (pas `GET` comme
+suggéré littéralement par la carte) : créer une ressource via une requête `GET`
+viole la sémantique HTTP (idempotence/absence d'effet de bord attendue d'un
+`GET`, risque de prefetch navigateur qui déclencherait un import non désiré).
+Chemin au pluriel (`medias`) pour rester cohérent avec le reste des routes de
+médias de l'app plutôt que le singulier suggéré par la carte.
+
+**US-APP-01 — Aucun plafond sur le nombre d'épisodes importés**, contrairement
+au seed qui exclut les séries fleuves via `MAX_EPISODES_PER_MEDIA=200`. Le seed
+plafonne parce qu'il importe un lot large et automatique ; ici l'utilisateur
+demande explicitement UNE série précise, il doit l'obtenir en entier. Testé en
+réel sans souci sur One Piece (23 saisons, 1181 épisodes, ~12 secondes).
+
+**US-APP-01 — `is_finished` d'une saison calculé uniquement via la date du
+dernier épisode connu**, sans le marqueur `episode_type === "finale"` que le
+seed utilise en priorité (ce champ TMDB n'est pas récupéré par l'import à la
+demande, simplification volontaire).
+
+**US-APP-01 — Recherche fusionnée uniquement en page 1** : les suggestions
+TMDB non importées ne sont ajoutées qu'à la première page de résultats (pas
+plus d'appels TMDB à chaque changement de page), car ce sont des suggestions
+d'import, pas des résultats paginés à part entière. Vérifié en réel.
+
+**US-APP-01 — Dédoublonnage contre TOUT le catalogue local**, pas seulement la
+page de résultats locale courante : `findAllLocalTmdbIds()` relit tous les
+`(type, tmdb_id)` de `media` (table volontairement petite, ~30 lignes) plutôt
+que de comparer aux seuls résultats locaux déjà paginés/filtrés par type — évite
+qu'un média déjà importé mais hors de la page/filtre courant ne réapparaisse à
+tort comme suggestion TMDB.
+
+**US-APP-01 — Limite connue : détection anime incomplète sur les films TMDB non
+importés.** `/search/movie` ne renvoie pas `origin_country`, seulement
+`genre_ids` : impossible de vérifier le critère JP requis par `detectIsAnime`.
+Un film TMDB non encore importé va donc toujours dans le seau "Films", jamais
+"Animés", même s'il s'agit réellement d'un film d'animation japonais (le seul
+film déjà importé actuel a néanmoins déjà des animes uniquement côté séries).
+La détection série (`/search/tv`, qui fournit bien `origin_country`) est
+fiable et vérifiée en réel (Naruto correctement bucket "Animés").
+
+**US-APP-01 — Limite connue : filtre PEGI incomplet sur les suggestions TMDB
+non importées.** Aucune donnée de certification n'est disponible sur les
+endpoints de recherche TMDB (il faudrait un appel détail par résultat, trop
+coûteux à chaque frappe clavier). Mitigation partielle : le flag `adult` de
+TMDB (disponible uniquement sur `/search/movie`) est utilisé comme proxy pour
+exclure les films marqués adultes quand le filtre PEGI est actif. Aucune
+mitigation équivalente pour les séries (pas de flag `adult` sur `/search/tv`) :
+un utilisateur connecté avec le filtre actif peut donc voir des suggestions de
+séries TMDB non filtrées par PEGI. Gap assumé et documenté plutôt que masqué :
+le filtre PEGI reste fiable à 100% sur tout le contenu déjà importé (comme
+avant, cf. US-PRO-10), seules les suggestions TMDB non encore importées
+échappent partiellement au filtre.
+
+**US-APP-01 — Route d'import non authentifiée** (comme la recherche elle-même),
+sans limite de débit : un visiteur peut en théorie déclencher un grand nombre
+d'imports et consommer le quota TMDB de l'équipe. Aucun mécanisme de rate
+limiting n'existe ailleurs dans l'app à réutiliser ; en ajouter un serait hors
+périmètre de cette US. Acceptable pour un projet école sans trafic de
+production, mais à surveiller si l'app est un jour exposée publiquement.
+
+Testé en réel (nettoyage systématique après coup, y compris des lignes
+`person`/`media_person` orphelines créées par les imports de test) : import
+d'un nouveau film (Fight Club, tmdb 550) → 201, genres/casting/PEGI corrects ;
+import d'une nouvelle série courte (Chernobyl, tmdb 87108) → saison/épisodes
+corrects ; import d'une série anime volumineuse (One Piece, tmdb 37854, 23
+saisons/1181 épisodes) → `is_anime=true` correctement détecté, ~12s ; second
+import du même `(type, tmdb_id)` → 200 avec l'id existant, aucun doublon ;
+type/tmdbId invalides → 400 ; tmdb_id inexistant côté TMDB → 404 ; recherche
+d'un titre déjà local → marqué `imported:true`, aucun doublon TMDB ; recherche
+d'un titre absent (Inception) → suggestion TMDB `imported:false, id:null`,
+import déclenché puis re-recherche confirmant `imported:true` avec le nouvel id
+local ; page 2 ne renvoie aucune suggestion TMDB. Base revérifiée après coup :
+`media`=30, `season`=65, `episode`=1118, `person`=5540 (baseline exacte du
+seed). Frontend vérifié par transformation Vite sans erreur sur les fichiers
+touchés (pas de vérification visuelle en navigateur).
