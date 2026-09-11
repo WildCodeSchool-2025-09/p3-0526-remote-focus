@@ -1,6 +1,7 @@
 import databaseClient, { type Rows } from "../../../database/client";
 import type { Media } from "../../types/Media/Media.types";
 import { PEGI16_VALUES, pegiFilterClause } from "../../utils/applyPegiFilter";
+import { isWatchedClause } from "../../utils/isWatchedClause";
 
 type MediaTypeFilter = "movie" | "tv" | "anime" | null;
 type WatchedFilter = "watched" | "to-watch" | null;
@@ -22,21 +23,7 @@ const GENRE_NAME_SUBQUERY = `(SELECT genre.name FROM classify_as
   JOIN genre ON genre.ID = classify_as.ID_genre
   WHERE classify_as.ID_media = m.ID LIMIT 1)`;
 
-const IS_WATCHED_CASE = `CASE
-  WHEN m.type = 'movie' THEN EXISTS(
-    SELECT 1 FROM media_user AS mu WHERE mu.ID_media = m.ID AND mu.ID_user = ?
-  )
-  ELSE (
-    SELECT COUNT(*) > 0 AND COUNT(*) = SUM(
-      CASE WHEN EXISTS(
-        SELECT 1 FROM episode_user AS eu WHERE eu.ID_episode = e.ID AND eu.ID_user = ?
-      ) THEN 1 ELSE 0 END
-    )
-    FROM episode AS e
-    JOIN season AS s ON s.ID = e.ID_season
-    WHERE s.ID_media = m.ID
-  )
-END AS isWatched`;
+const IS_WATCHED_CASE = `${isWatchedClause()} AS isWatched`;
 
 class TrackRepository {
   async mediaExists(mediaId: number) {

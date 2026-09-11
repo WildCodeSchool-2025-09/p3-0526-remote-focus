@@ -3,6 +3,7 @@ import type {
   DiscoverResponse,
   Format,
   HomepageResponse,
+  SuggestionsResponse,
 } from "../types/Catalog";
 
 function authHeaders(token?: string): HeadersInit {
@@ -62,6 +63,17 @@ export function fetchCatalog(
 
 export function fetchHomepage(token?: string): Promise<HomepageResponse> {
   return fetch(`${import.meta.env.VITE_API_URL}/api/medias/home`, {
+    headers: authHeaders(token),
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`${response.status}`);
+    }
+    return response.json();
+  });
+}
+
+export function fetchSuggestions(token: string): Promise<SuggestionsResponse> {
+  return fetch(`${import.meta.env.VITE_API_URL}/api/me/suggestions`, {
     headers: authHeaders(token),
   }).then((response) => {
     if (!response.ok) {

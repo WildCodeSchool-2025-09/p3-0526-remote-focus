@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MediaSection from "../components/Catalog/MediaSection";
+import PersonalizedSection from "../components/Homepage/PersonalizedSection";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchHomepage } from "../services/catalogService";
 import type { HomepageResponse } from "../types/Catalog";
@@ -52,6 +53,8 @@ function Homepage() {
   return (
     <div>
       <h1>Accueil</h1>
+
+      <PersonalizedSection />
 
       <MediaSection title="Nouveautés" medias={homepage.newReleases} />
       <MediaSection title="Populaires" medias={homepage.popular} />

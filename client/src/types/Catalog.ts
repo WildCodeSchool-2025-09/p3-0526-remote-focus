@@ -60,3 +60,8 @@ export type HomepageResponse = {
   animes: EnrichedMedia[];
   newReleases: EnrichedMedia[];
 };
+
+export type SuggestionsResponse = {
+  genreBased: Media[];
+  actorBased: Media[];
+};

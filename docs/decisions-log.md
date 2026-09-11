@@ -990,3 +990,68 @@ PEGI actif → sorties 16+/18 exclues même dans la version personnalisée (les 
 sorties du jeu de données actuel sont toutes les deux PEGI 16, résultat vide
 filtre actif — comportement correct, pas un bug). Utilisateurs de test nettoyés
 après coup.
+
+## US-ACC-04 / US-ACC-05
+
+**US-ACC-04/05 traitées ensemble** : ACC-04 dit explicitement "cette US couvre
+uniquement le conteneur générique et sa condition d'affichage" pour les
+sous-sections définies par ACC-05 — les deux n'ont de sens que combinées, comme
+DET-05/06 ou AUTH-01/02/03 précédemment dans cette session.
+
+**US-ACC-05 — Signal "acteurs préférés" volontairement absent du bloc genres**,
+alors que la carte les cite ensemble ("genres préférés, acteurs préférés,
+favoris/watchlist"). Le second bloc de 6 (comédiens les plus vus) couvre déjà ce
+signal avec un algorithme précis fourni par la carte elle-même — pas de raison de
+dupliquer une logique par acteur plus grossière dans le premier bloc.
+
+**US-ACC-05 — Nouveau module `suggestion/`** (`suggestionRepository.ts` +
+`suggestionActions.ts`), plutôt que d'étendre `homepage/` ou `catalog/` : c'est
+une préoccupation "connecté uniquement" distincte, exposée sur
+`GET /api/me/suggestions` (`verifyToken`, 401 sinon) contrairement à
+`/api/medias/home` qui sert aussi les visiteurs. Réutilise le
+`isWatchedClause` déjà utilisé par `trackRepository` (extrait dans
+`server/src/utils/isWatchedClause.ts` à cette occasion, au lieu de dupliquer le
+`CASE` SQL une 3e fois) pour le critère "non vu" des deux blocs.
+
+**US-ACC-05 — Bloc "comédiens les plus vus" construit ici, réutilisable tel quel
+pour US-ACC-06/US-PRO-06** (déjà anticipé dans le plan de cette session — "build
+once, reuse for both PRO-06 and ACC-06"). `suggestionRepository.readMostViewedActorIds`
+compte les apparitions d'un acteur (`role='actor'`) dans l'historique de
+visionnage du user (films vus via `media_user`+`media_person`, épisodes vus via
+`episode_user`+`episode_person`), tous types de contenu confondus.
+
+**US-ACC-05 — Repli "liste générique" volontairement PAS appliqué ici**,
+contrairement à US-ACC-03 : la carte dit explicitement "si moins de 6 résultats
+correspondent... afficher uniquement les résultats disponibles (PAS de
+complément générique)" — un bloc vide ou partiel (0 à 6 résultats) est le
+comportement correct et attendu, pas un manque à corriger.
+
+**US-ACC-05 — Seuil "20 médias visionnés" non testable de bout en bout avec le
+jeu de données actuel** : la base seedée ne contient que 10 films au total
+(`media_user` ne concerne que les films, cf. `CLAUDE.md`), il est donc
+structurellement impossible d'atteindre 20 lignes `media_user` distinctes pour
+un utilisateur avec les données actuelles. La requête `readMostWatchedGenreIds`
+a été vérifiée directement (exécution SQL sans erreur, forme du résultat
+correcte) mais pas exercée en conditions réelles via le seuil. À revérifier
+en réel si le seed est un jour enrichi avec plus de films.
+
+**US-ACC-05 — Pas de badges Top 3/Top 10/Nouveau sur les cards de suggestions**
+(pas d'`enrichRanking`) : ces badges signifient "populaire dans le catalogue",
+sémantiquement hors sujet pour une recommandation personnalisée classée par
+pertinence plutôt que par popularité globale.
+
+**US-ACC-04 — Conteneur `PersonalizedSection.tsx`** (nouveau dossier
+`components/Homepage/`) : ne s'affiche que si `isAuthenticated` ET que la requête
+`/api/me/suggestions` a réussi (sinon `null`, pas de section vide ni d'erreur
+visible pour l'utilisateur) — couvre la "condition d'affichage" demandée par la
+carte.
+
+Testé en réel avec plusieurs utilisateurs temporaires : sans token → 401 ; nouvel
+utilisateur sans aucune préférence/historique → les 2 blocs vides ; genre
+"Animation" aimé → bloc genre = exactement le top 6 par note parmi les titres
+Animation notés > 6 (vérifié précisément contre la base, y compris un faux
+négatif de test initial corrigé — Toy Story 5 est bien 8e, donc à raison exclu du
+top 6) ; film regardé (acteur commun avec un autre titre non vu noté > 7) → ce
+second titre apparaît dans le bloc acteurs, le titre déjà vu n'y apparaît jamais ;
+filtre PEGI actif → contenu 16+/18 exclu des deux blocs. Utilisateurs de test
+nettoyés après coup ; base partagée revérifiée à 0 utilisateur restant.

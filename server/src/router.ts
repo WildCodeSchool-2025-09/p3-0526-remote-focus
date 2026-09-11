@@ -13,6 +13,7 @@ import profileActions from "./modules/profile/profileActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
 import seasonActions from "./modules/season/seasonActions";
 import seriesActions from "./modules/series/seriesActions";
+import suggestionActions from "./modules/suggestion/suggestionActions";
 import trackActions from "./modules/track/trackActions";
 import trackingActions from "./modules/tracking/trackingActions";
 import userActions from "./modules/user/userActions";
@@ -114,5 +115,10 @@ router.patch(
 router.get("/api/me/dashboard", verifyToken, profileActions.readDashboard);
 router.get("/api/me/favorites", verifyToken, trackActions.browseFavorites);
 router.get("/api/me/watchlist", verifyToken, trackActions.browseWatchlist);
+router.get(
+  "/api/me/suggestions",
+  verifyToken,
+  suggestionActions.readSuggestions,
+);
 
 export default router;
