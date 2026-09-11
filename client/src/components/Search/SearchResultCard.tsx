@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { SearchMedia } from "../../types/Search";
 import { getMediaPath } from "../../utils/mediaPath";
+import MediaCardActions from "../MediaCardActions";
 
 type SearchResultCardProps = {
   media: SearchMedia;
@@ -14,8 +15,9 @@ function SearchResultCard({ media }: SearchResultCardProps) {
   return (
     <Link
       to={getMediaPath(media.type, media.id)}
-      className="flex w-[120px] shrink-0 flex-col gap-2 md:w-[170px]"
+      className="relative flex w-[120px] shrink-0 flex-col gap-2 md:w-[170px]"
     >
+      <MediaCardActions mediaId={media.id} />
       {media.poster != null ? (
         <img
           src={`https://image.tmdb.org/t/p/w342${media.poster}`}

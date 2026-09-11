@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import type { EnrichedMedia } from "../../types/Catalog";
 import { formatRating } from "../../utils/formatRating";
 import { getMediaPath } from "../../utils/mediaPath";
+import MediaCardActions from "../MediaCardActions";
 
 interface MediaCardProps {
   media: EnrichedMedia;
@@ -24,6 +25,7 @@ function MediaCard({ media, className }: MediaCardProps) {
   return (
     <div className={className}>
       <Link to={getMediaPath(media.type, media.id)} className="relative block">
+        <MediaCardActions mediaId={media.id} />
         {badgeLabel != null && (
           <span className="badge badge-primary absolute left-2 top-2 z-10">
             {badgeLabel}

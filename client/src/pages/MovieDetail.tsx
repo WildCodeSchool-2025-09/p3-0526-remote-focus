@@ -5,11 +5,13 @@ import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import MediaHeader from "../components/MediaHeader";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
 
 function MovieDetail() {
   const { id } = useParams();
+  const { token } = useAuth();
 
   const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ function MovieDetail() {
     setLoading(true);
     setError(null);
 
-    fetchMedia(Number(id))
+    fetchMedia(Number(id), token ?? undefined)
       .then((data) => {
         if (active) {
           setMediaDetail(data);
@@ -46,7 +48,7 @@ function MovieDetail() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, token]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId((current) => (current === personId ? null : personId));

@@ -12,8 +12,14 @@ import type {
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
-export async function fetchMedia(id: number): Promise<Media> {
-  const response = await fetch(`${API_URL}/api/medias/${id}`);
+function authHeaders(token?: string): HeadersInit {
+  return token != null ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function fetchMedia(id: number, token?: string): Promise<Media> {
+  const response = await fetch(`${API_URL}/api/medias/${id}`, {
+    headers: authHeaders(token),
+  });
 
   if (!response.ok) {
     throw new Error(`Média ${id} introuvable`);
@@ -22,8 +28,10 @@ export async function fetchMedia(id: number): Promise<Media> {
   return response.json();
 }
 
-export async function fetchSeries(id: number): Promise<Series> {
-  const response = await fetch(`${API_URL}/api/series/${id}`);
+export async function fetchSeries(id: number, token?: string): Promise<Series> {
+  const response = await fetch(`${API_URL}/api/series/${id}`, {
+    headers: authHeaders(token),
+  });
 
   if (!response.ok) {
     throw new Error(`Série ${id} introuvable`);
@@ -179,6 +187,41 @@ export async function saveGenrePreferences(
   if (!response.ok) {
     throw new Error("Impossible d'enregistrer vos préférences");
   }
+}
+
+export async function toggleFavorite(
+  mediaId: number,
+  token: string,
+): Promise<{ isFavorite: boolean }> {
+  const response = await fetch(`${API_URL}/api/me/medias/${mediaId}/favorite`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de mettre à jour les favoris");
+  }
+
+  return response.json();
+}
+
+export async function toggleWatchlist(
+  mediaId: number,
+  token: string,
+): Promise<{ isInWatchlist: boolean }> {
+  const response = await fetch(
+    `${API_URL}/api/me/medias/${mediaId}/watchlist`,
+    {
+      method: "PATCH",
+      headers: authHeaders(token),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de mettre à jour la watchlist");
+  }
+
+  return response.json();
 }
 
 export async function fetchKnownFor(

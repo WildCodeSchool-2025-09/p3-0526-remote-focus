@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import mediaRepository from "../media/mediaRepository";
+import trackRepository from "../track/trackRepository";
 import seriesRepository from "./seriesRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -18,7 +19,9 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const [genres, platforms, cast, castTotal, seasons, durationStats] =
+    const userId = req.user?.id;
+
+    const [genres, platforms, cast, castTotal, seasons, durationStats, track] =
       await Promise.all([
         mediaRepository.readGenres(id),
         mediaRepository.readPlatforms(id),
@@ -26,6 +29,7 @@ const read: RequestHandler = async (req, res, next) => {
         mediaRepository.countCast(id),
         seriesRepository.readSeasons(id),
         seriesRepository.readDurationStats(id),
+        userId != null ? trackRepository.readTrack(userId, id) : null,
       ]);
 
     const averageEpisodeDuration =
@@ -73,6 +77,8 @@ const read: RequestHandler = async (req, res, next) => {
         isFinished: Boolean(season.is_finished),
         episodeCount: season.episodeCount,
       })),
+      isFavorite: track != null && Boolean(track.favorite_media),
+      isInWatchlist: track != null && Boolean(track.watchlist),
       userStatus: null,
       userRating: null,
     });

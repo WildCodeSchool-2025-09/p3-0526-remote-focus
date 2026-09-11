@@ -133,12 +133,17 @@ CREATE TABLE like_(
    CONSTRAINT FK_like__genre FOREIGN KEY(ID_genre) REFERENCES genre(ID)
 );
 
+-- ATTENTION (2026-09-11) : la base partagée a aussi dérivé ici — user_rating y est en
+-- DECIMAL(15,2) au lieu de DECIMAL(2,1). Pas corrigé pour l'instant (hors scope
+-- US-DET-08), à traiter avant US-DET-10 (notation).
 CREATE TABLE track(
    ID_user INT,
    ID_media INT,
    favorite_media BOOLEAN NOT NULL,
+   favorited_at DATETIME,
    user_rating DECIMAL(2,1),
    watchlist BOOLEAN NOT NULL,
+   watchlist_added_at DATETIME,
    CONSTRAINT PK_track PRIMARY KEY(ID_user, ID_media),
    CONSTRAINT FK_track_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
    CONSTRAINT FK_track_media FOREIGN KEY(ID_media) REFERENCES media(ID)

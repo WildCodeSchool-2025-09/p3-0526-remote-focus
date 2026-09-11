@@ -10,6 +10,7 @@ import personActions from "./modules/person/personActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
 import seasonActions from "./modules/season/seasonActions";
 import seriesActions from "./modules/series/seriesActions";
+import trackActions from "./modules/track/trackActions";
 import userActions from "./modules/user/userActions";
 
 const router = express.Router();
@@ -39,8 +40,8 @@ router.post("/api/items", itemActions.add);
 */
 
 /* ************************************************************************* */
-router.get("/api/medias/:id", mediaActions.read);
-router.get("/api/series/:id", seriesActions.read);
+router.get("/api/medias/:id", optionalAuth, mediaActions.read);
+router.get("/api/series/:id", optionalAuth, seriesActions.read);
 router.get("/api/series/:serieId/seasons/:seasonId", seasonActions.read);
 router.get(
   "/api/series/:serieId/seasons/:seasonId/episodes/:episodeId",
@@ -52,6 +53,17 @@ router.get(
   "/api/persons/:id/known-for",
   optionalAuth,
   personActions.readKnownFor,
+);
+
+router.patch(
+  "/api/me/medias/:id/favorite",
+  verifyToken,
+  trackActions.toggleFavorite,
+);
+router.patch(
+  "/api/me/medias/:id/watchlist",
+  verifyToken,
+  trackActions.toggleWatchlist,
 );
 
 export default router;

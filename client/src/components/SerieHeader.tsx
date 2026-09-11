@@ -1,5 +1,6 @@
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
+import { useMediaTrack } from "../hooks/useMediaTrack";
 import type { Series } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
 import { formatRating } from "../utils/formatRating";
@@ -20,6 +21,13 @@ function SerieHeader({ series }: SerieHeaderProps) {
     : null;
 
   const [isMetaOpen, setIsMetaOpen] = useState(false);
+
+  const {
+    isFavorite,
+    isInWatchlist,
+    handleToggleFavorite,
+    handleToggleWatchlist,
+  } = useMediaTrack(series.id, series.isFavorite, series.isInWatchlist);
 
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
@@ -94,8 +102,20 @@ function SerieHeader({ series }: SerieHeaderProps) {
         <SerieInfo series={series} />
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
+          <ActionButton
+            label="Favoris"
+            color="#E83658"
+            icon={Heart}
+            onClick={handleToggleFavorite}
+            active={isFavorite}
+          />
+          <ActionButton
+            label="Watchlist"
+            color="#F5F5F0"
+            icon={Plus}
+            onClick={handleToggleWatchlist}
+            active={isInWatchlist}
+          />
           <ActionButton label="Vu" color="#17B890" icon={Check} />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
 

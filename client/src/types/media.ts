@@ -33,6 +33,8 @@ export type Media = {
   platforms: Platform[];
   cast: CastMember[];
   castTotal: number;
+  isFavorite: boolean;
+  isInWatchlist: boolean;
   userStatus: string | null;
   userRating: number | null;
 };
@@ -137,6 +139,8 @@ export type Series = {
   cast: CastMember[];
   castTotal: number;
   seasons: Season[];
+  isFavorite: boolean;
+  isInWatchlist: boolean;
   userStatus: string | null;
   userRating: number | null;
 };

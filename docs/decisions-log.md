@@ -418,3 +418,62 @@ moins un épisode dans `episode_user` où le comédien apparaît spécifiquement
 Impact : un média n'apparaît qu'une fois même s'il matchait les deux branches (cas
 impossible ici vu que `type='movie'` et `JOIN season` s'excluent mutuellement, mais
 `UNION` déduplique par sécurité).
+
+---
+
+## US-DET-08
+
+**Hors périmètre US-DET-08, remonté immédiatement** : en vérifiant `track` avant de
+coder, `user_rating` y est en `DECIMAL(15,2)` sur la base partagée au lieu de
+`DECIMAL(2,1)` documenté dans `schema.sql`. Sans impact sur cette carte (favoris/
+watchlist n'y touchent pas), mais à corriger avant US-DET-10 (notation). Documenté
+dans `schema.sql` en commentaire au-dessus de `CREATE TABLE track`.
+
+**US-DET-08** — Colonnes `track.favorited_at`/`watchlist_added_at` ajoutées sur la
+base partagée (`ALTER TABLE`, table vide, aucune donnée perdue) — c'était la
+migration "au fil de l'eau" annoncée pour cette carte précisément.
+
+**US-DET-08** — `toggleFavorite`/`toggleWatchlist` implémentés en `INSERT ... ON
+DUPLICATE KEY UPDATE` (upsert atomique) plutôt qu'un aller-retour SELECT puis
+INSERT/UPDATE séparé pour l'écriture elle-même — évite une race condition entre
+deux clics rapprochés. La lecture de l'état actuel (`readTrack`) reste un SELECT
+préalable pour calculer la valeur inversée à écrire.
+
+**US-DET-08 — Écart de périmètre assumé** : `MediaCardActions` (cœur + watchlist)
+n'est intégré que sur les écrans qui existent réellement aujourd'hui — Catalogue
+(`Catalog/MediaCard`), Recherche (`Search/SearchResultCard`, qui sert aussi le
+widget "connu pour" de DET-07 par réutilisation), et les fiches Film/Série. "Accueil"
+n'a pas encore de vraies cards média (US-ACC-01 reste à reconstruire) et "Favoris"/
+"Watchlist" n'existent pas encore comme pages (US-PRO-02/03, Phase 4) : l'intégration
+s'y fera naturellement quand ces écrans seront construits, puisqu'ils réutiliseront
+probablement les mêmes composants de card.
+Impact : aucun pour l'instant ; à vérifier que PRO-02/03/ACC-01 réutilisent bien
+`MediaCardActions` plutôt que de réinventer les icônes.
+
+**US-DET-08 — Limite connue, assumée** : les endpoints de LISTE (`/api/medias/discover`,
+`/api/medias`, `/api/medias/search`) ne renvoient pas le statut favori/watchlist par
+média — `MediaCardActions` y démarre donc toujours à `false`/`false`, même si le
+média est déjà en favoris. Seules les fiches détail (film/série, `GET /api/medias/:id`
+et `/api/series/:id`, étendues avec `optionalAuth` + une requête `track`) reflètent
+le vrai état au chargement.
+Pourquoi assumé : la carte ne demande explicitement que les routes d'écriture +
+composant avec mise à jour optimiste, pas de modifier la forme des réponses des
+endpoints de liste (qui nécessiterait une jointure en masse sur `track` pour N
+médias, plus coûteux et hors périmètre explicite).
+Impact : après un favori ajouté depuis le Catalogue, recharger la page affiche de
+nouveau un cœur vide tant qu'on ne revisite pas la fiche détail. À corriger quand
+US-PRO-02 ("liste de mes favoris") sera construite, qui aura de toute façon besoin
+de cette jointure en masse.
+
+**US-DET-08** — `ActionButton` étendu avec `onClick`/`active` optionnels (au lieu de
+créer un nouveau composant) pour piloter Favoris/Watchlist sur les fiches détail,
+tout en gardant Vu/Noter désactivés exactement comme avant (comportement par défaut
+inchangé si `onClick` n'est pas fourni).
+
+**US-DET-08** — Icônes visibles mais non interactives sur mobile (`pointer-events-none
+md:pointer-events-auto`) plutôt que masquées, sur les cards ET les fiches détail —
+conforme au critère "affichées mais non interactives sur mobile" (pas "cachées").
+
+Testé en réel : toggle favori (ajout/retrait), toggle watchlist, état reflété sur
+`GET /api/medias/:id` après coup, 401 sans token, 404 sur média inexistant. Données
+de test nettoyées après coup.

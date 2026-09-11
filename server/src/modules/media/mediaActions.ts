@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import trackRepository from "../track/trackRepository";
 import mediaRepository from "./mediaRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -17,11 +18,14 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const [genres, platforms, cast, castTotal] = await Promise.all([
+    const userId = req.user?.id;
+
+    const [genres, platforms, cast, castTotal, track] = await Promise.all([
       mediaRepository.readGenres(id),
       mediaRepository.readPlatforms(id),
       mediaRepository.readCast(id),
       mediaRepository.countCast(id),
+      userId != null ? trackRepository.readTrack(userId, id) : null,
     ]);
 
     res.json({
@@ -53,6 +57,8 @@ const read: RequestHandler = async (req, res, next) => {
         role: person.role,
       })),
       castTotal,
+      isFavorite: track != null && Boolean(track.favorite_media),
+      isInWatchlist: track != null && Boolean(track.watchlist),
       userStatus: null,
       userRating: null,
     });
