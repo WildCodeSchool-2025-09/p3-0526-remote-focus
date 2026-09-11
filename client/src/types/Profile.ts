@@ -9,6 +9,7 @@ export type DashboardData = {
     watchlist: number;
     favoriteActors: number;
     watchedTitles: number;
+    inProgress: number;
   };
 };
 

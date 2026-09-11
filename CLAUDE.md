@@ -146,10 +146,19 @@ Chaque US suit ce format :
   seed après nettoyage.
 - **Les 37 US du plan validé sont maintenant toutes implémentées** (Phases
   0 à 6 + US-CAL-01/US-APP-01 en autonome), toutes testées contre la base
-  réelle, Biome + typecheck clean. 94 commits d'avance sur `dev`, dont 12 pas
-  encore poussés sur `ClaudeEquipe` (poussés au prochain push groupé demandé
-  par l'utilisateur, pas avant). Rien n'a été poussé sur `dev` ni touché sur
+  réelle, Biome + typecheck clean. Rien n'a été poussé sur `dev` ni touché sur
   Trello à aucun moment.
+- **Repasse visuelle (2026-09-12)** : comparaison de l'app réelle contre les
+  maquettes StyleGuide/Wireframe (capture headless via Edge, contournement
+  documenté dans `docs/decisions-log.md`). Corrections appliquées : couleurs
+  des badges Nouveau/Top, tags PEGI retirés des cards (remplacés par le
+  pictogramme de type), boutons d'action des cards repassés en vertical, icône
+  Watchlist corrigée, biographie du comédien repositionnée, 5ᵉ carte "En cours"
+  ajoutée au dashboard (gap de découvrabilité sur PRO-05, sinon déjà terminée).
+  Constats documentés sans correction immédiate : refonte du filtre de genre du
+  Catalogue (proposition dans le journal), bannière d'accueil manquante,
+  chevauchement de l'en-tête sous ~400px de large. Détail complet dans
+  `docs/decisions-log.md`, section "Repasse visuelle (2026-09-12)".
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.

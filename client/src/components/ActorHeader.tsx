@@ -30,6 +30,10 @@ function ActorHeader({ actor }: ActorHeaderProps) {
       <div className="col-start-2 row-start-1 flex min-w-0 flex-col gap-3 md:gap-4">
         <h1 className="text-2xl font-bold md:text-4xl">{actor.name}</h1>
 
+        <p className="max-w-[660px] text-sm leading-relaxed text-[#C9D6DB] md:text-base">
+          {actor.biography ?? "Non renseigné"}
+        </p>
+
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton
             label="Favoris"

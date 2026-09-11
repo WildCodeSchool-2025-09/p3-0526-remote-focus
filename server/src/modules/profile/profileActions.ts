@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import authRepository from "../auth/authRepository";
 import personRepository from "../person/personRepository";
 import trackRepository from "../track/trackRepository";
+import trackingRepository from "../tracking/trackingRepository";
 import profileRepository from "./profileRepository";
 
 const readDashboard: RequestHandler = async (req, res, next) => {
@@ -22,12 +23,13 @@ const readDashboard: RequestHandler = async (req, res, next) => {
 
     const hidePegi16 = Boolean(user.is_pegi16);
 
-    const [favorites, watchlist, favoriteActors, watchedTitles] =
+    const [favorites, watchlist, favoriteActors, watchedTitles, inProgress] =
       await Promise.all([
         trackRepository.countFavorites(userId, null, hidePegi16),
         trackRepository.countWatchlist(userId, null, hidePegi16, null),
         personRepository.countFavorites(userId),
         profileRepository.countWatchedTitles(userId),
+        trackingRepository.countInProgress(userId, null, hidePegi16),
       ]);
 
     res.json({
@@ -41,6 +43,7 @@ const readDashboard: RequestHandler = async (req, res, next) => {
         watchlist,
         favoriteActors,
         watchedTitles,
+        inProgress,
       },
     });
   } catch (err) {

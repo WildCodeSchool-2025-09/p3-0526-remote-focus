@@ -1,4 +1,11 @@
-import { BarChart3, Bookmark, Heart, Settings, User } from "lucide-react";
+import {
+  BarChart3,
+  Bookmark,
+  Heart,
+  PlayCircle,
+  Settings,
+  User,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Avatar from "../components/Avatar";
@@ -75,7 +82,7 @@ function Profile() {
         </Link>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
         <DashboardCard
           icon={Heart}
           label="Favoris"
@@ -99,6 +106,12 @@ function Profile() {
           label="Statistiques"
           count={dashboard.counts.watchedTitles}
           to="/profile/statistics"
+        />
+        <DashboardCard
+          icon={PlayCircle}
+          label="En cours"
+          count={dashboard.counts.inProgress}
+          to="/profile/in-progress"
         />
       </div>
     </div>

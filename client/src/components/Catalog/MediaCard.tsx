@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Clapperboard, MonitorPlay, Sparkles, Star } from "lucide-react";
 import type { MouseEvent } from "react";
 import { useState } from "react";
 import { Link } from "react-router";
@@ -8,6 +8,20 @@ import { formatRating } from "../../utils/formatRating";
 import { getMediaPath } from "../../utils/mediaPath";
 import MediaCardActions from "../MediaCardActions";
 import RateMediaModal from "../RateMediaModal";
+
+function TypePictogram({ media }: { media: EnrichedMedia }) {
+  const Icon = media.isAnime
+    ? Sparkles
+    : media.type === "movie"
+      ? Clapperboard
+      : MonitorPlay;
+
+  return (
+    <span className="bg-primary absolute bottom-2 left-2 z-10 flex h-7 w-7 items-center justify-center rounded-full">
+      <Icon size={16} color="#0D1117" />
+    </span>
+  );
+}
 
 interface MediaCardProps {
   media: EnrichedMedia;
@@ -47,15 +61,15 @@ function MediaCard({ media, className }: MediaCardProps) {
           initialIsWatched={media.isWatched}
         />
         {badgeLabel != null && (
-          <span className="badge badge-primary absolute left-2 top-2 z-10">
+          <span
+            className={`badge absolute left-2 top-2 z-10 ${
+              media.topRank ? "badge-secondary" : "badge-accent"
+            }`}
+          >
             {badgeLabel}
           </span>
         )}
-        {media.pegi != null && (
-          <span className="badge badge-outline badge-sm absolute bottom-2 left-2 z-10 bg-base-100">
-            PEGI {media.pegi}
-          </span>
-        )}
+        <TypePictogram media={media} />
         <img
           src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
           alt={`${media.name} poster`}

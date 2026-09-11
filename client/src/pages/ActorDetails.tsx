@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import ActorFilmography from "../components/ActorFilmography";
 import ActorHeader from "../components/ActorHeader";
-import ActorInfo from "../components/ActorInfo";
 import BackButton from "../components/BackButton";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchActor } from "../services/api";
@@ -72,7 +71,6 @@ function ActorDetails() {
         <BackButton />
       </div>
       <ActorHeader actor={actor} />
-      <ActorInfo actor={actor} />
       <ActorFilmography actorId={actor.id} />
     </div>
   );

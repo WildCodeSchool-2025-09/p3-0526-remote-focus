@@ -10,6 +10,47 @@ pertinent.
 
 ---
 
+## Synthèse — manques, limites et propositions ouvertes
+
+Vue d'ensemble à date de fin d'implémentation des 37 US (2026-09-12). Détail complet
+de chaque point dans la section correspondante plus bas dans ce fichier.
+
+### Limites produit connues (fonctionnel)
+
+- **Personne (`person`)** : aucune date de naissance/décès ni profession en base ni
+  dans le pipeline TMDB — pages comédien sans ces 3 champs (voir DET-05).
+- **PRO-10** : filtre PEGI fiable à 100% sur tout contenu déjà importé (listes ET
+  accès direct par URL) ; jamais appliqué aux visiteurs (comportement voulu).
+- **APP-01** : sur les suggestions TMDB *non encore importées* dans la recherche
+  (`imported:false`), la détection anime est incomplète (pas de `origin_country` sur
+  `/search/movie`) et le filtre PEGI ne s'applique qu'aux films (via le flag `adult`,
+  aucun équivalent pour les séries) — gap assumé, contenu déjà importé non affecté.
+  Route d'import non authentifiée, sans rate limiting (acceptable hors production).
+- **CAL-01** : fenêtre 90 jours passés / 365 jours à venir (choix arbitraire, la carte
+  ne fixait pas de valeur).
+- **DET-07** : clic sur un comédien du casting navigue vers sa fiche complète
+  (`/actors/:id`) plutôt que d'ouvrir un panneau expansible inline — la maquette
+  wireframe suggère un panneau inline ; l'implémentation actuelle est fonctionnelle et
+  testée, non reconstruite (voir repasse visuelle ci-dessous).
+- **Repasse visuelle (2026-09-12)** : filtre de genre du Catalogue affiché à plat
+  (jusqu'à 27 pills, ~9 lignes sur mobile) — proposition de refonte documentée, non
+  implémentée. Bannière hero + bandeau CTA visiteur de l'Accueil absents (prévus par
+  la maquette wireframe). En-tête (barre de recherche + Connexion/Inscription) se
+  chevauche sous ~400px de large. Détail complet dans la section dédiée en fin de
+  fichier.
+
+### Corrections apportées lors de la repasse visuelle du 2026-09-12
+
+Badges Nouveau/Top corrigés (mauvaises couleurs), tags PEGI retirés des cards
+Accueil/Catalogue et remplacés par le pictogramme de type prévu par le styleguide,
+boutons d'action des cards repassés en disposition verticale, icône Watchlist
+corrigée (+/− blanc cassé au lieu d'un signet jaune), biographie du comédien
+repositionnée à côté de la photo, 5ᵉ carte "En cours" ajoutée au dashboard Profil
+(gap de découvrabilité sur US-PRO-05, qui était sinon déjà terminée et testée).
+Détail complet plus bas.
+
+---
+
 ## Phase 0 — Intégration US-DET-01 / US-CAT-01 / US-REC-01
 
 **US-CAT-01 / US-DET-01 / US-REC-01** — Ordre de merge DET-01 → CAT-01 → REC-01 dans
@@ -1510,3 +1551,188 @@ local ; page 2 ne renvoie aucune suggestion TMDB. Base revérifiée après coup 
 `media`=30, `season`=65, `episode`=1118, `person`=5540 (baseline exacte du
 seed). Frontend vérifié par transformation Vite sans erreur sur les fichiers
 touchés (pas de vérification visuelle en navigateur).
+
+## Repasse visuelle (2026-09-12)
+
+Contrôle de statut + comparaison systématique de l'app construite contre les deux
+maquettes (`Focus - StyleGuide.html`, `Focus - Wireframe App Films Series.html`,
+racine du repo, non versionnées). **Méthode** : ces fichiers sont des bundles
+Figma auto-extractibles (JS qui déballe le contenu au chargement, aucune image
+lisible en texte brut) — ni `grep` ni lecture brute du HTML ne donnent accès au
+design réel. Contournement trouvé cette session : rendu headless via
+`msedge.exe --headless --screenshot=...` (Edge est présent sur la machine),
+capturé en pleine hauteur puis découpé en sections lisibles avec un petit script
+PowerShell (`System.Drawing`). Le même contournement a servi à capturer l'app
+réelle (serveur + Vite lancés localement) pour une comparaison pixel par pixel,
+ce qui n'avait pas été possible plus tôt dans le projet (absence d'outil de
+navigateur dans les sessions précédentes, déjà signalée à plusieurs reprises dans
+ce journal). Fichiers de capture non conservés (répertoire temporaire hors repo).
+
+### 0. Statut US-PRO-05
+
+Confirmée implémentée et testée (commit `4234b79`, voir section US-PRO-05 plus
+haut) : route, page, filtre PEGI, tous vérifiés en réel à l'époque. Gap réel
+trouvé aujourd'hui : la page `/profile/in-progress` n'était liée nulle part dans
+l'UI (le commit le disait explicitement : "No nav entry added ... not adding a
+5th [dashboard card] unprompted"), donc invisible pour un utilisateur normal en
+navigation. **Corrigé** : 5ᵉ carte "En cours" ajoutée au dashboard Profil,
+nouveau compteur `inProgress` sur `GET /api/me/dashboard` (réutilise
+`trackingRepository.countInProgress`, déjà écrit pour la pagination de la page
+elle-même — aucune nouvelle requête SQL). Grille du dashboard passée à 5 colonnes
+(`md:grid-cols-5`) pour éviter qu'une carte isolée ne se retrouve seule sur sa
+ligne. Vérifié : `GET /api/me/dashboard` renvoie bien `counts.inProgress` (testé
+avec un utilisateur temporaire, nettoyé après coup).
+
+### 1. Corrections appliquées (rapides, sans risque)
+
+**Badges "Nouveau"/"Top 3"/"Top 10" — mauvaises couleurs.** Les trois rendus avec
+la même classe `badge-primary` (jaune), alors que le styleguide (section 04,
+"Badges de contenu") définit Nouveau en corail `#E83658` et Top 10/Top 3 en teal
+`#17B890` — deux couleurs déjà mappées dans `tailwind.config.js` (`accent` et
+`secondary` respectivement, jamais utilisées pour ces badges). Corrigé dans
+`MediaCard.tsx` : `badge-accent` pour "Nouveau", `badge-secondary` pour les rangs.
+Vérifié visuellement (capture Catalogue/Accueil réels après correction).
+
+**Tags PEGI sur les cards Accueil/Catalogue.** Retirés — absents des deux
+variantes de card montrées par le styleguide (section 15, "Carte film/série" et
+"Vignette catalogue") et explicitement signalés par l'utilisateur comme ne
+devant pas y figurer. À la place : le "pictogramme de type" prévu par le
+styleguide (section 04) mais jamais implémenté jusqu'ici — rond jaune `#F2B705`,
+icône Lucide noire, posé en bas à gauche de l'affiche (`Clapperboard` pour un
+film, `MonitorPlay` pour une série, `Sparkles` pour un anime, sur le champ
+`isAnime` déjà présent). Nouveau sous-composant `TypePictogram` dans
+`MediaCard.tsx`. Le tag PEGI reste affiché sur les fiches détail (film/série),
+seule sa présence sur les vignettes de liste était en cause.
+
+**Boutons d'action des cards — horizontaux au lieu de verticaux.**
+`MediaCardActions.tsx` (favoris/watchlist/vu, utilisé par Catalogue, Accueil,
+Recherche, Favoris, Watchlist, En cours — tous les écrans à base de
+`CatalogGrid`/`SearchResultCard`) empilait les 3 icônes en ligne
+(`flex ... gap-1`) ; le styleguide (section 05) et la maquette wireframe (poster
+catalogue avec 3 icônes rondes le long du bord droit) les montrent en colonne.
+Corrigé (`flex-col`). Les boutons d'action de la fiche détail
+(`ActionButton`/`MediaHeader`/`SerieHeader`) étaient déjà en ligne horizontale —
+conforme, c'est la disposition attendue à cet endroit précis (confirmée par la
+maquette wireframe, variante mobile de la fiche film : rangée de 4 icônes rondes).
+
+**Icône Watchlist incorrecte.** Utilisait `Bookmark` rempli jaune `#F2B705` à
+l'état actif. Le styleguide (section 05, "Icônes d'action rondes") prévoit un
+`+` au repos et un `−` à l'état actif, fond blanc cassé `#F5F5F0` (pas jaune) —
+et c'était déjà exactement ce que faisaient `MediaHeader`/`SerieHeader` via
+`ActionButton` (`icon={Plus}`, `color="#F5F5F0"`), juste pas `MediaCardActions`.
+Corrigé (icônes `Plus`/`Minus` de lucide-react, fond `#F5F5F0` + icône sombre à
+l'état actif) — se propage automatiquement à toutes les cards puisqu'un seul
+composant partagé.
+
+**Biographie du comédien mal placée.** `ActorInfo.tsx` rendait la biographie
+comme bloc séparé pleine largeur, sous le header (photo + nom), alors que la
+maquette wireframe (section 6, "Fiche comédien") la montre directement à droite
+de la photo, sous le nom, au-dessus du bouton Favoris — dans le même bloc que le
+header. Corrigé : biographie fusionnée dans `ActorHeader.tsx` ;
+`ActorInfo.tsx` supprimé (n'était utilisé nulle part ailleurs). Vérifié
+visuellement (capture réelle de la fiche Matt Damon avant/après).
+
+Vérification globale : typecheck + Biome clean sur tous les fichiers touchés ;
+captures réelles de l'app (Catalogue desktop/mobile, Accueil, fiche film, fiche
+comédien) prises après coup pour confirmer chaque correction visuellement, pas
+seulement par lecture de code.
+
+### 2. Tentative de correction, revertée
+
+**En-tête (recherche + Connexion/Inscription) qui se chevauchent sous ~400px de
+large.** Découvert pendant les captures de vérification (absent de la liste
+initiale de l'utilisateur). `Header.tsx` : le conteneur `flex-1` de la barre de
+recherche n'avait pas `min-w-0`, l'empêchant de rétrécir sous sa largeur
+intrinsèque — les boutons Connexion/Inscription étaient poussés hors du
+viewport. Ajout de `min-w-0` : le symptôme change (le texte "Connexion" chevauche
+maintenant visuellement le champ de recherche au lieu de déborder hors écran)
+sans être réellement résolu — capturé et comparé avant/après, la deuxième version
+n'est pas meilleure que la première. **Reverté.** Nécessite un vrai travail
+responsive (recherche réduite à une icône sur mobile, ou Connexion/Inscription
+déplacés dans un menu, plutôt qu'un correctif d'une ligne) — non traité ici pour
+ne pas se précipiter sur un correctif cosmétique qui masquerait le problème sans
+le régler.
+
+### 3. Constats documentés, non implémentés (nécessitent réflexion produit)
+
+**Filtre de genre du Catalogue — proposition de refonte.** Constat : la table
+`genre` contient 27 entrées (fusion des taxonomies TMDB film/série sans
+déduplication : "Action" et "Action & Adventure" coexistent, de même
+"Science-Fiction" et "Science-Fiction & Fantastique") ; affichées à plat
+(`flex-wrap`) dans `FilterBar.tsx`, elles remplissent la quasi-totalité de
+l'écran sur mobile avant tout contenu (9 lignes de pills capturées en réel avant
+la première card). La colorimétrie des pills elle-même est déjà conforme au
+styleguide (contour neutre au repos, plein jaune `#F2B705` pour l'actif) — le
+problème est uniquement la présentation/le nombre, pas la couleur.
+
+Deux éléments de spec trouvés dans les maquettes qui n'avaient pas été identifiés
+avant cette repasse :
+1. Le styleguide annote explicitement les pills de genre : *"Un seul genre actif
+   à la fois sur le catalogue"* — un sélecteur à choix unique, pas le multi-sélect
+   actuel (`selectedGenres: number[]`, plusieurs genres cumulables).
+2. La maquette wireframe montre, sur la variante mobile du Catalogue, la même
+   rangée de pills avec une **barre de défilement horizontale visible** sous la
+   rangée — confirmant qu'un défilement horizontal (pas un accordéon, pas une
+   modale) est le pattern d'interaction prévu pour un grand nombre de genres.
+
+**Proposition** (non implémentée — changement de comportement, pas seulement de
+style, donc documentée plutôt que précipitée comme demandé) : convertir
+`FilterBar` en sélection unique (un seul `selectedGenre: number | null` au lieu
+d'un tableau), rangée en défilement horizontal (`overflow-x-auto`, `flex-nowrap`,
+`scrollbar-none` — classe déjà utilisée ailleurs dans le projet pour les
+carrousels) plutôt qu'en `flex-wrap`. Impact à anticiper si validé : la route
+`GET /api/medias?genre=...` accepte aujourd'hui une liste d'IDs
+(`catalogRepository.buildFilterClause`, `ID_genre IN (?)`) — passer à un seul
+genre simplifie cette clause mais change le contrat de l'API (paramètre
+`genre` singulier). Éventuellement dédupliquer aussi les genres quasi-identiques
+côté seed (`Action`/`Action & Adventure`, etc.) plutôt que de les afficher tous.
+À trancher avec l'équipe avant implémentation.
+
+**Bannière d'accueil et bandeau CTA visiteur absents.** La maquette wireframe
+montre systématiquement, en haut de l'Accueil (visiteur ET connecté), une
+bannière hero ("Logo / Nom en plus grand / Slogan / description") juste sous la
+barre de recherche, et pour la variante visiteur uniquement, un bandeau
+"Créer un compte pour personnaliser" après le dernier carrousel. Aucun des deux
+n'existe dans `Homepage.tsx` actuel (la page enchaîne directement la barre de
+recherche puis Nouveautés/Populaires/Films/Séries/Animés). Non implémenté :
+nécessite un choix de contenu (média mis en avant ? texte statique ? image de
+fond, et laquelle ?) qui dépasse une correction rapide de style — à cadrer avec
+l'équipe/le design avant de construire quoi que ce soit.
+
+**Fiche comédien — clic sur un acteur du casting.** La maquette wireframe annote
+le carrousel de casting d'une fiche film/série : *"sélection avec panneau
+expansible ci-dessous"*, suggérant un panneau qui s'ouvre en ligne sous le
+carrousel au clic. L'implémentation actuelle (US-DET-07, déjà livrée et testée
+cette session) navigue plutôt vers la fiche complète du comédien (`/actors/:id`).
+Interprétation déjà fonctionnelle conservée telle quelle plutôt que reconstruite
+en panneau inline, qui serait une refonte UX plus large hors du périmètre
+"correction rapide sans risque" de cette repasse — à évaluer avec l'équipe si le
+comportement inline est réellement souhaité.
+
+### 4. Vérifié conforme (pas d'écart trouvé)
+
+- **Genres affichés en tags pleins sur les fiches détail** (film/série, tous
+  colorés en jaune) : ne contredit aucune spec — le styleguide ne documente que
+  l'usage "filtre" des pills de genre (un seul actif), pas leur usage comme
+  simple tag informatif sur une fiche. Choix cohérent (distingue visuellement les
+  genres des autres pills neutres année/durée/PEGI), non modifié.
+- **Boutons d'action ronds de la fiche détail** (`ActionButton`, `MediaHeader`/
+  `SerieHeader`) : déjà conformes au styleguide (icône ronde + libellé dessous,
+  bordure au repos, fond plein coloré + icône sombre à l'état actif) sur les 4
+  actions (Favoris, Watchlist, Vu, Noter), couleurs correctes (`#E83658`,
+  `#F5F5F0`, `#17B890`, `#F2B705`).
+- **Accordéon saison/épisode, badges plateforme, casting (avatar + nom +
+  personnage), toggle thème/PEGI, tabs catalogue/recherche** : conformes au
+  styleguide, aucun écart trouvé.
+
+### 5. Périmètre de cette repasse
+
+Comparaison pixel par pixel effectuée avec captures réelles pour : Accueil
+(visiteur, desktop), Catalogue (desktop et mobile), fiche film, fiche comédien.
+Les autres pages (Recherche, fiches saison/épisode, Profil et ses sous-pages,
+Calendrier) ont été vérifiées par lecture de code contre les composants déjà
+corrigés/validés ci-dessus (`MediaCard`/`MediaCardActions`/`SearchResultCard`
+étant partagés, une correction sur l'un se propage à tous ses consommateurs
+listés en section 1) plutôt que par capture individuelle de chacune, pour rester
+dans un temps raisonnable — à compléter par une vraie revue si l'équipe repère
+d'autres écarts sur ces pages précises.

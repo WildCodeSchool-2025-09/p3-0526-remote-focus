@@ -1,4 +1,4 @@
-import { Bookmark, Check, Heart } from "lucide-react";
+import { Check, Heart, Minus, Plus } from "lucide-react";
 import type { MouseEvent } from "react";
 import { useMediaTrack } from "../hooks/useMediaTrack";
 import { useWatchedStatus } from "../hooks/useWatchedStatus";
@@ -40,8 +40,10 @@ function MediaCardActions({
     action();
   };
 
+  const WatchlistIcon = isInWatchlist ? Minus : Plus;
+
   return (
-    <div className="pointer-events-none absolute right-2 top-2 z-10 flex gap-1 md:pointer-events-auto">
+    <div className="pointer-events-none absolute right-2 top-2 z-10 flex flex-col gap-1 md:pointer-events-auto">
       <button
         type="button"
         onClick={(event) => stopAndRun(event, handleToggleFavorite)}
@@ -63,12 +65,13 @@ function MediaCardActions({
         }
         aria-pressed={isInWatchlist}
         className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+        style={
+          isInWatchlist
+            ? { backgroundColor: "#F5F5F0", color: "#0D1117" }
+            : undefined
+        }
       >
-        <Bookmark
-          size={14}
-          fill={isInWatchlist ? "#F2B705" : "none"}
-          color={isInWatchlist ? "#F2B705" : "currentColor"}
-        />
+        <WatchlistIcon size={14} />
       </button>
       <button
         type="button"
