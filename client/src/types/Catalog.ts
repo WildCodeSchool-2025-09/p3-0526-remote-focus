@@ -14,6 +14,7 @@ export type Media = {
   pegi: string | null;
   isAnime: boolean;
   genreName: string | null;
+  isWatched?: boolean;
 };
 
 export type EnrichedMedia = Media & {

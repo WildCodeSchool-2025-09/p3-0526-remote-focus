@@ -1,4 +1,39 @@
 import databaseClient, { type Rows } from "../../../database/client";
+import type { Media } from "../../types/Media/Media.types";
+
+type MediaTypeFilter = "movie" | "tv" | "anime" | null;
+type WatchedFilter = "watched" | "to-watch" | null;
+
+type TrackedMedia = Media & { isWatched: boolean };
+
+type WatchlistMedia = TrackedMedia & {
+  watchlistAddedAt: Date | string | null;
+};
+
+const TYPE_FILTER_CLAUSE = `(? IS NULL
+  OR (? = 'anime' AND m.is_anime = TRUE)
+  OR (? = 'movie' AND m.type = 'movie' AND m.is_anime = FALSE)
+  OR (? = 'tv' AND m.type = 'tv' AND m.is_anime = FALSE))`;
+
+const GENRE_NAME_SUBQUERY = `(SELECT genre.name FROM classify_as
+  JOIN genre ON genre.ID = classify_as.ID_genre
+  WHERE classify_as.ID_media = m.ID LIMIT 1)`;
+
+const IS_WATCHED_CASE = `CASE
+  WHEN m.type = 'movie' THEN EXISTS(
+    SELECT 1 FROM media_user AS mu WHERE mu.ID_media = m.ID AND mu.ID_user = ?
+  )
+  ELSE (
+    SELECT COUNT(*) > 0 AND COUNT(*) = SUM(
+      CASE WHEN EXISTS(
+        SELECT 1 FROM episode_user AS eu WHERE eu.ID_episode = e.ID AND eu.ID_user = ?
+      ) THEN 1 ELSE 0 END
+    )
+    FROM episode AS e
+    JOIN season AS s ON s.ID = e.ID_season
+    WHERE s.ID_media = m.ID
+  )
+END AS isWatched`;
 
 class TrackRepository {
   async mediaExists(mediaId: number) {
@@ -47,6 +82,115 @@ class TrackRepository {
     );
 
     return nextValue;
+  }
+
+  async browseFavorites(
+    userId: number,
+    type: MediaTypeFilter,
+    offset: number,
+    limit: number,
+  ): Promise<TrackedMedia[]> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT m.ID AS id, m.tmdb_id AS tmdbId, m.name, m.type, m.released_at AS releasedAt,
+              m.duration, m.poster, m.synopsis, m.overall_rating AS overallRating, m.status,
+              m.original_name AS originalName, m.original_language AS originalLanguage,
+              m.pegi, m.is_anime AS isAnime, ${GENRE_NAME_SUBQUERY} AS genreName,
+              ${IS_WATCHED_CASE}
+       FROM track AS t
+       JOIN media AS m ON m.ID = t.ID_media
+       WHERE t.ID_user = ? AND t.favorite_media = TRUE AND ${TYPE_FILTER_CLAUSE}
+       ORDER BY t.favorited_at DESC
+       LIMIT ? OFFSET ?`,
+      [userId, userId, userId, type, type, type, type, limit, offset],
+    );
+    return (rows as unknown as TrackedMedia[]).map((row) => ({
+      ...row,
+      isWatched: Boolean(row.isWatched),
+    }));
+  }
+
+  async countFavorites(userId: number, type: MediaTypeFilter): Promise<number> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(*) AS total
+       FROM track AS t
+       JOIN media AS m ON m.ID = t.ID_media
+       WHERE t.ID_user = ? AND t.favorite_media = TRUE AND ${TYPE_FILTER_CLAUSE}`,
+      [userId, type, type, type, type],
+    );
+    return Number((rows as { total: number }[])[0].total);
+  }
+
+  async browseWatchlist(
+    userId: number,
+    type: MediaTypeFilter,
+    watchedFilter: WatchedFilter,
+    offset: number,
+    limit: number,
+  ): Promise<WatchlistMedia[]> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT * FROM (
+         SELECT m.ID AS id, m.tmdb_id AS tmdbId, m.name, m.type, m.released_at AS releasedAt,
+                m.duration, m.poster, m.synopsis, m.overall_rating AS overallRating, m.status,
+                m.original_name AS originalName, m.original_language AS originalLanguage,
+                m.pegi, m.is_anime AS isAnime, ${GENRE_NAME_SUBQUERY} AS genreName,
+                t.watchlist_added_at AS watchlistAddedAt,
+                ${IS_WATCHED_CASE}
+         FROM track AS t
+         JOIN media AS m ON m.ID = t.ID_media
+         WHERE t.ID_user = ? AND t.watchlist = TRUE AND ${TYPE_FILTER_CLAUSE}
+       ) AS w
+       WHERE (? IS NULL OR (? = 'watched' AND isWatched = 1) OR (? = 'to-watch' AND isWatched = 0))
+       ORDER BY watchlistAddedAt DESC
+       LIMIT ? OFFSET ?`,
+      [
+        userId,
+        userId,
+        userId,
+        type,
+        type,
+        type,
+        type,
+        watchedFilter,
+        watchedFilter,
+        watchedFilter,
+        limit,
+        offset,
+      ],
+    );
+    return (rows as unknown as WatchlistMedia[]).map((row) => ({
+      ...row,
+      isWatched: Boolean(row.isWatched),
+    }));
+  }
+
+  async countWatchlist(
+    userId: number,
+    type: MediaTypeFilter,
+    watchedFilter: WatchedFilter,
+  ): Promise<number> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(*) AS total FROM (
+         SELECT
+                ${IS_WATCHED_CASE}
+         FROM track AS t
+         JOIN media AS m ON m.ID = t.ID_media
+         WHERE t.ID_user = ? AND t.watchlist = TRUE AND ${TYPE_FILTER_CLAUSE}
+       ) AS w
+       WHERE (? IS NULL OR (? = 'watched' AND isWatched = 1) OR (? = 'to-watch' AND isWatched = 0))`,
+      [
+        userId,
+        userId,
+        userId,
+        type,
+        type,
+        type,
+        type,
+        watchedFilter,
+        watchedFilter,
+        watchedFilter,
+      ],
+    );
+    return Number((rows as { total: number }[])[0].total);
   }
 }
 

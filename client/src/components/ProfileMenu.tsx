@@ -1,14 +1,11 @@
 import { LogOut, User as UserIcon } from "lucide-react";
-import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
+import Avatar from "./Avatar";
 
 function ProfileMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [avatarFailed, setAvatarFailed] = useState(false);
 
   if (user == null) {
     return null;
@@ -27,17 +24,7 @@ function ProfileMenu() {
         className="btn btn-ghost btn-circle avatar"
         aria-label="Menu profil"
       >
-        <div className="flex w-9 items-center justify-center overflow-hidden rounded-full bg-base-300">
-          {avatarFailed ? (
-            <UserIcon size={18} />
-          ) : (
-            <img
-              src={`${API_URL}${user.avatar}`}
-              alt={user.login}
-              onError={() => setAvatarFailed(true)}
-            />
-          )}
-        </div>
+        <Avatar avatarPath={user.avatar} alt={user.login} size={36} />
       </button>
 
       <ul

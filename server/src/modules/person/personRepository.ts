@@ -86,6 +86,14 @@ class PersonRepository {
     );
     return Number((rows as { total: number }[])[0].total);
   }
+
+  async countFavorites(userId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      "SELECT COUNT(*) AS total FROM favorite WHERE ID_user = ?",
+      [userId],
+    );
+    return Number((rows as { total: number }[])[0].total);
+  }
 }
 
 export default new PersonRepository();

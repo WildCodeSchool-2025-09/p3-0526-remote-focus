@@ -7,6 +7,7 @@ import episodeActions from "./modules/episode/episodeActions";
 import genreActions from "./modules/genre/genreActions";
 import mediaActions from "./modules/media/mediaActions";
 import personActions from "./modules/person/personActions";
+import profileActions from "./modules/profile/profileActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
 import seasonActions from "./modules/season/seasonActions";
 import seriesActions from "./modules/series/seriesActions";
@@ -91,5 +92,9 @@ router.patch(
   verifyToken,
   trackingActions.toggleEpisodeWatched,
 );
+
+router.get("/api/me/dashboard", verifyToken, profileActions.readDashboard);
+router.get("/api/me/favorites", verifyToken, trackActions.browseFavorites);
+router.get("/api/me/watchlist", verifyToken, trackActions.browseWatchlist);
 
 export default router;

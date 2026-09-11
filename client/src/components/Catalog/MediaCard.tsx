@@ -25,7 +25,11 @@ function MediaCard({ media, className }: MediaCardProps) {
   return (
     <div className={className}>
       <Link to={getMediaPath(media.type, media.id)} className="relative block">
-        <MediaCardActions mediaId={media.id} />
+        <MediaCardActions
+          mediaId={media.id}
+          mediaType={media.type}
+          initialIsWatched={media.isWatched}
+        />
         {badgeLabel != null && (
           <span className="badge badge-primary absolute left-2 top-2 z-10">
             {badgeLabel}

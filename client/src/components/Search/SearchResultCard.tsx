@@ -17,7 +17,7 @@ function SearchResultCard({ media }: SearchResultCardProps) {
       to={getMediaPath(media.type, media.id)}
       className="relative flex w-[120px] shrink-0 flex-col gap-2 md:w-[170px]"
     >
-      <MediaCardActions mediaId={media.id} />
+      <MediaCardActions mediaId={media.id} mediaType={media.type} />
       {media.poster != null ? (
         <img
           src={`https://image.tmdb.org/t/p/w342${media.poster}`}

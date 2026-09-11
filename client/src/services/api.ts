@@ -1,3 +1,5 @@
+import type { CatalogResponse, Format } from "../types/Catalog";
+import type { DashboardData } from "../types/Profile";
 import type { KnownForResponse, SearchResults } from "../types/Search";
 import type { User } from "../types/User";
 import type {
@@ -249,6 +251,76 @@ export async function toggleWatched(
 
   if (!response.ok) {
     throw new Error("Impossible de mettre à jour le statut vu");
+  }
+
+  return response.json();
+}
+
+export async function fetchDashboard(token: string): Promise<DashboardData> {
+  const response = await fetch(`${API_URL}/api/me/dashboard`, {
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer votre tableau de bord");
+  }
+
+  return response.json();
+}
+
+export type WatchedListFilter = "watched" | "to-watch" | null;
+
+export async function fetchFavorites(
+  token: string,
+  type: Format,
+  page: number,
+  limit: number,
+): Promise<CatalogResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (type != null) {
+    params.set("type", type);
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/me/favorites?${params.toString()}`,
+    { headers: authHeaders(token) },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer vos favoris");
+  }
+
+  return response.json();
+}
+
+export async function fetchWatchlist(
+  token: string,
+  type: Format,
+  watched: WatchedListFilter,
+  page: number,
+  limit: number,
+): Promise<CatalogResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (type != null) {
+    params.set("type", type);
+  }
+  if (watched != null) {
+    params.set("watched", watched);
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/me/watchlist?${params.toString()}`,
+    { headers: authHeaders(token) },
+  );
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer votre watchlist");
   }
 
   return response.json();

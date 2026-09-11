@@ -1,17 +1,22 @@
-import { Bookmark, Heart } from "lucide-react";
+import { Bookmark, Check, Heart } from "lucide-react";
 import type { MouseEvent } from "react";
 import { useMediaTrack } from "../hooks/useMediaTrack";
+import { useWatchedStatus } from "../hooks/useWatchedStatus";
 
 type MediaCardActionsProps = {
   mediaId: number;
+  mediaType: string;
   initialIsFavorite?: boolean;
   initialIsInWatchlist?: boolean;
+  initialIsWatched?: boolean;
 };
 
 function MediaCardActions({
   mediaId,
+  mediaType,
   initialIsFavorite = false,
   initialIsInWatchlist = false,
+  initialIsWatched = false,
 }: MediaCardActionsProps) {
   const {
     isFavorite,
@@ -19,6 +24,12 @@ function MediaCardActions({
     handleToggleFavorite,
     handleToggleWatchlist,
   } = useMediaTrack(mediaId, initialIsFavorite, initialIsInWatchlist);
+
+  const { isWatched, handleToggleWatched } = useWatchedStatus(
+    mediaType === "movie" ? "movie" : "series",
+    mediaId,
+    initialIsWatched,
+  );
 
   const stopAndRun = (
     event: MouseEvent<HTMLButtonElement>,
@@ -57,6 +68,19 @@ function MediaCardActions({
           size={14}
           fill={isInWatchlist ? "#F2B705" : "none"}
           color={isInWatchlist ? "#F2B705" : "currentColor"}
+        />
+      </button>
+      <button
+        type="button"
+        onClick={(event) => stopAndRun(event, handleToggleWatched)}
+        aria-label={isWatched ? "Marquer comme non vu" : "Marquer comme vu"}
+        aria-pressed={isWatched}
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+      >
+        <Check
+          size={14}
+          color={isWatched ? "#17B890" : "currentColor"}
+          strokeWidth={isWatched ? 3 : 2}
         />
       </button>
     </div>

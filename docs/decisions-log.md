@@ -537,3 +537,89 @@ depuis un état partiel (marque tous les épisodes) puis démarquage, toggle sé
 individuellement) puis démarquage, 401 sans token sur les 4 routes, 404 sur
 film/série/saison/épisode inexistant sur les 4 routes. Utilisateur et données de
 test nettoyés après coup.
+
+## US-PRO-01
+
+**US-PRO-01 — Nouveau module `profile/` dédié au tableau de bord**, plutôt que
+d'étendre `user/` (préférences de genres) ou `track/`/`tracking/` — l'agrégation de
+compteurs multi-tables (favoris, watchlist, acteurs favoris, titres vus) est une
+préoccupation distincte de chacun de ces modules, qui exposent chacun une méthode de
+comptage réutilisée ici (`trackRepository.countFavorites`/`countWatchlist`,
+`personRepository.countFavorites`, `profileRepository.countWatchedTitles`).
+
+**US-PRO-01 — Définition de "titres vus" alignée sur l'architecture existante, pas
+sur la formulation littérale de la carte US-PRO-12** ("Mes statistiques", Phase 6,
+pas encore implémentée). US-PRO-12 décrit ce compteur comme "basé sur `media_user`
+uniquement", mais `media_user` ne concerne que les films (voir CLAUDE.md — "Modèle de
+données") : une série ne peut structurellement pas y apparaître. Le compteur du
+dashboard (et, par cohérence, celui qu'il faudra pour US-PRO-12) compte donc les
+films vus (`media_user`) + les séries entièrement vues, calculées dynamiquement via
+la même logique que `isFullyWatched` (US-DET-09), jamais stockées.
+Impact : à réutiliser tel quel pour US-PRO-12 plutôt que de re-suivre la formulation
+littérale de sa carte, qui contredirait la convention déjà actée.
+
+**US-PRO-01 — Compteur "Mes acteurs favoris" branché sur la table `favorite`**
+(existante dans `schema.sql`, 0 ligne à ce jour) même si aucune action de l'app ne
+permet encore de la remplir — ce sera fait par US-PRO-04 (Phase 6). Le compteur
+affiche donc `0` pour tout le monde jusqu'à cette US, ce qui est le comportement
+correct en attendant.
+
+**US-PRO-01 — Cartes "Mes acteurs favoris" et "Statistiques" non cliquables**
+(pas de `<Link>`, juste un badge "Bientôt disponible") car leurs pages dédiées
+(US-PRO-04 et US-PRO-12) sont en Phase 6, pas encore construites. Seules les cartes
+Favoris et Watchlist, construites dans cette même phase juste après, sont cliquables.
+
+**US-PRO-01 — Extraction d'un composant `Avatar` partagé** (`components/Avatar.tsx`)
+à partir du pattern déjà existant dans `ProfileMenu.tsx` (`<img>` + fallback icône
+Lucide `User` sur `onError`) — réutilisé ici pour l'en-tête du dashboard, et
+réutilisable tel quel pour US-PRO-07/09 (paramètres, upload photo). `ProfileMenu`
+a été mis à jour pour utiliser ce composant plutôt que de dupliquer la logique.
+
+## US-PRO-02 / US-PRO-03
+
+**US-PRO-02 / US-PRO-03 — Écart constaté sur les deux cartes : elles décrivent une
+action rapide "vu" comme "déjà développée dans l'US Accueil/Catalogue", mais
+`MediaCardActions` (utilisé sur Catalogue/Recherche depuis US-DET-08) n'avait que
+favori/watchlist — aucune bascule "vu" au niveau carte n'existait avant maintenant
+(US-DET-09 ne l'avait ajoutée qu'au niveau des fiches détail). Complété ici en
+ajoutant un troisième bouton à `MediaCardActions` (icône `Check`, même pattern
+optimiste que les deux autres, `useWatchedStatus` avec le scope "movie" ou "series"
+selon `media.type`) plutôt que de laisser la carte s'appuyer sur une fonctionnalité
+manquante.
+Impact : cette bascule "vu" apparaît désormais aussi sur Catalogue et Recherche (pas
+seulement Favoris/Watchlist), puisque les trois écrans partagent `MediaCardActions`.
+Aucune régression attendue, uniquement un bouton supplémentaire.
+
+**US-PRO-02 / US-PRO-03 — Pastille "type de contenu" non implémentée** : les deux
+cartes demandent qu'elle soit masquée quand un onglet Films/Séries/Animés est actif
+(redondante). Cette pastille n'existe nulle part dans l'app aujourd'hui — c'est une
+étape technique de US-CAT-01 encore incomplète (voir note dans
+`docs/decisions-log.md` / mémoire de session : "CAT-01 reste ouverte avec plusieurs
+étapes frontend incomplètes : Voir plus, pastille type, loading/error, responsive").
+Décision : ne pas la reconstruire ici par anticipation (US-CAT-01 n'est pas de mon
+ressort et pourrait la faire différemment). Comme Favoris/Watchlist réutilisent le
+même composant `MediaCard`/`CatalogGrid` que le Catalogue, le jour où US-CAT-01
+ajoute la pastille, elle apparaîtra automatiquement ici aussi — aucun travail
+supplémentaire prévu. Seul point à garder en tête pour l'implémenteur de CAT-01 :
+prévoir un moyen de la masquer conditionnellement (probablement une prop sur
+`MediaCard`), utile aux trois écrans (Catalogue, Favoris, Watchlist).
+
+**US-PRO-02 — Pagination "Voir plus" (10 par 10)** implémentée via un hook dédié
+`useLoadMoreMedias` (accumulation côté client, pas de remplacement de liste), plutôt
+que le composant `Pagination` numéroté déjà utilisé par le Catalogue — les deux
+cartes demandent explicitement un bouton "Voir plus", pas une pagination par numéros.
+
+**US-PRO-03 — Sous-filtre "À voir / Vu"** implémenté par un `CASE` SQL corrélé
+calculant `isWatched` par média (film : existence dans `media_user` ; série : tous
+les épisodes vus, même règle que `isSeriesFullyWatched` de US-DET-09, y compris le
+cas 0 épisode = non vu) puis un filtre sur ce résultat dans une sous-requête —
+nécessaire car regarder si un média de la watchlist est "vu" demande une logique
+différente selon `movie`/`tv`, non exprimable en une seule condition simple.
+
+Testé en réel avec un utilisateur temporaire : dashboard à 0 partout avant toute
+action, compteurs mis à jour après ajout de favoris/watchlist, filtre par type sur
+favoris et watchlist, filtre "à voir"/"vu" sur la watchlist (y compris bascule après
+qu'une série passe de partiellement à entièrement vue), 401 sans token sur les 3
+nouvelles routes de lecture. Un bug réel trouvé et corrigé pendant ce test : `isWatched`
+remontait `0`/`1` bruts (issus du `CASE` SQL) au lieu d'un booléen JS — corrigé par un
+`.map()` de coercition dans `trackRepository`. Données de test nettoyées après coup.
