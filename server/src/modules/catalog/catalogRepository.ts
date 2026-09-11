@@ -28,6 +28,35 @@ class CatalogRepository {
     return rows;
   }
 
+  async readRecentReleases(
+    hidePegi16: boolean,
+    genreIds: number[],
+    limit: number,
+  ): Promise<Media[]> {
+    const conditions = [
+      "m.released_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW() + INTERVAL 30 DAY",
+      pegiFilterClause(),
+    ];
+    const params: unknown[] = [hidePegi16, PEGI16_VALUES];
+
+    if (genreIds.length > 0) {
+      conditions.push(
+        "m.ID IN (SELECT ID_media FROM classify_as WHERE ID_genre IN (?))",
+      );
+      params.push(genreIds);
+    }
+
+    const [rows] = await databaseClient.query<Media[]>(
+      `SELECT m.ID AS id, m.tmdb_id AS tmdbId, m.name, m.type, m.released_at AS releasedAt, m.duration, m.poster, m.synopsis, m.overall_rating AS overallRating, m.status, m.original_name AS originalName, m.original_language AS originalLanguage, m.pegi, m.is_anime AS isAnime, (SELECT genre.name FROM classify_as JOIN genre ON genre.ID = classify_as.ID_genre WHERE classify_as.ID_media = m.ID LIMIT 1) AS genreName
+       FROM media AS m
+       WHERE ${conditions.join(" AND ")}
+       ORDER BY m.released_at DESC, m.overall_rating DESC
+       LIMIT ?`,
+      [...params, limit],
+    );
+    return rows;
+  }
+
   async readTopByGenre(
     genreId: number,
     type: "movie" | "tv" | "anime" | null,

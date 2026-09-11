@@ -58,4 +58,5 @@ export type HomepageResponse = {
   movies: EnrichedMedia[];
   series: EnrichedMedia[];
   animes: EnrichedMedia[];
+  newReleases: EnrichedMedia[];
 };

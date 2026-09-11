@@ -87,6 +87,17 @@ class TrackRepository {
     return nextValue;
   }
 
+  async readTrackedGenreIds(userId: number): Promise<number[]> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT DISTINCT ca.ID_genre AS id
+       FROM track AS t
+       JOIN classify_as AS ca ON ca.ID_media = t.ID_media
+       WHERE t.ID_user = ? AND (t.favorite_media = TRUE OR t.watchlist = TRUE)`,
+      [userId],
+    );
+    return rows.map((row) => row.id as number);
+  }
+
   async browseFavorites(
     userId: number,
     type: MediaTypeFilter,

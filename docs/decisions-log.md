@@ -947,3 +947,46 @@ un utilisateur temporaire filtre PEGI actif/inactif (un film PEGI 16 disparaît 
 US-PRO-10). Frontend vérifié par transformation Vite sans erreur sur
 `Homepage.tsx` et `catalogService.ts` (pas de vérification visuelle en
 navigateur). Utilisateur de test nettoyé après coup.
+
+## US-ACC-03
+
+**US-ACC-03 — Carte peu précise sur l'algorithme de personnalisation** ("genres
+préférés, acteurs préférés, favoris/watchlist" cités ensemble, sans règle de
+combinaison). Périmètre retenu : signal genre uniquement (genres aimés via
+`like_` UNION genres des médias en favoris/watchlist via `track`+`classify_as`) —
+le signal "acteurs préférés" est délibérément non traité ici et laissé à
+US-ACC-05, qui spécifie déjà un algorithme précis et détaillé pour la
+personnalisation par acteur ("comédiens les plus vus"). Éviter de dupliquer une
+logique moins rigoureuse ici pour ensuite la refaire proprement dans ACC-05.
+
+**US-ACC-03 — Fenêtre "récent OU à venir" élargie** : nouvelle méthode
+`catalogRepository.readRecentReleases` avec une fenêtre `NOW() - 30j` à
+`NOW() + 30j`, différente de `readLatest30Days` (déjà utilisée par le Catalogue,
+`NOW() - 30j` à `NOW()` uniquement) — la carte demande explicitement "sorties
+récentes OU À VENIR", ce que `readLatest30Days` ne couvre pas. Nouvelle méthode
+plutôt que modification de `readLatest30Days` pour ne rien changer au
+comportement déjà en prod du Catalogue.
+
+**US-ACC-03 — Filtre genre strict avec repli sur la liste générique si vide** :
+si le filtre par genres personnalisés ne renvoie aucun résultat (nouvel
+utilisateur sans préférences, ou préférences qui ne correspondent à aucune
+sortie récente/à venir du moment), la section retombe sur la même liste
+générique qu'un visiteur verrait — pas de section vide. Différent du choix
+explicite d'US-ACC-05 ("pas de complément générique" si moins de 6 résultats) :
+cette règle-là est spécifique à ACC-05 et écrite noir sur blanc dans sa carte,
+ACC-03 ne dit rien de tel donc un repli semblait le comportement attendu par
+défaut (éviter une section "Nouveautés" vide pour tout nouvel utilisateur).
+
+**US-ACC-03 — Ajouté dans la même réponse `/api/medias/home`** (clé
+`newReleases`) plutôt qu'un nouvel endpoint, pour rester cohérent avec le choix
+"un seul aller-retour" d'US-ACC-01/02.
+
+Testé en réel : visiteur → liste générique (2 sorties dans la fenêtre actuelle
+des données de seed) ; utilisateur avec un genre aimé correspondant à l'une des
+2 sorties → liste restreinte à cette seule sortie ; utilisateur avec un genre
+aimé sans rapport avec les sorties du moment → repli sur la liste générique (les
+2) ; nouvel utilisateur sans aucune préférence → aussi la liste générique ; filtre
+PEGI actif → sorties 16+/18 exclues même dans la version personnalisée (les 2
+sorties du jeu de données actuel sont toutes les deux PEGI 16, résultat vide
+filtre actif — comportement correct, pas un bug). Utilisateurs de test nettoyés
+après coup.

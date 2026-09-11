@@ -53,6 +53,7 @@ function Homepage() {
     <div>
       <h1>Accueil</h1>
 
+      <MediaSection title="Nouveautés" medias={homepage.newReleases} />
       <MediaSection title="Populaires" medias={homepage.popular} />
       <MediaSection title="Films" medias={homepage.movies} />
       <MediaSection title="Séries" medias={homepage.series} />
