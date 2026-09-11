@@ -1,12 +1,14 @@
 import express from "express";
 import actorActions from "./modules/actor/actorActions";
 import mediaActions from "./modules/media/mediaActions";
+import * as searchRoutes from "./modules/search/searchRoutes";
 
 const router = express.Router();
 
 /* ************************************************************************* */
 // Define Your API Routes Here
 /* ************************************************************************* */
+router.get("/api/medias/search", searchRoutes.browse);
 
 // Define item-related routes
 /* import itemActions from "./modules/item/itemActions.old";*/

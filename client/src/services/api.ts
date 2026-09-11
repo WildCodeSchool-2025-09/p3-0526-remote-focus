@@ -1,4 +1,5 @@
 import type { FilmographyItem, Media } from "../types/media";
+import type { SearchResults } from "../types/Search";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
@@ -22,6 +23,18 @@ export async function fetchFilmography(
 
   if (!response.ok) {
     throw new Error("Filmographie indisponible");
+  }
+
+  return response.json();
+}
+
+export async function searchMedias(query: string): Promise<SearchResults> {
+  const response = await fetch(
+    `${API_URL}/api/medias/search?q=${encodeURIComponent(query)}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("la recherche a échoué");
   }
 
   return response.json();

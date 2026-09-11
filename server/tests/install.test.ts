@@ -2,8 +2,8 @@
 import "dotenv/config";
 
 import fs from "node:fs";
-
 import databaseClient from "../database/client";
+
 
 import type { Rows } from "../database/client";
 
