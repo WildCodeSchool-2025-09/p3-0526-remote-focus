@@ -2,6 +2,7 @@ import express from "express";
 import { verifyToken } from "./middlewares/verifyToken";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
+import episodeActions from "./modules/episode/episodeActions";
 import genreActions from "./modules/genre/genreActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchRoutes from "./modules/search/searchRoutes";
@@ -39,6 +40,10 @@ router.post("/api/items", itemActions.add);
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/series/:id", seriesActions.read);
 router.get("/api/series/:serieId/seasons/:seasonId", seasonActions.read);
+router.get(
+  "/api/series/:serieId/seasons/:seasonId/episodes/:episodeId",
+  episodeActions.read,
+);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
 export default router;

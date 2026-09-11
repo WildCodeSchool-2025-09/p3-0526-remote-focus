@@ -88,6 +88,30 @@ export type SeasonDetail = {
   userRating: number | null;
 };
 
+export type EpisodeDetail = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  releasedAt: string | null;
+  synopsis: string | null;
+  duration: number | null;
+  poster: string | null;
+  overallRating: string | null;
+  season: {
+    id: number;
+    name: string | null;
+    number: number | null;
+  };
+  series: {
+    id: number;
+    name: string;
+  };
+  platforms: Platform[];
+  cast: CastMember[];
+  castTotal: number;
+  userStatus: string | null;
+};
+
 export type Series = {
   id: number;
   name: string;

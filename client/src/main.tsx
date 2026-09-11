@@ -9,6 +9,7 @@ import "./globals.css";
 import App from "./App";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
+import EpisodeDetail from "./pages/EpisodeDetail";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: "series/:serieId/seasons/:seasonId",
         element: <SeasonDetail />,
+      },
+      {
+        path: "series/:serieId/seasons/:seasonId/episodes/:episodeId",
+        element: <EpisodeDetail />,
       },
     ],
   },

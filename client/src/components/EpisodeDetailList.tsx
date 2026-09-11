@@ -1,12 +1,17 @@
+import { Link } from "react-router";
 import type { Episode } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
 
 type EpisodeDetailListProps = {
+  seriesId: number;
+  seasonId: number;
   episodes: Episode[];
   fallbackPoster: string | null;
 };
 
 function EpisodeDetailList({
+  seriesId,
+  seasonId,
   episodes,
   fallbackPoster,
 }: EpisodeDetailListProps) {
@@ -30,9 +35,10 @@ function EpisodeDetailList({
             .join(" · ");
 
           return (
-            <div
+            <Link
               key={episode.id}
-              className="flex gap-4 rounded-lg border border-white/10 bg-[#0F242F] p-3"
+              to={`/series/${seriesId}/seasons/${seasonId}/episodes/${episode.id}`}
+              className="flex gap-4 rounded-lg border border-white/10 bg-[#0F242F] p-3 hover:border-white/30"
             >
               {fallbackPoster != null ? (
                 <img
@@ -58,7 +64,7 @@ function EpisodeDetailList({
                   </p>
                 )}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

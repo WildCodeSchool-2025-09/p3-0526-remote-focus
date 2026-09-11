@@ -1,6 +1,7 @@
 import type { SearchResults } from "../types/Search";
 import type { User } from "../types/User";
 import type {
+  EpisodeDetail,
   FilmographyItem,
   Genre,
   Media,
@@ -40,6 +41,22 @@ export async function fetchSeason(
 
   if (!response.ok) {
     throw new Error(`Saison ${seasonId} introuvable`);
+  }
+
+  return response.json();
+}
+
+export async function fetchEpisode(
+  seriesId: number,
+  seasonId: number,
+  episodeId: number,
+): Promise<EpisodeDetail> {
+  const response = await fetch(
+    `${API_URL}/api/series/${seriesId}/seasons/${seasonId}/episodes/${episodeId}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`Épisode ${episodeId} introuvable`);
   }
 
   return response.json();

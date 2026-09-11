@@ -252,3 +252,44 @@ explicitement par l'utilisateur après constat de l'incohérence notée dans l'e
 US-DET-02 ci-dessus.
 Impact : aucun effet de bord ; réutilise le composant déjà créé pour US-DET-02/03.
 Testé en réel (page `/movies/:id` toujours fonctionnelle) avant commit.
+
+---
+
+## US-DET-04
+
+**US-DET-04** — Casting lu directement sur `episode_person` (pas d'agrégation
+nécessaire, contrairement à US-DET-03 où il fallait remonter par les épisodes de la
+saison) — l'épisode est déjà l'unité de granularité de cette table.
+Impact : aucun, comportement attendu.
+
+**US-DET-04** — Genres non affichés sur la fiche épisode (contrairement à ce que
+suggérait l'étape technique "EpisodeInfo (durée totale, genres, date de sortie, note,
+synopsis)"), note globale reprise de la série parente.
+Pourquoi : les critères d'acceptation réels d'US-DET-04 ne mentionnent PAS les genres
+(contrairement à US-DET-02/03 qui les listent explicitement) — seule l'étape
+technique en parle, incohérence probable de rédaction de la carte. Comme il n'existe
+aucune donnée de genre à la granularité épisode dans le schéma, j'ai suivi les
+critères d'acceptation (qui font foi) plutôt que l'étape technique. La note globale,
+elle, suit le même choix que US-DET-03 (réutilisée depuis la série).
+Impact : aucun champ genre sur la fiche épisode ; à revoir si l'équipe voulait
+effectivement des genres ici malgré l'absence dans les critères.
+
+**US-DET-04** — Vignette : fallback saison → série (`episode.poster ?? season.poster
+?? series.poster`, en pratique toujours saison ou série puisque `episode` n'a aucune
+colonne image).
+Impact : cohérent avec l'observation déjà loggée sous US-DET-03/US-DET-04 plus haut.
+
+**US-DET-04** — Interprétation de l'étape technique "Rendre chaque élément de la
+SeasonList (US06.1) cliquable avec un lien vers /serie/:serieId/saison/:seasonId" :
+traité comme une erreur de copier-coller dans la carte (référence à `SeasonList`,
+composant d'US-DET-02, alors que le contexte — routes avec `:episodeId`, page
+EpisodeDetail — indique clairement qu'il s'agit de rendre cliquable chaque élément
+de `EpisodeDetailList` (US-DET-03) vers la fiche épisode, pas vers la fiche série.
+Implémenté selon cette lecture.
+Impact : chaque ligne d'épisode dans `EpisodeDetailList` ouvre désormais
+`/series/:id/seasons/:seasonId/episodes/:episodeId`.
+
+**Route** : `/api/series/:serieId/seasons/:seasonId/episodes/:episodeId` et
+`/series/:serieId/seasons/:seasonId/episodes/:episodeId` (pas `/serie/.../saison/...`
+de la carte) — même raisonnement que US-DET-02/03 (anglais, cohérent avec les
+conventions de nommage).
