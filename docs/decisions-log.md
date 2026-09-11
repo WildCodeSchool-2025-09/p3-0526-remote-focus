@@ -1211,3 +1211,61 @@ entièrement vue → disparaît de la liste ; démarquée puis re-marquée
 partiellement → réapparaît ; filtre PEGI actif → contenu 16+/18 exclu même en
 cours. Frontend vérifié par transformation Vite sans erreur. Utilisateur de test
 nettoyé après coup.
+
+## US-DET-10
+
+**US-DET-10 — "Visionné" interprété comme `isWatched`, pas littéralement "entrée
+dans `media_user`"** : la carte dit "uniquement s'il a déjà visionné ce média
+(entrée dans `media_user` requise)", mais `media_user` est réservé aux films (cf.
+`CLAUDE.md`) — pris au pied de la lettre, cela rendrait structurellement
+impossible de noter une série, alors que le titre de la carte est explicite
+("noter les Films / Séries"). Interprétation retenue : film → présent dans
+`media_user` (`trackingRepository.isMovieWatched`) ; série → entièrement vue
+(`isSeriesFullyWatched`, même règle que partout ailleurs dans l'app) — 403 sinon,
+code retour choisi car le fichier de convention de nommage de l'équipe le réserve
+explicitement à "média non vu".
+
+**US-DET-10 — Deux routes séparées, un seul stockage** : `PATCH
+/api/me/medias/:id/rating` (film) et `PATCH /api/me/series/:id/rating` (série),
+chacune avec sa propre vérification "visionné", mais toutes deux appellent la
+même `trackRepository.upsertRating` (upsert sur `track.user_rating`, même
+pattern que `toggleFavorite`/`toggleWatchlist`) — cohérent avec le découpage
+film/série déjà en place ailleurs (`toggleMovieWatched`/`toggleSeriesWatched`).
+
+**US-DET-10 — Note effaçable** (`rating: null`), non demandé explicitement par
+la carte mais cohérent avec une colonne nullable et l'attente UX normale de
+pouvoir retirer une note. Bouton "Effacer la note" affiché uniquement si une
+note existe déjà.
+
+**US-DET-10 — Validation par demi-point via `Number.isInteger(valeur * 2)`**
+plutôt qu'une liste en dur des 11 valeurs valides (0, 0.5, ..., 5) — évite une
+énumération fragile, valide toute la plage 0–5 par pas de 0,5 en une seule règle.
+
+**US-DET-10 — Emplacement Watchlist/Favoris : bouton compact réutilisant la même
+modale que la fiche détaillée**, plutôt qu'un widget d'étoiles interactif
+directement intégré à chaque petite card. Un sélecteur demi-étoile précis est
+difficile à manier correctement sur une card de catalogue en taille réduite
+(a fortiori au doigt sur mobile) ; réutiliser une seule modale testée partout
+réduit aussi le risque par rapport à deux implémentations différentes du même
+composant de notation. Champ `userRating` ajouté à `TrackedMedia`
+(favoris/watchlist) uniquement — pas à `Media` de base, car le Catalogue/
+Recherche/Accueil n'ont pas cette donnée disponible (pas de jointure `track`) et
+la carte ne les liste pas comme emplacements de notation.
+
+**US-DET-10 — Note privée confirmée par construction, pas par un filtre
+explicite** : `track.user_rating` est déjà scopé par `(ID_user, ID_media)`, donc
+chaque lecture (`readTrack`, listes favoris/watchlist) ne peut par nature
+remonter que la ligne de l'utilisateur courant — aucune moyenne communautaire
+n'est calculée nulle part, `media.overall_rating` (note IMDb) n'est lu ni
+modifié par aucune des nouvelles requêtes.
+
+Testé en réel avec deux utilisateurs temporaires : 401 sans token, 404 sur média
+inexistant, 403 sur film non vu et sur série non entièrement vue, 400 sur note
+hors plage (6, -1) et sur note non multiple de 0,5 (3,3), note valide 3,5
+acceptée sur film vu (reflétée sur la fiche détaillée ET dans la liste Favoris),
+note effacée (`null`) reflétée partout, série entièrement vue puis notée 5,
+confidentialité vérifiée (un second utilisateur et un visiteur voient
+`userRating: null` sur le même film, note IMDb inchangée). Frontend vérifié par
+transformation Vite sans erreur sur les 5 fichiers touchés (pas de vérification
+visuelle en navigateur, comme pour les US précédentes sans US-spécifique
+concernée par cette limite). Utilisateurs de test nettoyés après coup.

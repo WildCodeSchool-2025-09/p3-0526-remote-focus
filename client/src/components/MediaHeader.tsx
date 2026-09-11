@@ -7,6 +7,7 @@ import { formatDuration } from "../utils/formatDuration";
 import { formatRating } from "../utils/formatRating";
 import ActionButton from "./ActionButton";
 import MediaInfo from "./MediaInfo";
+import RateMediaModal from "./RateMediaModal";
 
 type MediaHeaderProps = {
   media: Media;
@@ -35,6 +36,9 @@ function MediaHeader({ media }: MediaHeaderProps) {
     media.id,
     media.isWatched,
   );
+
+  const [userRating, setUserRating] = useState(media.userRating);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
@@ -120,7 +124,13 @@ function MediaHeader({ media }: MediaHeaderProps) {
             onClick={handleToggleWatched}
             active={isWatched}
           />
-          <ActionButton label="Noter" color="#F2B705" icon={Star} />
+          <ActionButton
+            label="Noter"
+            color="#F2B705"
+            icon={Star}
+            onClick={isWatched ? () => setIsRatingModalOpen(true) : undefined}
+            active={userRating != null}
+          />
 
           {media.platforms.length > 0 && (
             <>
@@ -139,6 +149,18 @@ function MediaHeader({ media }: MediaHeaderProps) {
           )}
         </div>
       </div>
+
+      {isRatingModalOpen && (
+        <RateMediaModal
+          scope="movie"
+          mediaId={media.id}
+          initialRating={
+            typeof userRating === "string" ? Number(userRating) : userRating
+          }
+          onClose={() => setIsRatingModalOpen(false)}
+          onRated={setUserRating}
+        />
+      )}
     </div>
   );
 }

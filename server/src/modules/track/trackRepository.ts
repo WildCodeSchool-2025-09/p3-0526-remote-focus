@@ -6,7 +6,10 @@ import { isWatchedClause } from "../../utils/isWatchedClause";
 type MediaTypeFilter = "movie" | "tv" | "anime" | null;
 type WatchedFilter = "watched" | "to-watch" | null;
 
-type TrackedMedia = Media & { isWatched: boolean };
+type TrackedMedia = Media & {
+  isWatched: boolean;
+  userRating: number | string | null;
+};
 
 type WatchlistMedia = TrackedMedia & {
   watchlistAddedAt: Date | string | null;
@@ -36,7 +39,7 @@ class TrackRepository {
 
   async readTrack(userId: number, mediaId: number) {
     const [rows] = await databaseClient.query<Rows>(
-      "SELECT favorite_media, watchlist FROM track WHERE ID_user = ? AND ID_media = ?",
+      "SELECT favorite_media, watchlist, user_rating FROM track WHERE ID_user = ? AND ID_media = ?",
       [userId, mediaId],
     );
     return rows[0] ?? null;
@@ -74,6 +77,15 @@ class TrackRepository {
     return nextValue;
   }
 
+  async upsertRating(userId: number, mediaId: number, rating: number | null) {
+    await databaseClient.query(
+      `INSERT INTO track (ID_user, ID_media, favorite_media, watchlist, user_rating)
+       VALUES (?, ?, FALSE, FALSE, ?)
+       ON DUPLICATE KEY UPDATE user_rating = VALUES(user_rating)`,
+      [userId, mediaId, rating],
+    );
+  }
+
   async readTrackedGenreIds(userId: number): Promise<number[]> {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT DISTINCT ca.ID_genre AS id
@@ -97,6 +109,7 @@ class TrackRepository {
               m.duration, m.poster, m.synopsis, m.overall_rating AS overallRating, m.status,
               m.original_name AS originalName, m.original_language AS originalLanguage,
               m.pegi, m.is_anime AS isAnime, ${GENRE_NAME_SUBQUERY} AS genreName,
+              t.user_rating AS userRating,
               ${IS_WATCHED_CASE}
        FROM track AS t
        JOIN media AS m ON m.ID = t.ID_media
@@ -155,6 +168,7 @@ class TrackRepository {
                 m.original_name AS originalName, m.original_language AS originalLanguage,
                 m.pegi, m.is_anime AS isAnime, ${GENRE_NAME_SUBQUERY} AS genreName,
                 t.watchlist_added_at AS watchlistAddedAt,
+                t.user_rating AS userRating,
                 ${IS_WATCHED_CASE}
          FROM track AS t
          JOIN media AS m ON m.ID = t.ID_media

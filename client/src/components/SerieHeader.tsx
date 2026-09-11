@@ -6,6 +6,7 @@ import type { Series } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
 import { formatRating } from "../utils/formatRating";
 import ActionButton from "./ActionButton";
+import RateMediaModal from "./RateMediaModal";
 import SerieInfo from "./SerieInfo";
 
 type SerieHeaderProps = {
@@ -35,6 +36,9 @@ function SerieHeader({ series }: SerieHeaderProps) {
     series.id,
     series.isWatched,
   );
+
+  const [userRating, setUserRating] = useState(series.userRating);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
@@ -130,7 +134,13 @@ function SerieHeader({ series }: SerieHeaderProps) {
             onClick={handleToggleWatched}
             active={isWatched}
           />
-          <ActionButton label="Noter" color="#F2B705" icon={Star} />
+          <ActionButton
+            label="Noter"
+            color="#F2B705"
+            icon={Star}
+            onClick={isWatched ? () => setIsRatingModalOpen(true) : undefined}
+            active={userRating != null}
+          />
 
           {series.platforms.length > 0 && (
             <>
@@ -149,6 +159,18 @@ function SerieHeader({ series }: SerieHeaderProps) {
           )}
         </div>
       </div>
+
+      {isRatingModalOpen && (
+        <RateMediaModal
+          scope="series"
+          mediaId={series.id}
+          initialRating={
+            typeof userRating === "string" ? Number(userRating) : userRating
+          }
+          onClose={() => setIsRatingModalOpen(false)}
+          onRated={setUserRating}
+        />
+      )}
     </div>
   );
 }

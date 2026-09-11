@@ -37,7 +37,7 @@ export type Media = {
   isInWatchlist: boolean;
   isWatched: boolean;
   userStatus: string | null;
-  userRating: number | null;
+  userRating: number | string | null;
 };
 
 export type FilmographyItem = {
@@ -90,7 +90,7 @@ export type SeasonDetail = {
   castTotal: number;
   isWatched: boolean;
   userStatus: string | null;
-  userRating: number | null;
+  userRating: number | string | null;
 };
 
 export type EpisodeDetail = {
@@ -148,5 +148,5 @@ export type Series = {
   isInWatchlist: boolean;
   isWatched: boolean;
   userStatus: string | null;
-  userRating: number | null;
+  userRating: number | string | null;
 };

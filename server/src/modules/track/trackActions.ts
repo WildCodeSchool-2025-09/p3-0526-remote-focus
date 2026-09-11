@@ -1,7 +1,20 @@
 import type { RequestHandler } from "express";
+import { z } from "zod";
 import { buildPaginationMeta } from "../../utils/pagination";
+import trackingRepository from "../tracking/trackingRepository";
 import userRepository from "../user/userRepository";
 import trackRepository from "./trackRepository";
+
+const ratingSchema = z.object({
+  rating: z
+    .number()
+    .min(0, "La note doit être comprise entre 0 et 5")
+    .max(5, "La note doit être comprise entre 0 et 5")
+    .refine((value) => Number.isInteger(value * 2), {
+      message: "La note doit être un multiple de 0,5",
+    })
+    .nullable(),
+});
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -143,9 +156,91 @@ const browseWatchlist: RequestHandler = async (req, res, next) => {
   }
 };
 
+const rateMovie: RequestHandler = async (req, res, next) => {
+  try {
+    const mediaId = Number(req.params.id);
+    const userId = req.user?.id;
+
+    if (Number.isNaN(mediaId)) {
+      res.sendStatus(400);
+      return;
+    }
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const parsed = ratingSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.flatten() });
+      return;
+    }
+
+    if (!(await trackRepository.mediaExists(mediaId))) {
+      res.sendStatus(404);
+      return;
+    }
+
+    if (!(await trackingRepository.isMovieWatched(userId, mediaId))) {
+      res.status(403).json({ error: "média non vu" });
+      return;
+    }
+
+    await trackRepository.upsertRating(userId, mediaId, parsed.data.rating);
+
+    res.json({ userRating: parsed.data.rating });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const rateSeries: RequestHandler = async (req, res, next) => {
+  try {
+    const mediaId = Number(req.params.id);
+    const userId = req.user?.id;
+
+    if (Number.isNaN(mediaId)) {
+      res.sendStatus(400);
+      return;
+    }
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const parsed = ratingSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.flatten() });
+      return;
+    }
+
+    if (!(await trackRepository.mediaExists(mediaId))) {
+      res.sendStatus(404);
+      return;
+    }
+
+    if (!(await trackingRepository.isSeriesFullyWatched(userId, mediaId))) {
+      res.status(403).json({ error: "média non vu" });
+      return;
+    }
+
+    await trackRepository.upsertRating(userId, mediaId, parsed.data.rating);
+
+    res.json({ userRating: parsed.data.rating });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   toggleFavorite,
   toggleWatchlist,
   browseFavorites,
   browseWatchlist,
+  rateMovie,
+  rateSeries,
 };

@@ -97,6 +97,8 @@ router.patch(
   verifyToken,
   trackActions.toggleWatchlist,
 );
+router.patch("/api/me/medias/:id/rating", verifyToken, trackActions.rateMovie);
+router.patch("/api/me/series/:id/rating", verifyToken, trackActions.rateSeries);
 router.patch(
   "/api/me/medias/:id/watched",
   verifyToken,

@@ -104,7 +104,7 @@ const read: RequestHandler = async (req, res, next) => {
       isInWatchlist: track != null && Boolean(track.watchlist),
       isWatched,
       userStatus: null,
-      userRating: null,
+      userRating: track?.user_rating ?? null,
     });
   } catch (err) {
     next(err);

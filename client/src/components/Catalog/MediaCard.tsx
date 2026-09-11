@@ -1,9 +1,13 @@
 import { Star } from "lucide-react";
+import type { MouseEvent } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
+import type { RatingScope } from "../../services/api";
 import type { EnrichedMedia } from "../../types/Catalog";
 import { formatRating } from "../../utils/formatRating";
 import { getMediaPath } from "../../utils/mediaPath";
 import MediaCardActions from "../MediaCardActions";
+import RateMediaModal from "../RateMediaModal";
 
 interface MediaCardProps {
   media: EnrichedMedia;
@@ -16,11 +20,23 @@ const RANK_LABEL: Record<"top3" | "top10", string> = {
 };
 
 function MediaCard({ media, className }: MediaCardProps) {
+  const [userRating, setUserRating] = useState(media.userRating);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+
   const badgeLabel = media.topRank
     ? RANK_LABEL[media.topRank]
     : media.isNew
       ? "Nouveau"
       : null;
+
+  const canRate = media.isWatched === true && media.userRating !== undefined;
+  const ratingScope: RatingScope = media.type === "movie" ? "movie" : "series";
+
+  const handleOpenRating = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsRatingModalOpen(true);
+  };
 
   return (
     <div className={className}>
@@ -59,7 +75,31 @@ function MediaCard({ media, className }: MediaCardProps) {
             {formatRating(media.overallRating)}
           </span>
         </p>
+
+        {canRate && (
+          <button
+            type="button"
+            onClick={handleOpenRating}
+            className="pointer-events-none text-xs text-focus-yellow underline md:pointer-events-auto"
+          >
+            {userRating != null ? `Ma note : ${userRating}/5` : "Noter"}
+          </button>
+        )}
       </Link>
+
+      {isRatingModalOpen && (
+        <RateMediaModal
+          scope={ratingScope}
+          mediaId={media.id}
+          initialRating={
+            typeof userRating === "string"
+              ? Number(userRating)
+              : (userRating ?? null)
+          }
+          onClose={() => setIsRatingModalOpen(false)}
+          onRated={setUserRating}
+        />
+      )}
     </div>
   );
 }

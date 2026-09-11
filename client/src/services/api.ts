@@ -315,6 +315,36 @@ export async function toggleWatched(
   return response.json();
 }
 
+export type RatingScope = "movie" | "series";
+
+const RATING_PATH: Record<RatingScope, (id: number) => string> = {
+  movie: (id) => `/api/me/medias/${id}/rating`,
+  series: (id) => `/api/me/series/${id}/rating`,
+};
+
+export async function rateMedia(
+  scope: RatingScope,
+  id: number,
+  rating: number | null,
+  token: string,
+): Promise<{ userRating: number | null }> {
+  const response = await fetch(`${API_URL}${RATING_PATH[scope](id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ rating }),
+  });
+
+  if (response.status === 403) {
+    throw new Error("Vous devez avoir vu ce média pour pouvoir le noter.");
+  }
+
+  if (!response.ok) {
+    throw new Error("Impossible d'enregistrer votre note");
+  }
+
+  return response.json();
+}
+
 export async function fetchDashboard(token: string): Promise<DashboardData> {
   const response = await fetch(`${API_URL}/api/me/dashboard`, {
     headers: authHeaders(token),

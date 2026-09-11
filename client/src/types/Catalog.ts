@@ -17,6 +17,7 @@ export type Media = {
   isAnime: boolean;
   genreName: string | null;
   isWatched?: boolean;
+  userRating?: number | string | null;
 };
 
 export type EnrichedMedia = Media & {
