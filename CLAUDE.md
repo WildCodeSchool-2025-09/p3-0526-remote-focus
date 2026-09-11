@@ -108,7 +108,16 @@ Chaque US suit ce format :
   US-PRO-11 (mécanique de thème) implémentées et testées contre la base réelle.
   Deux bugs préexistants trouvés et corrigés au passage (voir "Décisions
   tranchées" ci-dessous) : `is_pegi16` non désactivé par défaut à l'inscription,
-  et absence de middleware d'auth sur les routes de liste de médias.
+  et absence de middleware d'auth sur les routes de liste de médias. Suite à
+  clarification produit le même jour : le filtre PEGI bloque aussi désormais
+  l'accès direct par URL aux fiches détail 16+/18 (pas seulement les listes).
+- Phase 5 (même branche `ClaudeApp`) : US-ACC-01 (page d'accueil de base, jamais
+  reconstruite malgré la note Phase 0 — bloquant remonté et traité avant la
+  suite) + US-ACC-02 (populaires) + US-ACC-03 (nouveautés personnalisées) +
+  US-ACC-04/05 (suggestions personnalisées : genres + comédiens les plus vus,
+  algorithme réutilisable tel quel pour US-ACC-06/US-PRO-06) + US-REC-02 (tri
+  des résultats de recherche, carte vide). Implémentées et testées contre la
+  base réelle.
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.
