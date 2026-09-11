@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import "./globals.css";
 import App from "./App";
-import MovieDetail from "./pages/MovieDetail";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import Homepage from "./pages/Homepage";
+import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 
@@ -41,8 +41,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-
-  // Try adding a new route! For example, "/about" with an About component
 ]);
 
 /* ************************************************************************* */

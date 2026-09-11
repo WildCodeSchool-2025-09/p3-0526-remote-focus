@@ -5,10 +5,11 @@ import logoFocus from "../assets/images/logoFocus.png";
 function Navbar() {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex flex-1 flex-col items-center gap-1 rounded-md px-2 py-2 text-xs transition-colors
-     lg:flex-none lg:flex-row lg:gap-3 lg:px-3 lg:text-lg ${isActive
-      ? "bg-primary/10 text-primary font-semibold"
-      : "text-base-content/70 hover:text-base-content lg:hover:bg-base-300"
-    }`;
+     lg:flex-none lg:flex-row lg:gap-3 lg:px-3 lg:text-lg ${
+       isActive
+         ? "bg-primary/10 text-primary font-semibold"
+         : "text-base-content/70 hover:text-base-content lg:hover:bg-base-300"
+     }`;
 
   return (
     <nav
