@@ -40,6 +40,7 @@ class MediaRepository {
        FROM person AS pe
        JOIN media_person AS mp ON mp.ID_person = pe.ID
        WHERE mp.ID_media = ? AND mp.role = 'actor'
+       ORDER BY pe.ID ASC
        LIMIT ?`,
       [id, limit],
     );
