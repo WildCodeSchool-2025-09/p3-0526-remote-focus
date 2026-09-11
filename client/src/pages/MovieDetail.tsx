@@ -20,18 +20,37 @@ function MovieDetail() {
       return;
     }
 
+    let active = true;
+
     setLoading(true);
     setError(null);
 
     fetchMedia(Number(id))
-      .then((data) => setMediaDetail(data))
-      .catch(() => setError("Ce film est introuvable."))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (active) {
+          setMediaDetail(data);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setError("Ce film est introuvable.");
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);
   };
+
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
