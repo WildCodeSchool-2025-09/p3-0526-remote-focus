@@ -17,8 +17,8 @@ export type Media = {
 };
 
 export type EnrichedMedia = Media & {
-  topRank: "top3" | "top10" | null;
-  isNew: boolean;
+  topRank?: "top3" | "top10" | null;
+  isNew?: boolean;
 };
 
 export type GenreSection = {
@@ -37,3 +37,17 @@ export type LikedGenre = {
   id: number;
   name: string;
 };
+
+export type PaginationMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type CatalogResponse = {
+  data: EnrichedMedia[];
+  pagination: PaginationMeta;
+};
+
+export type Format = "movie" | "tv" | "anime" | null;

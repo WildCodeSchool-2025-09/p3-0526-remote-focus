@@ -1,8 +1,11 @@
 import type { RequestHandler } from "express";
 
-import catalogRepository from "./catalogRepository";
+import type { EnrichedMedia, Media } from "../../types/Media/Media.types";
+import { buildPaginationMeta } from "../../utils/pagination";
 import userRepository from "../user/userRepository";
-import type { Media, EnrichedMedia } from "../../types/Media/Media.types";
+import catalogRepository from "./catalogRepository";
+
+const DEFAULT_PAGE_SIZE = 15;
 
 const isMediaNew = (releasedAt: Date | string | null): boolean => {
   const today = new Date();
@@ -19,9 +22,9 @@ const isMediaNew = (releasedAt: Date | string | null): boolean => {
   );
 };
 
-const enrichRanking = (medias: Media[]): EnrichedMedia[] => {
+const enrichRanking = (medias: Media[], offset = 0): EnrichedMedia[] => {
   return medias.map((media, index) => {
-    const position = index + 1;
+    const position = offset + index + 1;
 
     let topRank: "top3" | "top10" | null = null;
 
@@ -101,4 +104,53 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { readDiscoverSections };
+const browse: RequestHandler = async (req, res, next) => {
+  try {
+    const requestedType = req.query.type;
+
+    if (
+      requestedType !== undefined &&
+      requestedType !== "movie" &&
+      requestedType !== "tv" &&
+      requestedType !== "anime"
+    ) {
+      res.status(400).json({
+        error: "Invalid media type",
+      });
+      return;
+    }
+
+    const type = requestedType ? requestedType : null;
+
+    const genreParam = req.query.genre;
+    const genreIds =
+      typeof genreParam === "string" && genreParam.length > 0
+        ? genreParam
+            .split(",")
+            .map(Number)
+            .filter((id) => Number.isInteger(id) && id > 0)
+        : [];
+
+    const requestedPage = Number(req.query.page);
+    const page = requestedPage > 0 ? requestedPage : 1;
+
+    const requestedLimit = Number(req.query.limit);
+    const limit = requestedLimit > 0 ? requestedLimit : DEFAULT_PAGE_SIZE;
+
+    const offset = (page - 1) * limit;
+
+    const [medias, total] = await Promise.all([
+      catalogRepository.readByFilters(type, genreIds, offset, limit),
+      catalogRepository.countByFilters(type, genreIds),
+    ]);
+
+    res.json({
+      data: enrichRanking(medias, offset),
+      pagination: buildPaginationMeta(page, limit, total),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { readDiscoverSections, browse };

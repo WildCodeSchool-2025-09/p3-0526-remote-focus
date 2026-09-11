@@ -1,17 +1,33 @@
 import { Star } from "lucide-react";
 import { Link } from "react-router";
-import type { Media } from "../../types/Catalog";
+import type { EnrichedMedia } from "../../types/Catalog";
 import { formatRating } from "../../utils/formatRating";
 
 interface MediaCardProps {
-  media: Media;
+  media: EnrichedMedia;
   className: string;
 }
 
+const RANK_LABEL: Record<"top3" | "top10", string> = {
+  top3: "Top 3",
+  top10: "Top 10",
+};
+
 function MediaCard({ media, className }: MediaCardProps) {
+  const badgeLabel = media.topRank
+    ? RANK_LABEL[media.topRank]
+    : media.isNew
+      ? "Nouveau"
+      : null;
+
   return (
     <div className={className}>
-      <Link to={`/${media.type}s/${media.id}`}>
+      <Link to={`/${media.type}s/${media.id}`} className="relative block">
+        {badgeLabel != null && (
+          <span className="badge badge-primary absolute left-2 top-2 z-10">
+            {badgeLabel}
+          </span>
+        )}
         <img
           src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
           alt={`${media.name} poster`}
