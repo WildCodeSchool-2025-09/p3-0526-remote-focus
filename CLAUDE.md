@@ -144,6 +144,12 @@ Chaque US suit ce format :
   limiting). Testée en réel (import film/série/série anime volumineuse,
   dédoublonnage, recherche fusionnée), base revérifiée à la baseline exacte du
   seed après nettoyage.
+- **Les 37 US du plan validé sont maintenant toutes implémentées** (Phases
+  0 à 6 + US-CAL-01/US-APP-01 en autonome), toutes testées contre la base
+  réelle, Biome + typecheck clean. 94 commits d'avance sur `dev`, dont 12 pas
+  encore poussés sur `ClaudeEquipe` (poussés au prochain push groupé demandé
+  par l'utilisateur, pas avant). Rien n'a été poussé sur `dev` ni touché sur
+  Trello à aucun moment.
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne
   équipe) — s'y référer avant de reprendre le travail sur une US déjà entamée.
