@@ -86,11 +86,27 @@ Chaque US suit ce format :
 - Seed backend complet : 30 médias, 65 saisons, 1118 épisodes, 5540 personnes
 - Frontend : config Tailwind/DaisyUI initialisée, Navbar en cours
 - ~35 US rédigées (catalogue, fiches détail, accueil, recherche, authentification, profil)
+- Phase 0 (branche locale `ClaudeApp`, non poussée sur `dev`) : US-DET-01 + US-CAT-01 +
+  US-REC-01 mergés (conflits Header/Navbar/App.tsx/router.ts/api.ts résolus à la main).
+  US-ACC-01 à réécrire entièrement (pattern `Homepage/` non conforme aux conventions).
 
-## Décisions en attente
+## Décisions tranchées
 
-- Stockage JWT : cookie httpOnly vs localStorage — à trancher avant d'implémenter l'auth
-- Mises à jour `schemaFinal.sql` à appliquer : `media.duration`/`episode.duration` → `INT`
-  (minutes) ; `track.user_rating` → `DECIMAL(2,1)` ; ajout `track.favorited_at`,
-  `track.watchlist_added_at` (`DATETIME`) ; `user_.created_at` (`DATETIME`) ; `media.pegi`
-  (`INT`) ; contrainte unique sur `user_.email` ; `user_.is_pegi_ok` renommé `is_pegi16`
+- **Stockage JWT** : `localStorage` (cohérent avec les étapes techniques déjà écrites
+  dans les cartes US-AUTH-01/02)
+- `user_.email` UNIQUE, `is_pegi16` (renommé), `media.duration`/`episode.duration` → `INT`,
+  `track.user_rating` → `DECIMAL(2,1)` : déjà appliqués dans `server/database/schema.sql`
+  sur `dev`
+- `track.favorited_at`/`watchlist_added_at` (`DATETIME`), `user_.created_at` (`DATETIME`) :
+  pas encore appliqués — à faire au fil de l'eau (avec US-DET-08 et US-AUTH-01
+  respectivement), pas de conflit connu
+
+## Décision à reconfirmer avant la Phase 2
+
+- **`media.pegi`** : le pipeline TMDB déjà écrit (`server/bin/tmdbFetch.ts`,
+  `pegiFromMovie`/`pegiFromTv`), le seed (30 médias) et les 4 branches CAT-01/DET-01/
+  REC-01/Presentation_branch traitent tous `pegi` comme `VARCHAR(50)` avec l'ensemble
+  fermé `'TP'|'10'|'12'|'16'|'18'` — avec un commentaire d'équipe explicite justifiant ce
+  choix plutôt qu'un INT. La conversion en INT (`TP = 0`) initialement envisagée
+  demanderait de réécrire ce pipeline + le seed + les types dans 4 branches. À trancher
+  avant d'implémenter le filtre PEGI de US-CAT-02.
