@@ -43,16 +43,19 @@ function DiscoverSection() {
             title={`${discover.genreSections[0].name}`}
             medias={discover.genreSections[0].medias}
             searchParams={requestedType}
+            genreId={discover.genreSections[0].id}
           />
           <MediaSection
             title={`${discover.genreSections[1].name}`}
             medias={discover.genreSections[1].medias}
             searchParams={requestedType}
+            genreId={discover.genreSections[1].id}
           />
           <MediaSection
             title={`${discover.genreSections[2].name}`}
             medias={discover.genreSections[2].medias}
             searchParams={requestedType}
+            genreId={discover.genreSections[2].id}
           />
         </>
       ) : (
