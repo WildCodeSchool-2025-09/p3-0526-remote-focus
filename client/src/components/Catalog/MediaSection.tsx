@@ -1,10 +1,10 @@
-import type { Media } from "../../types/Catalog";
+import type { EnrichedMedia } from "../../types/Catalog";
 import Carousel from "./Carousel";
 import MediaCard from "./MediaCard";
 
 interface MediaSectionProps {
   title: string;
-  medias: Media[];
+  medias: EnrichedMedia[];
 }
 
 function MediaSection({ title, medias }: MediaSectionProps) {

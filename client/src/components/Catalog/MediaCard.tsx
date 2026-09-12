@@ -75,7 +75,7 @@ function MediaCard({ media, className }: MediaCardProps) {
           )}
         </div>
         <h4
-          className="line-clamp-2 min-h-12 content-center"
+          className="line-clamp-2 min-h-12 content-center font-display font-semibold text-base"
           title={`${media.name}`}
         >
           {media.name}

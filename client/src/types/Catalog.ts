@@ -29,7 +29,7 @@ export type GenreSection = {
 
 export type DiscoverResponse = {
   topRated: EnrichedMedia[];
-  latest: Media[];
+  latest: EnrichedMedia[];
   genreSections: GenreSection[];
 };
 

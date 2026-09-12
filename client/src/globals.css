@@ -118,7 +118,7 @@
   }
 
   .catalog-carousel-item {
-    @apply carousel-item shrink-0 card w-[42%] sm:w-[30%] md:w-[22%] lg:w-40;
+    @apply carousel-item shrink-0 card w-[152px] sm:w-40 md:w-44;
   }
 
   .carousel-nav {
