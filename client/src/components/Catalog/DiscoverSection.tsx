@@ -29,19 +29,30 @@ function DiscoverSection() {
     <>
       {discover ? (
         <>
-          <MediaSection title="Populaires" medias={discover.topRated} />
-          <MediaSection title="Nouveautés" medias={discover.latest} />
+          <MediaSection
+            title="Populaires"
+            medias={discover.topRated}
+            searchParams={requestedType}
+          />
+          <MediaSection
+            title="Nouveautés"
+            medias={discover.latest}
+            searchParams={requestedType}
+          />
           <MediaSection
             title={`${discover.genreSections[0].name}`}
             medias={discover.genreSections[0].medias}
+            searchParams={requestedType}
           />
           <MediaSection
             title={`${discover.genreSections[1].name}`}
             medias={discover.genreSections[1].medias}
+            searchParams={requestedType}
           />
           <MediaSection
             title={`${discover.genreSections[2].name}`}
             medias={discover.genreSections[2].medias}
+            searchParams={requestedType}
           />
         </>
       ) : (

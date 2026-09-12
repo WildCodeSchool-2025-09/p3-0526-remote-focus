@@ -5,9 +5,10 @@ import MediaCard from "./MediaCard";
 interface MediaSectionProps {
   title: string;
   medias: EnrichedMedia[];
+  searchParams: string | undefined;
 }
 
-function MediaSection({ title, medias }: MediaSectionProps) {
+function MediaSection({ title, medias, searchParams }: MediaSectionProps) {
   return (
     <>
       <h3 className="mt-9 mb-4">{title}</h3>
@@ -17,6 +18,7 @@ function MediaSection({ title, medias }: MediaSectionProps) {
             <MediaCard
               key={media.id}
               media={media}
+              searchParams={searchParams}
               className="catalog-carousel-item"
             />
           ))}

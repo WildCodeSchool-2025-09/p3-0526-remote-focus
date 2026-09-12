@@ -6,9 +6,10 @@ import MediaActions from "./MediaActions";
 interface MediaCardProps {
   media: EnrichedMedia;
   className: string;
+  searchParams: string | undefined;
 }
 
-function MediaCard({ media, className }: MediaCardProps) {
+function MediaCard({ media, className, searchParams }: MediaCardProps) {
   let mediaIcon = null;
 
   if (media.type === "movie") {
@@ -17,6 +18,14 @@ function MediaCard({ media, className }: MediaCardProps) {
     mediaIcon = <Sparkles size={20} />;
   } else if (media.type === "tv") {
     mediaIcon = <TvMinimalPlay size={20} />;
+  }
+
+  if (
+    searchParams === "movie" ||
+    searchParams === "tv" ||
+    searchParams === "anime"
+  ) {
+    mediaIcon = null;
   }
 
   let topNewBadge = null;
