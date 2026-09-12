@@ -1,9 +1,10 @@
 import { Clapperboard, Sparkles, Star, TvMinimalPlay } from "lucide-react";
-import type { Media } from "../../types/Catalog";
+import type { EnrichedMedia } from "../../types/Catalog";
 import { Link } from "react-router";
+import MediaActions from "./MediaActions";
 
 interface MediaCardProps {
-  media: Media;
+  media: EnrichedMedia;
   className: string;
 }
 
@@ -18,36 +19,57 @@ function MediaCard({ media, className }: MediaCardProps) {
     mediaIcon = <TvMinimalPlay size={20} />;
   }
 
-  let newTopBadge = null;
-  let badgeColor = null;
+  let topNewBadge = null;
+  let topRankBadge = null;
 
   if (media.isNew) {
-    newTopBadge = "Nouveau";
-    badgeColor = "bg-focus-coral";
-  } else if (media.topRank === "top3") {
-    newTopBadge = "Top 3";
-    badgeColor = "bg-focus-teal text-focus-void";
+    topNewBadge = "Nouveau";
+  }
+
+  if (media.topRank === "top3") {
+    topRankBadge = "Top 3";
   } else if (media.topRank === "top10") {
-    newTopBadge = "Top 10";
-    badgeColor = "bg-focus-teal text-focus-void";
+    topRankBadge = "Top 10";
+  }
+
+  let urlDetails = null;
+
+  if (media.type === "movie") {
+    urlDetails = "movies";
+  } else if (media.isAnime && media.type === "tv") {
+    urlDetails = "animes";
+  } else if (media.type === "tv") {
+    urlDetails = "tv";
   }
 
   return (
-    <div className={className}>
-      <Link to={`/${media.type}s/${media.id}`}>
+    <div className={`${className} relative`}>
+      <Link to={`/${urlDetails}/${media.id}`}>
         <div className="relative">
-          <span
-            className={`absolute px-2.5 py-1 top-2 left-2 text-xs ${badgeColor} rounded-btn font-semibold`}
-          >
-            {newTopBadge}
-          </span>
+          {topNewBadge && (
+            <span className="absolute px-2.5 py-1 top-2 left-2 text-xs bg-focus-coral rounded-btn font-semibold shadow-badge">
+              {topNewBadge}
+            </span>
+          )}
+          {topRankBadge && (
+            <span
+              className={`absolute px-2.5 py-1 left-2 text-xs bg-focus-teal rounded-btn font-semibold text-focus-void shadow-badge ${
+                topNewBadge ? "top-10" : "top-2"
+              }`}
+            >
+              {topRankBadge}
+            </span>
+          )}
           <img
             src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
             alt={`${media.name} poster`}
             className="rounded-box"
           />
           {mediaIcon && (
-            <span className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-full badge-primary shadow-[0_0_8px_-3px_black]">
+            <span
+              className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-full badge-primary shadow-badge"
+              title={media.isAnime ? "anime" : `${media.type}`}
+            >
               {mediaIcon}
             </span>
           )}
@@ -67,6 +89,7 @@ function MediaCard({ media, className }: MediaCardProps) {
           </span>
         </p>
       </Link>
+      <MediaActions media={media} />
     </div>
   );
 }
