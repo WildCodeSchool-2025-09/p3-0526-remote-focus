@@ -1,46 +1,54 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router";
 
 function TypeFilter() {
-  let buttonClasses = null;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeFilter = searchParams.get("type") ?? "all";
 
-  const [activeFilter, setActiveFilter] = useState("all");
+  function getButtonClasses(filter: string) {
+    if (activeFilter === filter) {
+      return "border-b-2 border-focus-yellow px-0.5 pb-3 font-semibold text-focus-yellow";
+    }
 
-  if (activeFilter === "all") {
-    buttonClasses =
-      "border-b-2 border-focus-yellow px-0.5 pb-3 font-semibold text-focus-yellow";
-  } else {
-    buttonClasses =
-      "border-b-2 border-transparent px-0.5 pb-3 text-focus-muted";
+    return "border-b-2 border-transparent px-0.5 pb-3 text-focus-muted";
+  }
+
+  function handleFilterChange(filter: string) {
+    if (filter === "all") {
+      searchParams.delete("type");
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ type: filter });
+    }
   }
 
   return (
     <>
-      <search className="flex gap-8 border-b border-white/10 mt-8">
+      <search className="flex gap-8 border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10">
         <button
           type="button"
-          className={`${buttonClasses}`}
-          onClick={() => setActiveFilter("all")}
+          className={getButtonClasses("all")}
+          onClick={() => handleFilterChange("all")}
         >
           Tous
         </button>
         <button
           type="button"
-          className={`${buttonClasses}`}
-          onClick={() => setActiveFilter("movies")}
+          className={getButtonClasses("movie")}
+          onClick={() => handleFilterChange("movie")}
         >
           Films
         </button>
         <button
           type="button"
-          className={`${buttonClasses}`}
-          onClick={() => setActiveFilter("tv")}
+          className={getButtonClasses("tv")}
+          onClick={() => handleFilterChange("tv")}
         >
           Séries
         </button>
         <button
           type="button"
-          className={`${buttonClasses}`}
-          onClick={() => setActiveFilter("animes")}
+          className={getButtonClasses("anime")}
+          onClick={() => handleFilterChange("anime")}
         >
           Animes
         </button>

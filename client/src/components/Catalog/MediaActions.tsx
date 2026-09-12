@@ -6,7 +6,7 @@ interface MediaActionsProps {
 }
 
 const buttonsClass =
-  "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/50 shadow-badge";
+  "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/70 shadow-badge";
 
 function MediaActions({ media }: MediaActionsProps) {
   return (
