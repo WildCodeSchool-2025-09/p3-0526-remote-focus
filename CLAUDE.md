@@ -161,7 +161,13 @@ Chaque US suit ce format :
   Constats documentés sans correction immédiate : passage du filtre de genre en
   sélection unique (changerait le contrat de l'API, proposition dans le
   journal), bannière d'accueil manquante, chevauchement de l'en-tête sous
-  ~400px de large. Détail complet dans `docs/decisions-log.md`, section
+  ~400px de large. Fiche série : liste de cards Saisons remplacée par un
+  accordéon (`SeasonAccordion.tsx`, réutilise intégralement les routes/hooks
+  US-DET-09, aucune duplication) ; navigation saison/épisode + fil d'Ariane
+  vérifiés par de vrais clics simulés via le protocole DevTools (CDP), pas
+  seulement une relecture de code ; boutons d'action des fiches film/série
+  revérifiés au pixel près contre le styleguide (déjà conformes, aucun
+  changement nécessaire). Détail complet dans `docs/decisions-log.md`, section
   "Repasse visuelle (2026-09-12)".
 - Toutes les décisions/écarts/limites connues de chaque US sont documentées dans
   `docs/decisions-log.md` (plus jamais dans les cartes Trello, voir consigne

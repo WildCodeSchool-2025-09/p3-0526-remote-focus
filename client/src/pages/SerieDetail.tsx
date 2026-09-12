@@ -4,7 +4,7 @@ import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import SeasonList from "../components/SeasonList";
+import SeasonAccordion from "../components/SeasonAccordion";
 import SerieHeader from "../components/SerieHeader";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchSeries } from "../services/api";
@@ -72,7 +72,10 @@ function SerieDetail() {
         <BackButton />
       </div>
       <SerieHeader series={seriesDetail} />
-      <SeasonList seriesId={seriesDetail.id} seasons={seriesDetail.seasons} />
+      <SeasonAccordion
+        seriesId={seriesDetail.id}
+        seasons={seriesDetail.seasons}
+      />
       <CastList
         cast={seriesDetail.cast}
         castTotal={seriesDetail.castTotal}

@@ -53,7 +53,13 @@ jaune), biographie du comédien repositionnée à côté de la photo, filtre de 
 du Catalogue passé en défilement horizontal (mêmes flèches que les carrousels de
 médias, une seule ligne au lieu de 3), 5ᵉ carte "En cours" ajoutée au dashboard
 Profil (gap de découvrabilité sur US-PRO-05, qui était sinon déjà terminée et
-testée). Détail complet plus bas.
+testée), liste de cards Saisons de la fiche série remplacée par un accordéon
+(saison dépliable → liste d'épisodes scrollable, réutilise intégralement la
+logique/les routes US-DET-09, aucune duplication), navigation saison/épisode et
+fil d'Ariane vérifiés par de vrais clics simulés (protocole DevTools, pas
+seulement une relecture du code), boutons d'action des fiches film/série
+revérifiés au pixel près contre le styleguide et confirmés déjà conformes.
+Détail complet plus bas.
 
 ---
 
@@ -1777,3 +1783,90 @@ corrigés/validés ci-dessus (`MediaCard`/`MediaCardActions`/`SearchResultCard`
 listés en section 1) plutôt que par capture individuelle de chacune, pour rester
 dans un temps raisonnable — à compléter par une vraie revue si l'équipe repère
 d'autres écarts sur ces pages précises.
+
+### 7. Fiche série — accordéon Saisons/Épisodes (2026-09-12, suite à retour direct)
+
+**Nouveau composant `SeasonAccordion.tsx`**, remplace `SeasonList.tsx` (supprimé,
+plus aucun consommateur) sur `SerieDetail.tsx`. Chaque saison est une ligne
+dépliable (affiche + titre + nombre d'épisodes + chevron) ; au clic sur le
+chevron, la ligne se déplie et charge sa liste d'épisodes (numéro, titre, durée,
+case "vu"), scrollable au-delà de 420px de hauteur (`max-h-[420px]
+overflow-y-auto`) pour les saisons à beaucoup d'épisodes.
+
+**Aucune logique DET-09 dupliquée, comme demandé** : le chargement des épisodes
+au dépliement appelle exactement la même route que la page saison dédiée
+(`fetchSeason` → `GET /api/series/:serieId/seasons/:seasonId`, chargé
+paresseusement une seule fois par saison et mis en cache en `state` local le
+temps que le composant reste monté) ; la case "vu" réutilise directement
+`EpisodeWatchToggle` (déjà utilisé par `EpisodeDetailList` sur la page saison),
+donc le même hook `useWatchedStatus("episode", ...)` et la même route
+`PATCH /api/me/episodes/:id/watched` livrés par US-DET-09 — zéro nouvelle route,
+zéro nouvelle requête SQL.
+
+**Deux interactions distinctes sur la même ligne**, même pattern déjà validé sur
+la fiche comédien (US-DET-05, séparation clic photo/clic nom pour éviter un
+`<button>` imbriqué dans un `<a>`) : cliquer sur le titre/l'affiche de la saison
+(un `<Link>`) navigue vers `/series/:id/seasons/:seasonId` ; cliquer sur le
+chevron (un `<button>` séparé, pas imbriqué dans le `<Link>`) déplie/replie la
+liste d'épisodes sans navigation. Cliquer sur un épisode dans la liste dépliée
+(également un `<Link>`) navigue vers sa fiche détail ; la case "vu" à
+l'intérieur de ce lien absorbe son propre clic (`preventDefault`/
+`stopPropagation`, déjà le comportement d'`EpisodeWatchToggle`) sans déclencher
+la navigation — même pattern que la liste de la page saison dédiée.
+
+**"Checkbox" interprétée comme le toggle rond déjà existant** (`EpisodeWatchToggle`,
+cercle à bordure teal, rempli quand vu), pas un `<input type="checkbox">` natif
+— cohérent avec l'usage déjà établi partout ailleurs dans l'app pour ce même état
+(fiche saison, fiches détail), un input natif aurait introduit un second
+langage visuel pour la même action.
+
+**Testé en réel avec de vrais clics simulés (pas seulement une relecture du
+code)**, via une session Edge headless pilotée en direct par le protocole
+DevTools (CDP) — trouvé cette session comme extension du contournement de
+capture d'écran déjà utilisé pour la repasse précédente. Un premier essai avec
+`--headless=new` puis avec l'option `--window-size` seule s'est révélé peu
+fiable : le viewport de rendu restait bloqué à une largeur mobile (~500px)
+quel que soit le flag passé en ligne de commande. Corrigé en fixant
+explicitement le viewport via la commande CDP `Emulation.setDeviceMetricsOverride`
+après connexion, plutôt qu'en ligne de commande — fiable une fois appliqué.
+
+Séquence réellement rejouée par clics (coordonnées obtenues via
+`getBoundingClientRect()` sur les vrais éléments rendus, pas des sélecteurs
+approximatifs) : clic sur le chevron de Saison 1 → liste d'épisodes révélée
+(vérifié par le changement d'`aria-label` et l'apparition d'un lien épisode) ;
+clic sur l'en-tête de Saison 1 → navigation confirmée vers
+`/series/19/seasons/38`, fil d'Ariane confirmé
+"Accueil › Catalogue › Séries › Rick et Morty › Saison 1" ; clic sur un épisode
+de la liste de la page saison → navigation confirmée vers
+`/series/19/seasons/38/episodes/485`, fil d'Ariane confirmé sur les 5 niveaux
+jusqu'au nom de l'épisode. Avec une session authentifiée injectée (utilisateur
+de test créé via l'API, token placé dans `localStorage` avant rechargement) :
+clic sur la case "vu" du premier épisode dans l'accordéon déplié → aucune
+navigation (reste sur `/series/19`), `aria-label` du bouton passé à "Marquer
+comme non vu", et confirmé indépendamment par un second appel à
+`GET /api/series/19/seasons/38` montrant `episodes[0].isWatched === true` —
+preuve que le clic dans l'accordéon persiste réellement en base via la même
+route que la page dédiée, pas un état visuel local isolé. Utilisateur de test
+et ligne `episode_user` nettoyés après coup.
+
+**Boutons d'action (Favoris/Watchlist/Vu/Noter) sur les fiches film/série —
+vérifiés déjà conformes, aucune correction nécessaire.** Couleurs exactes
+resamplées au pixel près directement sur le fichier `Focus - StyleGuide.html`
+rendu (pas une approximation visuelle) : Favoris actif `#E83658`, Watchlist
+actif `#F5F5F0` (fond plein blanc cassé + icône sombre, pas de couleur jaune),
+Vu actif `#148C70`≈`#17B890` (écart dû à l'anti-aliasing du contour fin sur la
+capture, pas à la valeur CSS réelle), Note actif `#F2B705`. Ces 4 valeurs sont
+exactement celles déjà câblées dans `ActionButton.tsx`/`MediaHeader.tsx`/
+`SerieHeader.tsx` (`color="#E83658"`, `"#F5F5F0"`, `"#17B890"`, `"#F2B705"`
+respectivement) — confirmé par capture réelle de `/movies/1` et `/series/19`
+après coup, forme et couleur identiques à la référence sur les 4 boutons.
+Aucun changement de code sur ces fichiers. Le bouton Watchlist qui "semblait
+non conforme" sur une capture antérieure était vraisemblablement la version
+*card* (`MediaCardActions`, corrigée lors du repasse précédente pour un fond
+blanc cassé fixe plutôt que la bordure neutre du styleguide, un choix
+délibérément simplifié à la demande explicite de l'utilisateur ce jour-là) —
+pas la version *fiche détail*, qui n'a jamais eu ce problème.
+
+Vérification finale : typecheck + Biome clean (`SeasonAccordion.tsx`,
+`SerieDetail.tsx`). Serveur de dev, client Vite et navigateur CDP éteints et
+répertoires temporaires supprimés après les tests.
