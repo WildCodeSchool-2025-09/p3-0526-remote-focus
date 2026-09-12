@@ -72,7 +72,7 @@ function MediaCard({ media, className, searchParams }: MediaCardProps) {
           <img
             src={`https://image.tmdb.org/t/p/w342/${media.poster}`}
             alt={`${media.name} poster`}
-            className="rounded-box"
+            className="rounded-box w-full aspect-[2/3] object-cover"
           />
           {mediaIcon && (
             <span
