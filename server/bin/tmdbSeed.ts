@@ -11,12 +11,36 @@ import "dotenv/config";
 
 import fs from "node:fs";
 import path from "node:path";
+import zlib from "node:zlib";
 
 import database from "../database/client";
 
 import type { Rows } from "../database/client";
 
-const SEED_FILE = path.join(__dirname, "../database/seeds/tmdb.json");
+const SEEDS_DIR = path.join(__dirname, "../database/seeds");
+
+/** Dump compressé produit par tmdbFetch.ts. */
+const SEED_FILE_GZ = path.join(SEEDS_DIR, "tmdb.json.gz");
+
+/** Variante non compressée, tolérée pour le débogage. */
+const SEED_FILE_RAW = path.join(SEEDS_DIR, "tmdb.json");
+
+/** Lit le dump, compressé ou non. */
+const readSeedFile = (): SeedFile => {
+  if (fs.existsSync(SEED_FILE_GZ)) {
+    const compressed = fs.readFileSync(SEED_FILE_GZ);
+
+    return JSON.parse(zlib.gunzipSync(compressed).toString("utf8"));
+  }
+
+  if (fs.existsSync(SEED_FILE_RAW)) {
+    return JSON.parse(fs.readFileSync(SEED_FILE_RAW, "utf8"));
+  }
+
+  throw new Error(
+    `Aucun dump trouvé dans ${SEEDS_DIR}\nLancez d'abord "npm run tmdb:fetch".`,
+  );
+};
 
 /* ------------------------------------------------------------------ *
  * Types (miroir de la sortie de tmdbFetch.ts)
@@ -132,13 +156,7 @@ const buildIdMap = async (table: string) => {
  * ------------------------------------------------------------------ */
 
 const seed = async () => {
-  if (!fs.existsSync(SEED_FILE)) {
-    throw new Error(
-      `Fichier introuvable : ${SEED_FILE}\nLancez d'abord "npm run tmdb:fetch".`,
-    );
-  }
-
-  const data = JSON.parse(fs.readFileSync(SEED_FILE, "utf8")) as SeedFile;
+  const data = readSeedFile();
 
   console.info(`Seed depuis un export du ${data.generated_at}\n`);
 

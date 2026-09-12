@@ -8,7 +8,7 @@ const isMediaNew = (releasedAt: Date | string | null): boolean => {
   const today = new Date();
 
   const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 90);
 
   const releasedAtDate = releasedAt ? new Date(releasedAt) : null;
 
@@ -59,7 +59,7 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
 
     const topRated = await catalogRepository.readTopRated(type);
 
-    const newReleases = await catalogRepository.readLatest30Days(type);
+    const newReleases = await catalogRepository.readLatest90Days(type);
 
     const likedGenres = await userRepository.readRandomGenres(userId);
 

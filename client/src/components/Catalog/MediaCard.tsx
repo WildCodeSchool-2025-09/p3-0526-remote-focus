@@ -13,7 +13,7 @@ function MediaCard({ media, className }: MediaCardProps) {
 
   if (media.type === "movie") {
     mediaIcon = <Clapperboard size={20} />;
-  } else if (media.type === "tv" && media.isAnime) {
+  } else if (media.isAnime) {
     mediaIcon = <Sparkles size={20} />;
   } else if (media.type === "tv") {
     mediaIcon = <TvMinimalPlay size={20} />;
@@ -36,7 +36,7 @@ function MediaCard({ media, className }: MediaCardProps) {
 
   if (media.type === "movie") {
     urlDetails = "movies";
-  } else if (media.isAnime && media.type === "tv") {
+  } else if (media.isAnime) {
     urlDetails = "animes";
   } else if (media.type === "tv") {
     urlDetails = "tv";
@@ -80,10 +80,16 @@ function MediaCard({ media, className }: MediaCardProps) {
         >
           {media.name}
         </h4>
-        <p className="text-focus-muted-dark text-xs flex items-center gap-1">
-          {media.genreName} ·{" "}
-          {media.releasedAt ? String(media.releasedAt).slice(0, 4) : "-"} ·
-          <span className="flex gap-1 justify-start">
+        <p className="text-focus-muted-dark text-xs flex items-center gap-1 whitespace-nowrap">
+          <span className="min-w-0 truncate" title={`${media.genreName}`}>
+            {media.genreName}
+          </span>
+          ·
+          <span className="shrink-0">
+            {media.releasedAt ? String(media.releasedAt).slice(0, 4) : "-"}
+          </span>
+          ·
+          <span className="flex shrink-0 gap-1 justify-start">
             <Star fill="#F2B705" color="#F2B705" size={12} className="mt-px" />
             {media.overallRating}/10
           </span>
