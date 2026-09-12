@@ -23,7 +23,7 @@ const enrichMedias = (medias: Media[]): EnrichedMedia[] => {
     return {
       ...media,
       topRank: position <= 3 ? "top3" : position <= 10 ? "top10" : null,
-      isNew: isMediaNew(media.released_at),
+      isNew: isMediaNew(media.releasedAt),
     };
   });
 };

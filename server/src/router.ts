@@ -1,5 +1,5 @@
 import express from "express";
-import homepageActions from "./modules/Homepage/homepageActions";
+import homepageActions from "./modules/homepage/homepageActions";
 
 const router = express.Router();
 

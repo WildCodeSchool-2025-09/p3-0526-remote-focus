@@ -1,4 +1,4 @@
-import type { HomepageData } from "../types/homepage";
+import type { HomepageData } from "../types/Homepage";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 

@@ -1,11 +1,9 @@
-import type { RowDataPacket } from "mysql2/promise";
-
-export type Media = RowDataPacket & {
+export type Media = {
   id: number;
   tmdbId: number;
   name: string;
   type: string;
-  releasedAt: Date | string | null;
+  releasedAt: string | null;
   duration: number | null;
   poster: string | null;
   synopsis: string | null;
@@ -20,4 +18,10 @@ export type Media = RowDataPacket & {
 export type EnrichedMedia = Media & {
   topRank: "top3" | "top10" | null;
   isNew: boolean;
+};
+
+export type HomepageData = {
+  films: EnrichedMedia[];
+  series: EnrichedMedia[];
+  animes: EnrichedMedia[];
 };
