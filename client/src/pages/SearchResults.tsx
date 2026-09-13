@@ -75,16 +75,16 @@ const SearchResults = () => {
     };
   }, [trimmedQuery]);
 
-  const hasResults =
-    searchResults.films.length > 0 ||
-    searchResults.series.length > 0 ||
-    searchResults.animes.length > 0 ||
-    searchResults.actors.length > 0;
+  const allMedias = [
+    ...searchResults.films,
+    ...searchResults.series,
+    ...searchResults.animes,
+  ];
+
+  const hasResults = allMedias.length > 0 || searchResults.actors.length > 0;
 
   return (
     <div className="min-h-screen bg-base-100 p-8 space-y-6">
-      <h1>Recherche</h1>
-
       {loading && <span className="loading loading-spinner text-primary" />}
 
       {!loading && error && (
@@ -102,10 +102,8 @@ const SearchResults = () => {
 
       {!loading && !error && hasResults && (
         <div className="space-y-8">
-          <MediaList title="Films" medias={searchResults.films} />
-          <MediaList title="Séries" medias={searchResults.series} />
-          <MediaList title="Animés" medias={searchResults.animes} />
           <ActorList title="Comédiens" actors={searchResults.actors} />
+          <MediaList medias={allMedias} />
         </div>
       )}
     </div>
