@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 //a voir avec les composants extérieur
+import ActorList from "../components/Search/ActorList";
 import MediaList from "../components/Search/MediaList";
 import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
@@ -104,6 +105,7 @@ const SearchResults = () => {
           <MediaList title="Films" medias={searchResults.films} />
           <MediaList title="Séries" medias={searchResults.series} />
           <MediaList title="Animés" medias={searchResults.animes} />
+          <ActorList title="Comédiens" actors={searchResults.actors} />
         </div>
       )}
     </div>
