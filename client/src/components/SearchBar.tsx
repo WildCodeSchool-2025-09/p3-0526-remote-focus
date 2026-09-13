@@ -15,6 +15,8 @@ const SearchBar = ({
 }: SearchBarProps) => {
   // Aligné sur le palier "lg" de Tailwind (1024px), déjà utilisé par Navbar/Header
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  // En dessous de 425px, le placeholder disparaît (l'icône Search reste seule visible)
+  const showPlaceholder = useMediaQuery("(min-width: 425px)");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
@@ -36,13 +38,17 @@ const SearchBar = ({
     <label
       className={`input input-bordered mx-2 rounded-3xl bg-base-300 flex w-full items-center gap-2 ${borderClass}`}
     >
-      <Search className={`size-4 ${iconClass}`} />
+      <Search className={`size-4 shrink-0 ${iconClass}`} />
       <input
         type="search"
         value={value}
         onChange={handleChange}
         placeholder={
-          isDesktop ? "Rechercher un film, une série,..." : "Recherche"
+          !showPlaceholder
+            ? ""
+            : isDesktop
+              ? "Rechercher un film, une série,..."
+              : "Recherche"
         }
         className="grow"
       />
