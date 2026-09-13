@@ -20,23 +20,29 @@ const SearchBar = ({
     onChange(event.target.value);
   };
 
-  const stateClass = hasNoResults
+  const borderClass = hasNoResults
     ? "input-error"
     : value
       ? "input-warning"
       : "";
 
+  const iconClass = hasNoResults
+    ? "text-error"
+    : value
+      ? "text-warning"
+      : "opacity-60";
+
   return (
     <label
-      className={`input input-bordered mx-2 flex w-full items-center gap-2 ${stateClass}`}
+      className={`input input-bordered mx-2 rounded-3xl bg-base-300 flex w-full items-center gap-2 ${borderClass}`}
     >
-      <Search className="size-4 opacity-60" />
+      <Search className={`size-4 ${iconClass}`} />
       <input
         type="search"
         value={value}
         onChange={handleChange}
         placeholder={
-          isDesktop ? "Rechercher un film, une série, un animé..." : ""
+          isDesktop ? "Rechercher un film, une série,..." : "Recherche"
         }
         className="grow"
       />
