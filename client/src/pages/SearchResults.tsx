@@ -1,5 +1,6 @@
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 //a voir avec les composants extérieur
 import ActorList from "../components/Search/ActorList";
@@ -21,6 +22,7 @@ const emptyResults: SearchResultsType = {
 };
 
 const SearchResults = () => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { searchQuery, setSearchQuery, setHasNoResults } = useSearch();
   const [searchResults, setSearchResults] =
@@ -85,6 +87,11 @@ const SearchResults = () => {
     };
   }, [trimmedQuery, setHasNoResults]);
 
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    navigate("/catalog");
+  };
+
   const allMedias = [
     ...searchResults.films,
     ...searchResults.series,
@@ -105,9 +112,23 @@ const SearchResults = () => {
         !error &&
         trimmedQuery.length >= MIN_QUERY_LENGTH &&
         !hasResults && (
-          <p className="text-focus-muted">
-            Aucun résultat trouvé pour « {trimmedQuery} ».
-          </p>
+          <div className="flex flex-col items-center gap-4 py-12 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-base-content/20">
+              <Search className="size-6 opacity-70" />
+            </div>
+            <h2>Aucun résultat trouvé</h2>
+            <p className="max-w-md text-focus-muted">
+              Vérifiez l'orthographe ou essayez un titre, un genre ou un nom de
+              comédien plus court.
+            </p>
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="btn btn-outline btn-warning rounded-full"
+            >
+              Effacer la recherche
+            </button>
+          </div>
         )}
 
       {!loading && !error && hasResults && (
