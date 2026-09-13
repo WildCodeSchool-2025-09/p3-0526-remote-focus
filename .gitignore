@@ -10,4 +10,5 @@ node_modules
 # Copies temporaires depuis US-CAT-01 (pas encore mergée), a retirer apres le vrai merge
 client/src/types/Catalog.ts
 client/src/components/Catalog/MediaActions.tsx
+client/src/components/Catalog/Carousel.tsx
 server/src/types/Media/Media.types.ts

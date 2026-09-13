@@ -1,4 +1,5 @@
 import type { Person } from "../../types/Search";
+import Carousel from "../Catalog/Carousel";
 import SearchActorCard from "./SearchActorCard";
 
 type ActorListProps = {
@@ -14,10 +15,16 @@ const ActorList = ({ title, actors }: ActorListProps) => {
   return (
     <section className="space-y-3">
       <h2>{title}</h2>
-      <div className="flex gap-4 overflow-x-auto scrollbar-none pb-2">
-        {actors.map((actor) => (
-          <SearchActorCard key={actor.id} person={actor} />
-        ))}
+      {/*
+        Nombre de cartes visibles selon le palier d'écran (w-24 = 96px + gap-4 = 16px, largeur = 112*n - 16) :
+        mobile 3, sm (640px) 4, md (768px) 5, lg (1024px) 6, xl (1280px) 8 — le reste défile via le carrousel
+      */}
+      <div className="max-w-[320px] sm:max-w-[432px] md:max-w-[544px] lg:max-w-[656px] xl:max-w-[880px]">
+        <Carousel>
+          {actors.map((actor) => (
+            <SearchActorCard key={actor.id} person={actor} />
+          ))}
+        </Carousel>
       </div>
     </section>
   );

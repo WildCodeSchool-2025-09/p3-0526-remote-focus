@@ -6,7 +6,7 @@ type SearchActorCardProps = {
 
 const SearchActorCard = ({ person }: SearchActorCardProps) => {
   return (
-    <div className="flex w-24 shrink-0 flex-col items-center gap-2 text-center">
+    <div className="carousel-item flex w-24 shrink-0 flex-col items-center gap-2 text-center">
       {person.photo != null ? (
         <img
           src={`https://image.tmdb.org/t/p/w185${person.photo}`}
