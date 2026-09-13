@@ -1,6 +1,6 @@
 //ne pas commit
-import type { Media } from "../../types/Media-search";
-import MediaCard from "./MediaCard.wip-thomas";
+import type { Media } from "../../types/Search";
+import MediaCard from "./SearchMediaCard";
 
 type MediaListProps = {
   title: string;

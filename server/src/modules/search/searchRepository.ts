@@ -1,22 +1,14 @@
 import client from "../../../database/client";
 import type { Rows } from "../../../database/client";
+import type { Media } from "../../types/Media/Media.types";
 
 //recherche par média
-export interface MediaSearchRow extends Rows {
-  id: number;
-  name: string;
-  type: "movie" | "series";
-  is_anime: number | boolean;
-  poster: string | null;
-  released_at: Date | null;
-}
-
 export async function findMediaByTitle(
   q: string,
   type: string | undefined,
   limit: number,
   offset: number,
-): Promise<MediaSearchRow[]> {
+): Promise<Media[]> {
   const params: unknown[] = [`%${q}%`];
   let typeClause = "";
 
@@ -30,12 +22,29 @@ export async function findMediaByTitle(
 
   params.push(limit, offset);
 
-  const [rows] = await client.query<MediaSearchRow[]>(
-    `SELECT m.id, m.name, m.type, m.is_anime, m.poster, m.released_at
-      FROM media m
-      WHERE m.name LIKE ? ${typeClause}
-      ORDER BY m.name ASC
-      LIMIT ? OFFSET ?`,
+  const [rows] = await client.query<Media[]>(
+    `SELECT
+      m.ID AS id,
+      m.tmdb_id AS tmdbId,
+      m.name,
+      m.type,
+      m.released_at AS releasedAt,
+      m.duration,
+      m.poster,
+      m.synopsis,
+      m.overall_rating AS overallRating,
+      m.status,
+      m.original_name AS originalName,
+      m.original_language AS originalLanguage,
+      m.pegi,
+      m.is_anime AS isAnime,
+      (SELECT genre.name FROM classify_as
+        JOIN genre ON genre.ID = classify_as.ID_genre
+        WHERE classify_as.ID_media = m.ID LIMIT 1) AS genreName
+    FROM media m
+    WHERE m.name LIKE ? ${typeClause}
+    ORDER BY m.name ASC
+    LIMIT ? OFFSET ?`,
     params,
   );
 

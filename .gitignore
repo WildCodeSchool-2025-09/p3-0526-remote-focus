@@ -6,3 +6,8 @@ node_modules
 !.vscode/settings.json
 !.vscode/extensions.json
 .env
+
+# Copies temporaires depuis US-CAT-01 (pas encore mergée), a retirer apres le vrai merge
+client/src/types/Catalog.ts
+client/src/components/Catalog/MediaActions.tsx
+server/src/types/Media/Media.types.ts

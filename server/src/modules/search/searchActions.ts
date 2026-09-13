@@ -1,15 +1,9 @@
+import type { Media } from "../../types/Media/Media.types";
 import {
   countMediaByTitle,
   findMediaByTitle,
   findPersonByName,
 } from "./searchRepository";
-
-interface MediaDto {
-  id: number;
-  name: string;
-  poster: string | null;
-  releasedAt: Date | null;
-}
 
 interface PersonDto {
   id: number;
@@ -18,9 +12,9 @@ interface PersonDto {
 }
 
 export interface SearchResult {
-  films: MediaDto[];
-  series: MediaDto[];
-  animes: MediaDto[];
+  films: Media[];
+  series: Media[];
+  animes: Media[];
   actors: PersonDto[];
   hasMore: boolean;
 }
@@ -39,22 +33,15 @@ export async function browseResults(
     countMediaByTitle(q, type),
   ]);
 
-  const films: MediaDto[] = [];
-  const series: MediaDto[] = [];
-  const animes: MediaDto[] = [];
+  const films: Media[] = [];
+  const series: Media[] = [];
+  const animes: Media[] = [];
 
-  for (const row of mediaRows) {
-    const dto: MediaDto = {
-      id: row.id,
-      name: row.name,
-      poster: row.poster,
-      releasedAt: row.released_at,
-    };
-
-    // is_anime prime sur type : un anime reste un anime, qu'il soit "movie" ou "series"
-    if (row.is_anime) animes.push(dto);
-    else if (row.type === "movie") films.push(dto);
-    else if (row.type === "series") series.push(dto);
+  for (const media of mediaRows) {
+    // isAnime prime sur type : un anime reste un anime, qu'il soit "movie" ou "series"
+    if (media.isAnime) animes.push(media);
+    else if (media.type === "movie") films.push(media);
+    else if (media.type === "series") series.push(media);
   }
 
   const actors: PersonDto[] = personRows.map((p) => ({
