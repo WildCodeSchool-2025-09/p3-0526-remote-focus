@@ -22,7 +22,7 @@ const emptyResults: SearchResultsType = {
 
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { searchQuery, setSearchQuery } = useSearch();
+  const { searchQuery, setSearchQuery, setHasNoResults } = useSearch();
   const [searchResults, setSearchResults] =
     useState<SearchResultsType>(emptyResults);
   const [loading, setLoading] = useState(false);
@@ -46,6 +46,7 @@ const SearchResults = () => {
   useEffect(() => {
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setSearchResults(emptyResults);
+      setHasNoResults(false);
       return;
     }
 
@@ -57,11 +58,20 @@ const SearchResults = () => {
       .then((results) => {
         if (!cancelled) {
           setSearchResults(results);
+
+          const noMatches =
+            results.films.length === 0 &&
+            results.series.length === 0 &&
+            results.animes.length === 0 &&
+            results.actors.length === 0;
+
+          setHasNoResults(noMatches);
         }
       })
       .catch(() => {
         if (!cancelled) {
           setError(true);
+          setHasNoResults(false);
         }
       })
       .finally(() => {
@@ -73,7 +83,7 @@ const SearchResults = () => {
     return () => {
       cancelled = true;
     };
-  }, [trimmedQuery]);
+  }, [trimmedQuery, setHasNoResults]);
 
   const allMedias = [
     ...searchResults.films,
