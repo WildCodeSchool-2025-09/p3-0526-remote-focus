@@ -1,10 +1,7 @@
 import express from "express";
-<<<<<<< HEAD
 import homepageActions from "./modules/homepage/homepageActions";
-=======
 import actorActions from "./modules/actor/actorActions";
 import mediaActions from "./modules/media/mediaActions";
->>>>>>> dev
 
 const router = express.Router();
 
