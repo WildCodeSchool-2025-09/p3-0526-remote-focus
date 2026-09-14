@@ -3,3 +3,5 @@ coverage
 .env
 .tmdb-cache
 server/database/.tmdb-cache/
+server/database/seeds/
+
