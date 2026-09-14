@@ -8,6 +8,7 @@ import App from "./App";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import Homepage from "./pages/Homepage";
+import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "*",
         element: <NotFound />,
+      },
+      {
+        path: "movies/:id",
+        element: <MovieDetail />,
       },
     ],
   },
