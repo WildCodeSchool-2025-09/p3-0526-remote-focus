@@ -4,7 +4,7 @@ class MediaRepository {
   async read(id: number) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT ID, name, type, original_name, poster, synopsis, duration,
-              released_at, overall_rating, original_language, pegi
+              released_at, overall_rating, original_language, pegi, status
        FROM media
        WHERE ID = ?`,
       [id],
@@ -55,6 +55,45 @@ class MediaRepository {
       [id],
     );
     return Number(rows[0].total);
+  }
+
+  async readSeasons(mediaId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT s.ID, s.name, s.number, s.poster, s.released_at,
+              s.synopsis, s.is_finished,
+              COUNT(e.ID) AS episode_count
+       FROM season AS s
+       LEFT JOIN episode AS e ON e.ID_season = s.ID
+       WHERE s.ID_media = ?
+       GROUP BY s.ID
+       ORDER BY s.number ASC`,
+      [mediaId],
+    );
+    return rows;
+  }
+
+  async readDurations(mediaId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT SUM(e.duration) AS total_duration,
+              AVG(e.duration) AS average_duration,
+              COUNT(e.ID) AS episode_count
+       FROM episode AS e
+       JOIN season AS s ON s.ID = e.ID_season
+       WHERE s.ID_media = ?`,
+      [mediaId],
+    );
+    return rows[0];
+  }
+
+  async readEpisodes(seasonId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT ID, name, number, released_at, synopsis, duration
+       FROM episode
+       WHERE ID_season = ?
+       ORDER BY number ASC`,
+      [seasonId],
+    );
+    return rows;
   }
 }
 
