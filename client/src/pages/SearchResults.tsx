@@ -89,6 +89,7 @@ const SearchResults = () => {
 
   const handleClearSearch = () => {
     setSearchQuery("");
+    setHasNoResults(false);
     navigate("/catalog");
   };
 
