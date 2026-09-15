@@ -5,6 +5,7 @@ import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
 import { fetchSerie } from "../services/api";
 import type { Serie } from "../types/media";
+import SerieHeader from "../components/SerieHeader";
 
 function SerieDetail() {
   const { id } = useParams();
@@ -65,7 +66,7 @@ function SerieDetail() {
         categoryLabel="Séries"
         categoryPath="/catalog?type=tv"
       />
-      <h1 className="text-2xl font-bold md:text-4xl">{serieDetail.name}</h1>
+      <SerieHeader serie={serieDetail} />
       <CastList
         cast={serieDetail.cast}
         castTotal={serieDetail.castTotal}
