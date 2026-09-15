@@ -58,4 +58,5 @@ export const createGenreSections = (
             medias,
         };
     });
+    return genreSections;
 };
