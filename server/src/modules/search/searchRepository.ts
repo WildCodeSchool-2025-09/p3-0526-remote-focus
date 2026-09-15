@@ -67,9 +67,11 @@ export async function findPersonByName(
     `SELECT p.ID as id, p.name, p.photo
      FROM person p
      WHERE p.name LIKE ?
-     ORDER BY p.name ASC
+     ORDER BY
+       CASE WHEN p.name LIKE ? THEN 0 ELSE 1 END,
+       p.ID ASC
      LIMIT ? OFFSET ?`,
-    [`%${q}%`, limit, offset],
+    [`%${q}%`, `${q}%`, limit, offset],
   );
 
   return rows;
