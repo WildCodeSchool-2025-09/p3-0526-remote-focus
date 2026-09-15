@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface CarouselProps {
@@ -21,16 +27,7 @@ function Carousel({ children }: CarouselProps) {
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
 
-  function updateScrollButtons() {
-    if (carouselRef.current) {
-      const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
-
-      setIsAtStart(scrollLeft <= 0);
-      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 1);
-    }
-  }
-
-  useEffect(() => {
+  const updateScrollButtons = useCallback(() => {
     if (carouselRef.current) {
       const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
 
@@ -38,6 +35,10 @@ function Carousel({ children }: CarouselProps) {
       setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 1);
     }
   }, []);
+
+  useEffect(() => {
+    updateScrollButtons();
+  }, [updateScrollButtons]);
 
   return (
     <div className="flex items-center gap-4">

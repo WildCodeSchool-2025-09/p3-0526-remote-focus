@@ -2,40 +2,8 @@ import type { RequestHandler } from "express";
 
 import catalogRepository from "./catalogRepository";
 import userRepository from "../user/userRepository";
-import type { Media, EnrichedMedia } from "../../types/Media/Media.types";
+import { createGenreSections, enrichRanking } from "./catalogHelpers";
 
-const isMediaNew = (releasedAt: Date | string | null): boolean => {
-  const today = new Date();
-
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 90);
-
-  const releasedAtDate = releasedAt ? new Date(releasedAt) : null;
-
-  return (
-    releasedAtDate !== null &&
-    releasedAtDate >= thirtyDaysAgo &&
-    releasedAtDate <= today
-  );
-};
-
-const enrichRanking = (medias: Media[]): EnrichedMedia[] => {
-  return medias.map((media, index) => {
-    const position = index + 1;
-
-    let topRank: "top3" | "top10" | null = null;
-
-    if (position <= 3) {
-      topRank = "top3";
-    } else if (position <= 10) {
-      topRank = "top10";
-    }
-
-    const isNew = isMediaNew(media.releasedAt);
-
-    return { ...media, topRank, isNew };
-  });
-};
 
 const readDiscoverSections: RequestHandler = async (req, res, next) => {
   try {
@@ -71,25 +39,7 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
 
     const enrichedTopRated = enrichRanking(topRated);
 
-    const genreSections = likedGenres.map((likedGenre, index) => {
-      const medias = topGenres[index].map((media) => {
-        const rankedMedia = enrichedTopRated.find(
-          (rankedMedia) => rankedMedia.id === media.id,
-        );
-
-        return {
-          ...media,
-          topRank: rankedMedia ? rankedMedia.topRank : null,
-          isNew: isMediaNew(media.releasedAt),
-        };
-      });
-
-      return {
-        id: likedGenre.id,
-        name: likedGenre.name,
-        medias,
-      };
-    });
+    const genreSections = createGenreSections(likedGenres, topGenres, enrichedTopRated)
 
     res.json({
       topRated: enrichedTopRated,

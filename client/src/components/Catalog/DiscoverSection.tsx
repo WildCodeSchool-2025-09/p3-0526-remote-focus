@@ -5,19 +5,17 @@ import type { DiscoverResponse } from "../../types/Catalog";
 import MediaSection from "./MediaSection";
 import MediaCardLoading from "./MediaCardLoading";
 
+type MediaType = "movie" | "tv" | "anime";
+function isValidMediaType(type: string): type is MediaType {
+  return ["movie", "tv", "anime"].includes(type);
+}
+
 function DiscoverSection() {
   const [searchParams] = useSearchParams();
 
   const type = searchParams.get("type");
 
-  const requestedType =
-    type === "movie"
-      ? type
-      : type === "tv"
-        ? type
-        : type === "anime"
-          ? type
-          : undefined;
+  const requestedType = type && isValidMediaType(type) ? type : undefined;
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -70,36 +68,25 @@ function DiscoverSection() {
 
   return (
     <>
-      <>
+      <MediaSection
+        title="Populaires"
+        medias={discover.topRated}
+        searchParams={requestedType}
+      />
+      <MediaSection
+        title="Nouveautés"
+        medias={discover.latest}
+        searchParams={requestedType}
+      />
+      {discover.genreSections.map((genre) => (
         <MediaSection
-          title="Populaires"
-          medias={discover.topRated}
+          key={genre.id}
+          title={genre.name}
+          medias={genre.medias}
           searchParams={requestedType}
+          genreId={genre.id}
         />
-        <MediaSection
-          title="Nouveautés"
-          medias={discover.latest}
-          searchParams={requestedType}
-        />
-        <MediaSection
-          title={`${discover.genreSections[0].name}`}
-          medias={discover.genreSections[0].medias}
-          searchParams={requestedType}
-          genreId={discover.genreSections[0].id}
-        />
-        <MediaSection
-          title={`${discover.genreSections[1].name}`}
-          medias={discover.genreSections[1].medias}
-          searchParams={requestedType}
-          genreId={discover.genreSections[1].id}
-        />
-        <MediaSection
-          title={`${discover.genreSections[2].name}`}
-          medias={discover.genreSections[2].medias}
-          searchParams={requestedType}
-          genreId={discover.genreSections[2].id}
-        />
-      </>
+      ))}
     </>
   );
 }
