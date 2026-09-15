@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
-import MediaHeader from "../components/MediaHeader";
+import MovieHeader from "../components/MovieHeader";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
 
@@ -66,7 +66,7 @@ function MovieDetail() {
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
       <Breadcrumb currentLabel={mediaDetail.name} />
-      <MediaHeader media={mediaDetail} />
+      <MovieHeader media={mediaDetail} />
       <CastList
         cast={mediaDetail.cast}
         castTotal={mediaDetail.castTotal}

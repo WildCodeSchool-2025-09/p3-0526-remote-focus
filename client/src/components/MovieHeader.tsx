@@ -3,9 +3,9 @@ import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Media } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
-import MediaInfo from "./MediaInfo";
+import MovieInfo from "./MovieInfo";
 
-type MediaHeaderProps = {
+type MovieHeaderProps = {
   media: Media;
 };
 
@@ -13,7 +13,7 @@ const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
 const PILL_ACTIVE =
   "rounded-full border border-[#F2B705] bg-[#F2B705] px-4 py-2 text-sm font-semibold text-[#0D1117]";
 
-function MediaHeader({ media }: MediaHeaderProps) {
+function MovieHeader({ media }: MovieHeaderProps) {
   const year = media.releasedAt
     ? new Date(media.releasedAt).getFullYear()
     : null;
@@ -78,7 +78,7 @@ function MediaHeader({ media }: MediaHeaderProps) {
       </div>
 
       <div className="col-span-2 row-start-2 flex flex-col gap-4 md:col-span-1 md:col-start-2">
-        <MediaInfo media={media} />
+        <MovieInfo media={media} />
 
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
@@ -129,4 +129,4 @@ function ActionButton({ label, color, icon: Icon }: ActionButtonProps) {
   );
 }
 
-export default MediaHeader;
+export default MovieHeader;

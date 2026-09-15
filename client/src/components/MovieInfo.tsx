@@ -1,10 +1,10 @@
 import type { Media } from "../types/media";
 
-type MediaInfoProps = {
+type MovieInfoProps = {
   media: Media;
 };
 
-function MediaInfo({ media }: MediaInfoProps) {
+function MovieInfo({ media }: MovieInfoProps) {
   if (media.synopsis == null) {
     return null;
   }
@@ -16,4 +16,4 @@ function MediaInfo({ media }: MediaInfoProps) {
   );
 }
 
-export default MediaInfo;
+export default MovieInfo;
