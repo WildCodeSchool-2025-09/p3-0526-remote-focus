@@ -1,4 +1,3 @@
-//ne pas commit
 import type { Media } from "../../types/Search";
 import MediaCard from "./SearchMediaCard";
 

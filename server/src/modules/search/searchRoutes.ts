@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from "express";
 import type { SearchResult } from "./searchActions";
 import { browseResults } from "./searchActions";
 
-// En dessous de ce nombre de caractères, on ne lance pas de requête SQL
 const MIN_QUERY_LENGTH = 2;
 
 const emptyResult: SearchResult = {

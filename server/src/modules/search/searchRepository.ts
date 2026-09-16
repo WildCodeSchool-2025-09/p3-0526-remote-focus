@@ -2,7 +2,6 @@ import client from "../../../database/client";
 import type { Rows } from "../../../database/client";
 import type { Media } from "../../types/Media/Media.types";
 
-//recherche par média
 export async function findMediaByTitle(
   q: string,
   type: string | undefined,
@@ -12,11 +11,9 @@ export async function findMediaByTitle(
   const params: unknown[] = [`%${q}%`];
   let typeClause = "";
 
-  // "anime" n'est pas une valeur de la colonne type (movie/series) mais un flag séparé is_anime
   if (type === "anime") {
     typeClause = "AND m.is_anime = 1";
   } else if (type === "movie" || type === "series") {
-    // La colonne media.type ne connaît que "movie"/"tv" (convention TMDB), jamais "series"
     typeClause = "AND m.type = ? AND m.is_anime = 0";
     params.push(type === "series" ? "tv" : type);
   }
@@ -54,7 +51,6 @@ export async function findMediaByTitle(
   return rows;
 }
 
-//recherche par nom
 export interface PersonSearchRow extends Rows {
   id: number;
   name: string;
@@ -80,7 +76,6 @@ export async function findPersonByName(
   return rows;
 }
 
-//pour stocker le nombre de résultat
 export async function countMediaByTitle(
   q: string,
   type: string | undefined,
@@ -91,7 +86,6 @@ export async function countMediaByTitle(
   if (type === "anime") {
     typeClause = "AND m.is_anime = 1";
   } else if (type === "movie" || type === "series") {
-    // La colonne media.type ne connaît que "movie"/"tv" (convention TMDB), jamais "series"
     typeClause = "AND m.type = ? AND m.is_anime = 0";
     params.push(type === "series" ? "tv" : type);
   }

@@ -3,18 +3,16 @@ import Carousel from "../Catalog/Carousel";
 import SearchActorCard from "./SearchActorCard";
 
 type ActorListProps = {
-  title: string;
   actors: Person[];
 };
 
-const ActorList = ({ title, actors }: ActorListProps) => {
+const ActorList = ({ actors }: ActorListProps) => {
   if (actors.length === 0) {
     return null;
   }
 
   return (
     <section className="space-y-3">
-      <h2>{title}</h2>
       <Carousel>
         {actors.map((actor) => (
           <SearchActorCard key={actor.id} person={actor} />

@@ -2,7 +2,6 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
-//a voir avec les composants extérieur
 import ActorList from "../components/Search/ActorList";
 import MediaList from "../components/Search/MediaList";
 import { useSearch } from "../contexts/SearchContext";
@@ -116,9 +115,6 @@ const SearchResults = () => {
       .finally(() => setLoadingMoreMedia(false));
   };
 
-  // Chaque catégorie est déjà triée par pertinence côté API, mais les concaténer perd
-  // ce tri global : on refait le même critère (préfixe d'abord, puis alphabétique)
-  // sur la liste fusionnée pour obtenir un classement cohérent tous types confondus.
   const trimmedLower = trimmedQuery.toLowerCase();
 
   const allMedias = [
@@ -171,7 +167,7 @@ const SearchResults = () => {
 
       {!loading && !error && hasResults && (
         <div className="space-y-8">
-          <ActorList title="Comédiens" actors={searchResults.actors} />
+          <ActorList actors={searchResults.actors} />
           <MediaList medias={allMedias} />
 
           {searchResults.hasMore && (

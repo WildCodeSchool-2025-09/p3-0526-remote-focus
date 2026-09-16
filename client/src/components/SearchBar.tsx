@@ -13,9 +13,7 @@ const SearchBar = ({
   onChange,
   hasNoResults = false,
 }: SearchBarProps) => {
-  // Aligné sur le palier "lg" de Tailwind (1024px), déjà utilisé par Navbar/Header
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  // En dessous de 500px, le placeholder disparaît et le champ devient rond tant qu'il est vide
   const showPlaceholder = useMediaQuery("(min-width: 500px)");
   const isCompact = !showPlaceholder && value.length === 0;
 

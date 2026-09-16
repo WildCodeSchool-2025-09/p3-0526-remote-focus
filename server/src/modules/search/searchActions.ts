@@ -29,7 +29,6 @@ export async function browseResults(
 
   const [mediaRows, personRows, totalMedia] = await Promise.all([
     findMediaByTitle(q, type, limit, offset),
-    // Les acteurs ne sont pas (encore) paginés : toujours le premier lot, indépendamment de "page"
     findPersonByName(q, limit, 0),
     countMediaByTitle(q, type),
   ]);
@@ -39,8 +38,6 @@ export async function browseResults(
   const animes: Media[] = [];
 
   for (const media of mediaRows) {
-    // isAnime prime sur type : un anime reste un anime, qu'il soit "movie" ou "tv"
-    // La colonne media.type ne connaît que "movie"/"tv" (convention TMDB), jamais "series"
     if (media.isAnime) animes.push(media);
     else if (media.type === "movie") films.push(media);
     else if (media.type === "tv") series.push(media);
