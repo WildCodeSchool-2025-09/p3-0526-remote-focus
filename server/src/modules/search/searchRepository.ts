@@ -16,8 +16,9 @@ export async function findMediaByTitle(
   if (type === "anime") {
     typeClause = "AND m.is_anime = 1";
   } else if (type === "movie" || type === "series") {
+    // La colonne media.type ne connaît que "movie"/"tv" (convention TMDB), jamais "series"
     typeClause = "AND m.type = ? AND m.is_anime = 0";
-    params.push(type);
+    params.push(type === "series" ? "tv" : type);
   }
 
   params.push(limit, offset);
@@ -88,8 +89,9 @@ export async function countMediaByTitle(
   if (type === "anime") {
     typeClause = "AND m.is_anime = 1";
   } else if (type === "movie" || type === "series") {
+    // La colonne media.type ne connaît que "movie"/"tv" (convention TMDB), jamais "series"
     typeClause = "AND m.type = ? AND m.is_anime = 0";
-    params.push(type);
+    params.push(type === "series" ? "tv" : type);
   }
 
   const [rows] = await client.query<Rows>(
