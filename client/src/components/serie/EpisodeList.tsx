@@ -1,8 +1,8 @@
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
-import { fetchEpisodes } from "../services/api";
-import type { Episode } from "../types/media";
-import { formatDuration } from "../utils/formatDuration";
+import { fetchEpisodes } from "../../services/api";
+import type { Episode } from "../../types/media";
+import { formatDuration } from "../../utils/formatDuration";
 
 type EpisodeListProps = {
   seasonId: number;

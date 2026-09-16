@@ -1,6 +1,5 @@
-import type { Serie } from "../types/media";
-import { formatDuration } from "../utils/formatDuration";
-
+import type { Serie } from "../../types/media";
+import { formatDuration } from "../../utils/formatDuration";
 type SerieInfoProps = {
   serie: Serie;
 };

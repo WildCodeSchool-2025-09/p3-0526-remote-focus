@@ -5,8 +5,8 @@ import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
 import { fetchSerie } from "../services/api";
 import type { Serie } from "../types/media";
-import SerieHeader from "../components/SerieHeader";
-import SeasonList from "../components/SeasonList";
+import SeasonList from "../components/serie/SeasonList";
+import SerieHeader from "../components/serie/SerieHeader";
 
 function SerieDetail() {
   const { id } = useParams();

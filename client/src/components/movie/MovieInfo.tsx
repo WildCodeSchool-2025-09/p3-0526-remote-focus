@@ -1,4 +1,4 @@
-import type { Media } from "../types/media";
+import type { Media } from "../../types/media";
 
 type MovieInfoProps = {
   media: Media;

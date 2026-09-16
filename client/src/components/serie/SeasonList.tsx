@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import type { Season } from "../types/media";
+import type { Season } from "../../types/media";
 import EpisodeList from "./EpisodeList";
 
 type SeasonListProps = {

@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
-import MovieHeader from "../components/MovieHeader";
+import MovieHeader from "../components/movie/MovieHeader";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
 
