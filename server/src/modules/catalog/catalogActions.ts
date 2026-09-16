@@ -54,4 +54,44 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { readDiscoverSections };
+export const browse: RequestHandler = async (req, res, next) => {
+  try {
+    const requestedType = req.query.type;
+    const requestedGenre = req.query.genre?.toString();
+    const requestedPage = req.query.page;
+
+    if (
+      requestedType !== undefined &&
+      requestedType !== "movie" &&
+      requestedType !== "tv" &&
+      requestedType !== "anime"
+    ) {
+      res.status(400).json({
+        error: "Invalid media type",
+      });
+      return;
+    }
+
+    const genreIds = requestedGenre
+      ? requestedGenre.split(",").map((genre) => Number(genre))
+      : null;
+    const type = requestedType ? requestedType : null;
+    const page = requestedPage ? Number(requestedPage) : 1;
+    const limit = 15;
+    const offset = (page - 1) * limit;
+
+    if (!Number.isInteger(page) || page < 1) {
+      res.status(400).json({ error: "Invalid page number" });
+      return;
+    }
+
+    if (genreIds?.some((genreId) => Number.isNaN(genreId) || genreId <= 0)) {
+      res.status(400).json({ error: "Invalid genre ID" });
+      return;
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { readDiscoverSections, browse };

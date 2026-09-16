@@ -13,6 +13,7 @@ const router = express.Router();
 import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
+router.get("/api/medias", catalogActions.browse);
 
 /*
 router.get("/api/items", itemActions.browse);

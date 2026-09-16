@@ -36,6 +36,12 @@ class CatalogRepository {
     );
     return rows;
   }
+
+  async readByFilters(limit = 15) {
+    const [rows] = await databaseClient.query<Media[]>("SELECT");
+  }
+
+  async countByFilters() {}
 }
 
 export default new CatalogRepository();
