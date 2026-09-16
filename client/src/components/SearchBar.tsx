@@ -41,9 +41,10 @@ const SearchBar = ({
     <label
       className={`input input-bordered mx-2 flex items-center bg-base-300 ${shapeClass} ${borderClass}`}
     >
-      <Search className={`size-4 shrink-0 ${iconClass}`} />
+      <Search aria-hidden="true" className={`size-4 shrink-0 ${iconClass}`} />
       <input
         type="search"
+        aria-label="Rechercher un film, une série ou un animé"
         value={value}
         onChange={handleChange}
         placeholder={

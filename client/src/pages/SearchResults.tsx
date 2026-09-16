@@ -37,7 +37,7 @@ const SearchResults = () => {
   const trimmedQuery = debouncedQuery.trim();
   const activeType = searchParams.get("type") ?? undefined;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies:
+  // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate le contexte depuis l'URL une seule fois au montage, pas à chaque frappe
   useEffect(() => {
     const queryFromUrl = searchParams.get("q");
     if (queryFromUrl && queryFromUrl !== searchQuery) {
