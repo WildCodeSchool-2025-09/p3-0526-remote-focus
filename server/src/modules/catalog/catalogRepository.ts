@@ -95,7 +95,19 @@ ${GENRE_NAME}
     return rows;
   }
 
-  async countByFilters() {}
+  async countByFilters(
+    type: "movie" | "tv" | "anime" | null,
+    genreIds: number[] | null,
+  ): Promise<Media[]> {
+    const [rows] = await databaseClient.query<Media[]>(
+      `SELECT COUNT(DISTINCT m.ID) AS total
+      FROM media AS m
+      JOIN classify_as ON m.ID = classify_as.ID_media
+      WHERE ${MEDIA_TYPE}`,
+      [],
+    );
+    return rows;
+  }
 }
 
 export default new CatalogRepository();
