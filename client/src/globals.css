@@ -114,7 +114,15 @@
   }
 
   .carousel-container {
+<<<<<<< HEAD
     @apply carousel carousel-center gap-4 py-2 overflow-x-auto scroll-smooth scrollbar-none snap-x touch-pan-x w-full;
+=======
+    @apply carousel carousel-start gap-4 py-2 scrollbar-none snap-x touch-pan-x w-full;
+  }
+
+  .catalog-carousel-item {
+    @apply carousel-item shrink-0 card w-[152px] sm:w-40 md:w-44;
+>>>>>>> dev
   }
 
   .carousel-nav {
