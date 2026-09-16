@@ -116,11 +116,25 @@ const SearchResults = () => {
       .finally(() => setLoadingMoreMedia(false));
   };
 
+  // Chaque catégorie est déjà triée par pertinence côté API, mais les concaténer perd
+  // ce tri global : on refait le même critère (préfixe d'abord, puis alphabétique)
+  // sur la liste fusionnée pour obtenir un classement cohérent tous types confondus.
+  const trimmedLower = trimmedQuery.toLowerCase();
+
   const allMedias = [
     ...searchResults.films,
     ...searchResults.series,
     ...searchResults.animes,
-  ];
+  ].sort((a, b) => {
+    const aStartsWithQuery = a.name.toLowerCase().startsWith(trimmedLower);
+    const bStartsWithQuery = b.name.toLowerCase().startsWith(trimmedLower);
+
+    if (aStartsWithQuery !== bStartsWithQuery) {
+      return aStartsWithQuery ? -1 : 1;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
 
   const hasResults = allMedias.length > 0 || searchResults.actors.length > 0;
 
