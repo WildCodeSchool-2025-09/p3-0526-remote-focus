@@ -7,7 +7,7 @@ type MediaCardProps = {
 
 const MediaCard = ({ media }: MediaCardProps) => {
   return (
-    <div className="card bg-base-200 w-40 shrink-0 relative">
+    <div className="card bg-base-200 w-full relative">
       <figure className="aspect-[2/3] bg-base-300">
         {media.poster != null && (
           <img
