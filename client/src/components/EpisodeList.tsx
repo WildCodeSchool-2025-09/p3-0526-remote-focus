@@ -67,7 +67,7 @@ function EpisodeList({ seasonId }: EpisodeListProps) {
           </span>
 
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-base">{episode.name}</span>
+            <span className="text-base md:truncate">{episode.name}</span>
             {episode.duration != null && (
               <span className="text-sm text-[#9FB4BD]">
                 {formatDuration(episode.duration)}
