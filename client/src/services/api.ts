@@ -3,10 +3,13 @@ import type { FilmographyItem, Media } from "../types/media";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
-const searchMedias = async (query: string): Promise<SearchResults> => {
-  const response = await fetch(
-    `${API_URL}/api/medias/search?q=${encodeURIComponent(query)}`,
-  );
+const searchMedias = async (
+  query: string,
+  page = 1,
+): Promise<SearchResults> => {
+  const params = new URLSearchParams({ q: query, page: String(page) });
+
+  const response = await fetch(`${API_URL}/api/medias/search?${params}`);
 
   if (!response.ok) {
     throw new Error("la recherche a échoué");

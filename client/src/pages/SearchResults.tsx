@@ -29,6 +29,8 @@ const SearchResults = () => {
     useState<SearchResultsType>(emptyResults);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [mediaPage, setMediaPage] = useState(1);
+  const [loadingMoreMedia, setLoadingMoreMedia] = useState(false);
 
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
@@ -46,6 +48,8 @@ const SearchResults = () => {
   }, [trimmedQuery, setSearchParams]);
 
   useEffect(() => {
+    setMediaPage(1);
+
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setSearchResults(emptyResults);
       setHasNoResults(false);
@@ -93,6 +97,25 @@ const SearchResults = () => {
     navigate("/catalog");
   };
 
+  const handleLoadMoreMedia = () => {
+    const nextPage = mediaPage + 1;
+    setLoadingMoreMedia(true);
+
+    searchMedias(trimmedQuery, nextPage)
+      .then((results) => {
+        setSearchResults((previous) => ({
+          ...previous,
+          films: [...previous.films, ...results.films],
+          series: [...previous.series, ...results.series],
+          animes: [...previous.animes, ...results.animes],
+          hasMore: results.hasMore,
+        }));
+        setMediaPage(nextPage);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoadingMoreMedia(false));
+  };
+
   const allMedias = [
     ...searchResults.films,
     ...searchResults.series,
@@ -136,6 +159,19 @@ const SearchResults = () => {
         <div className="space-y-8">
           <ActorList title="Comédiens" actors={searchResults.actors} />
           <MediaList medias={allMedias} />
+
+          {searchResults.hasMore && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={handleLoadMoreMedia}
+                disabled={loadingMoreMedia}
+                className="btn btn-outline btn-warning rounded-full"
+              >
+                {loadingMoreMedia ? "Chargement…" : "Voir plus"}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
