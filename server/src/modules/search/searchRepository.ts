@@ -21,7 +21,7 @@ export async function findMediaByTitle(
     params.push(type === "series" ? "tv" : type);
   }
 
-  params.push(limit, offset);
+  params.push(`${q}%`, limit, offset);
 
   const [rows] = await client.query<Media[]>(
     `SELECT
@@ -44,7 +44,9 @@ export async function findMediaByTitle(
         WHERE classify_as.ID_media = m.ID LIMIT 1) AS genreName
     FROM media m
     WHERE m.name LIKE ? ${typeClause}
-    ORDER BY m.name ASC
+    ORDER BY
+      CASE WHEN m.name LIKE ? THEN 0 ELSE 1 END,
+      m.name ASC
     LIMIT ? OFFSET ?`,
     params,
   );
