@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
 import TypeFilter from "../components/Catalog/TypeFilter";
@@ -31,6 +31,7 @@ const SearchResults = () => {
   const [error, setError] = useState(false);
   const [mediaPage, setMediaPage] = useState(1);
   const [loadingMoreMedia, setLoadingMoreMedia] = useState(false);
+  const searchGeneration = useRef(0);
 
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
@@ -60,6 +61,7 @@ const SearchResults = () => {
   }, [trimmedQuery, setSearchParams]);
 
   useEffect(() => {
+    searchGeneration.current += 1;
     setMediaPage(1);
 
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
@@ -111,10 +113,14 @@ const SearchResults = () => {
 
   const handleLoadMoreMedia = () => {
     const nextPage = mediaPage + 1;
+    const generationAtStart = searchGeneration.current;
     setLoadingMoreMedia(true);
 
     searchMedias(trimmedQuery, nextPage, activeType)
       .then((results) => {
+        if (searchGeneration.current !== generationAtStart) {
+          return;
+        }
         setSearchResults((previous) => ({
           ...previous,
           films: [...previous.films, ...results.films],
@@ -124,7 +130,11 @@ const SearchResults = () => {
         }));
         setMediaPage(nextPage);
       })
-      .catch(() => setError(true))
+      .catch(() => {
+        if (searchGeneration.current === generationAtStart) {
+          setError(true);
+        }
+      })
       .finally(() => setLoadingMoreMedia(false));
   };
 
