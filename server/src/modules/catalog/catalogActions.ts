@@ -1,8 +1,8 @@
 import type { RequestHandler } from "express";
 
-import catalogRepository from "./catalogRepository";
 import userRepository from "../user/userRepository";
 import { createGenreSections, enrichRanking } from "./catalogHelpers";
+import catalogRepository from "./catalogRepository";
 
 const readDiscoverSections: RequestHandler = async (req, res, next) => {
   try {

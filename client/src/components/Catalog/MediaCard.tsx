@@ -1,6 +1,6 @@
 import { Clapperboard, Sparkles, Star, TvMinimalPlay } from "lucide-react";
-import type { EnrichedMedia } from "../../types/Catalog";
 import { Link } from "react-router";
+import type { EnrichedMedia } from "../../types/Catalog";
 import MediaActions from "./MediaActions";
 
 interface MediaCardProps {

@@ -1,13 +1,13 @@
+import { afterEach, describe, expect, it, jest, test } from "@jest/globals";
+import supertest from "supertest";
+import databaseClient from "../../database/client";
+import type { Rows } from "../../database/client";
+import app from "../../src/app";
 import {
   enrichRanking,
   isMediaNew,
 } from "../../src/modules/catalog/catalogHelpers";
-import { expect, test, describe, it, afterEach, jest } from "@jest/globals";
 import type { Media } from "../../src/types/Media/Media.types";
-import app from "../../src/app";
-import supertest from "supertest";
-import databaseClient from "../../database/client";
-import type { Rows } from "../../database/client";
 
 afterEach(() => {
   jest.restoreAllMocks();

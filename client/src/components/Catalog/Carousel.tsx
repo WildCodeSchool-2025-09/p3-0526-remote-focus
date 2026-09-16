@@ -1,11 +1,11 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
+  type ReactNode,
   useCallback,
   useEffect,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
-import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface CarouselProps {
   children: ReactNode;
