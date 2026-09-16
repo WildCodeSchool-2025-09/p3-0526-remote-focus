@@ -4,7 +4,6 @@ import catalogRepository from "./catalogRepository";
 import userRepository from "../user/userRepository";
 import { createGenreSections, enrichRanking } from "./catalogHelpers";
 
-
 const readDiscoverSections: RequestHandler = async (req, res, next) => {
   try {
     const requestedType = req.query.type;
@@ -39,7 +38,11 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
 
     const enrichedTopRated = enrichRanking(topRated);
 
-    const genreSections = createGenreSections(likedGenres, topGenres, enrichedTopRated)
+    const genreSections = createGenreSections(
+      likedGenres,
+      topGenres,
+      enrichedTopRated,
+    );
 
     res.json({
       topRated: enrichedTopRated,
