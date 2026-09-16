@@ -28,7 +28,7 @@ const enrichMedias = (medias: Media[]): EnrichedMedia[] => {
   });
 };
 
-const browseByCategory: RequestHandler = async (_req, res, next) => {
+const browseHomepage: RequestHandler = async (_req, res, next) => {
   try {
     const [films, series, animes] = await Promise.all([
       HomepageRepository.readByCategory("movie"),
@@ -46,4 +46,4 @@ const browseByCategory: RequestHandler = async (_req, res, next) => {
   }
 };
 
-export default { browseByCategory };
+export default { browseHomepage };

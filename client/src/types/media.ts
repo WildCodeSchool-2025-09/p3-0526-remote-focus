@@ -34,8 +34,8 @@ export type Media = {
   platforms: Platform[];
   cast: CastMember[];
   castTotal: number;
-  userStatus: string | null;
-  userRating: number | null;
+  userStatus: null;
+  userRating: null;
 };
 
 export type FilmographyItem = {

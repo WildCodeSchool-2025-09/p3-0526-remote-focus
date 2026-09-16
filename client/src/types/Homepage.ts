@@ -13,6 +13,7 @@ export type Media = {
   originalLanguage: string | null;
   pegi: string | null;
   isAnime: boolean;
+  genreName: string | null;
 };
 
 export type EnrichedMedia = Media & {

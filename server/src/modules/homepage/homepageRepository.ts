@@ -8,15 +8,19 @@ class HomepageRepository {
     limit = 20,
   ): Promise<Media[]> {
     const [rows] = await databaseClient.query<Media[]>(
-      `SELECT ID AS id, tmdb_id AS tmdbId, name, type, released_at AS releasedAt,
-              duration, poster, synopsis, overall_rating AS overallRating, status,
-              original_name AS originalName, original_language AS originalLanguage,
-              pegi, is_anime AS isAnime
-       FROM media
-       WHERE (? = 'anime' AND is_anime = TRUE)
-          OR (? = 'movie' AND type = 'movie' AND is_anime = FALSE)
-          OR (? = 'tv'    AND type = 'tv'    AND is_anime = FALSE)
-       ORDER BY overall_rating DESC
+      `SELECT m.ID AS id, m.tmdb_id AS tmdbId, m.name, m.type, m.released_at AS releasedAt,
+              m.duration, m.poster, m.synopsis, m.overall_rating AS overallRating, m.status,
+              m.original_name AS originalName, m.original_language AS originalLanguage,
+              m.pegi, m.is_anime AS isAnime,
+              (SELECT genre.name FROM classify_as
+                 JOIN genre ON genre.ID = classify_as.ID_genre
+                WHERE classify_as.ID_media = m.ID
+                LIMIT 1) AS genreName
+       FROM media AS m
+       WHERE (? = 'anime' AND m.is_anime = TRUE)
+          OR (? = 'movie' AND m.type = 'movie' AND m.is_anime = FALSE)
+          OR (? = 'tv'    AND m.type = 'tv'    AND m.is_anime = FALSE)
+       ORDER BY m.overall_rating DESC
        LIMIT ?`,
       [category, category, category, limit],
     );

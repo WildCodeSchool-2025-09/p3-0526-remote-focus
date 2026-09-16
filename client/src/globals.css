@@ -112,6 +112,18 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+
+  .carousel-container {
+    @apply carousel carousel-center gap-4 py-2 overflow-x-auto scroll-smooth scrollbar-none snap-x touch-pan-x w-full;
+  }
+
+  .carousel-nav {
+    @apply flex-shrink-0 w-10 h-10 rounded-full border border-base-content/20 bg-base-200 text-base-content/60 flex items-center justify-center transition-colors hover:border-primary hover:text-primary;
+  }
+
+  .carousel-nav-disabled {
+    @apply flex-shrink-0 w-10 h-10 rounded-full border border-base-content/10 bg-base-100 text-base-content/30 flex items-center justify-center transition-colors;
+  }
 }
 
 /* ================================================================== *
