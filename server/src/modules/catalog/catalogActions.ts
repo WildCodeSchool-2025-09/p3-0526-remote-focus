@@ -89,6 +89,12 @@ export const browse: RequestHandler = async (req, res, next) => {
       res.status(400).json({ error: "Invalid genre ID" });
       return;
     }
+    res.json({
+      type,
+      genreIds,
+      limit,
+      offset,
+    });
   } catch (err) {
     next(err);
   }
