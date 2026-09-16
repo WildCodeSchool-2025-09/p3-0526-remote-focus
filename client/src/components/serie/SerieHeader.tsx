@@ -1,8 +1,8 @@
 import { Check, Heart, Plus, Star } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import type { Serie } from "../../types/media";
 import SerieInfo from "./SerieInfo";
+import ActionButton from "../ActionButton";
 
 type SerieHeaderProps = {
   serie: Serie;
@@ -109,28 +109,6 @@ function SerieHeader({ serie }: SerieHeaderProps) {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-type ActionButtonProps = {
-  label: string;
-  color: string;
-  icon: LucideIcon;
-};
-
-function ActionButton({ label, color, icon: Icon }: ActionButtonProps) {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <button
-        type="button"
-        disabled
-        className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12"
-        style={{ borderColor: color, color }}
-      >
-        <Icon size={22} strokeWidth={1.8} />
-      </button>
-      <span className="text-sm text-white/60">{label}</span>
     </div>
   );
 }

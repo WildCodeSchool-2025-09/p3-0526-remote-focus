@@ -7,9 +7,9 @@ import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import Homepage from "./pages/Homepage";
 import MovieDetail from "./pages/MovieDetail";
-import SerieDetail from "./pages/SerieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import SerieDetail from "./pages/SerieDetail";
 
 const router = createBrowserRouter([
   {

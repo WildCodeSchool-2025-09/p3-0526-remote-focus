@@ -1,4 +1,4 @@
-import type { FilmographyItem, Media, Serie, Episode } from "../types/media";
+import type { Episode, FilmographyItem, Media, Serie } from "../types/media";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 

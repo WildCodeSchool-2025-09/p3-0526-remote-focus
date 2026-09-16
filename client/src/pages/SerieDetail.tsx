@@ -3,10 +3,10 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
-import { fetchSerie } from "../services/api";
-import type { Serie } from "../types/media";
 import SeasonList from "../components/serie/SeasonList";
 import SerieHeader from "../components/serie/SerieHeader";
+import { fetchSerie } from "../services/api";
+import type { Serie } from "../types/media";
 
 function SerieDetail() {
   const { id } = useParams();
