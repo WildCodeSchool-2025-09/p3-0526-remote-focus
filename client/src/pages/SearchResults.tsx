@@ -183,7 +183,7 @@ const SearchResults = () => {
             <button
               type="button"
               onClick={handleClearSearch}
-              className="btn btn-outline btn-warning rounded-full"
+              className="btn-cta-pill"
             >
               Effacer la recherche
             </button>
@@ -201,7 +201,7 @@ const SearchResults = () => {
                 type="button"
                 onClick={handleLoadMoreMedia}
                 disabled={loadingMoreMedia}
-                className="btn btn-outline btn-warning rounded-full"
+                className="btn-cta-pill"
               >
                 {loadingMoreMedia ? "Chargement…" : "Voir plus"}
               </button>
