@@ -49,9 +49,11 @@ function MediaCard({
     urlDetails = "tv";
   }
 
+  const linkTo = urlDetails ? `/${urlDetails}/${media.id}` : "/catalogue";
+
   return (
     <div className={`${className} relative`}>
-      <Link to={`/${urlDetails}/${media.id}`}>
+      <Link to={`${linkTo}`}>
         <div className="relative">
           {topNewBadge && (
             <span className="absolute px-2.5 py-1 top-2 left-2 text-xs bg-focus-coral rounded-btn font-semibold shadow-badge">

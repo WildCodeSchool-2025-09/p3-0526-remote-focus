@@ -21,7 +21,7 @@ function MediaSection({
   return (
     <>
       <h3 className="mt-9 mb-4">{title}</h3>
-      {medias[0] ? (
+      {medias.length > 0 ? (
         <Carousel>
           {medias.map((media) => (
             <MediaCard
@@ -34,7 +34,7 @@ function MediaSection({
           ))}
           {genreId !== undefined && (
             <Link
-              to=""
+              to="" // add a link to catalog page with genre filters when done
               className="catalog-carousel-item items-center justify-center bg-focus-surface/60 text-focus-muted-dark/60 rounded-box hover:bg-focus-surface hover:text-focus-muted transition-colors"
             >
               Voir tout
