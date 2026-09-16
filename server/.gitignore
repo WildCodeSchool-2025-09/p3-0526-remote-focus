@@ -2,6 +2,5 @@ node_modules
 coverage
 .env
 .tmdb-cache
-server/database/.tmdb-cache/
-server/database/seeds/
-
+database/.tmdb-cache/
+database/seeds/

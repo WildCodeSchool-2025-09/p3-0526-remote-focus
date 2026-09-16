@@ -12,6 +12,9 @@ router.get("/api/medias/search", searchRoutes.browse);
 
 // Define item-related routes
 /* import itemActions from "./modules/item/itemActions.old";*/
+import catalogActions from "./modules/catalog/catalogActions";
+
+router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 
 /*
 router.get("/api/items", itemActions.browse);
