@@ -6,10 +6,16 @@ import MediaActions from "./MediaActions";
 interface MediaCardProps {
   media: EnrichedMedia;
   className: string;
-  searchParams: string | undefined;
+  showTypeIcon?: boolean;
+  showGenre?: boolean;
 }
 
-function MediaCard({ media, className, searchParams }: MediaCardProps) {
+function MediaCard({
+  media,
+  className,
+  showTypeIcon = true,
+  showGenre = true,
+}: MediaCardProps) {
   let mediaIcon = null;
 
   if (media.type === "movie") {
@@ -18,14 +24,6 @@ function MediaCard({ media, className, searchParams }: MediaCardProps) {
     mediaIcon = <Sparkles size={20} />;
   } else if (media.type === "tv") {
     mediaIcon = <TvMinimalPlay size={20} />;
-  }
-
-  if (
-    searchParams === "movie" ||
-    searchParams === "tv" ||
-    searchParams === "anime"
-  ) {
-    mediaIcon = null;
   }
 
   let topNewBadge = null;
@@ -74,7 +72,7 @@ function MediaCard({ media, className, searchParams }: MediaCardProps) {
             alt={`${media.name} poster`}
             className="rounded-box w-full aspect-[2/3] object-cover"
           />
-          {mediaIcon && (
+          {showTypeIcon && mediaIcon && (
             <span
               className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-full badge-primary shadow-badge"
               title={media.isAnime ? "anime" : `${media.type}`}
@@ -90,10 +88,14 @@ function MediaCard({ media, className, searchParams }: MediaCardProps) {
           {media.name}
         </h4>
         <p className="text-focus-muted-dark text-xs flex items-center gap-1 whitespace-nowrap">
-          <span className="min-w-0 truncate" title={`${media.genreName}`}>
-            {media.genreName}
-          </span>
-          ·
+          {showGenre && (
+            <>
+              <span className="min-w-0 truncate" title={`${media.genreName}`}>
+                {media.genreName}
+              </span>
+              ·
+            </>
+          )}
           <span className="shrink-0">
             {media.releasedAt ? String(media.releasedAt).slice(0, 4) : "-"}
           </span>

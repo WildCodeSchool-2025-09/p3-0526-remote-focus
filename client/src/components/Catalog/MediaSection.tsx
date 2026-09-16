@@ -6,14 +6,16 @@ import MediaCard from "./MediaCard";
 interface MediaSectionProps {
   title: string;
   medias: EnrichedMedia[];
-  searchParams: string | undefined;
+  showTypeIcon?: boolean;
+  showGenre?: boolean;
   genreId?: number;
 }
 
 function MediaSection({
   title,
   medias,
-  searchParams,
+  showTypeIcon = true,
+  showGenre = true,
   genreId,
 }: MediaSectionProps) {
   return (
@@ -25,7 +27,8 @@ function MediaSection({
             <MediaCard
               key={media.id}
               media={media}
-              searchParams={searchParams}
+              showTypeIcon={showTypeIcon}
+              showGenre={showGenre}
               className="catalog-carousel-item"
             />
           ))}

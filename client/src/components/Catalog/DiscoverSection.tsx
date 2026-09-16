@@ -71,19 +71,22 @@ function DiscoverSection() {
       <MediaSection
         title="Populaires"
         medias={discover.topRated}
-        searchParams={requestedType}
+        showTypeIcon={!requestedType}
+        showGenre={true}
       />
       <MediaSection
         title="Nouveautés"
         medias={discover.latest}
-        searchParams={requestedType}
+        showTypeIcon={!requestedType}
+        showGenre={true}
       />
       {discover.genreSections.map((genre) => (
         <MediaSection
           key={genre.id}
           title={genre.name}
           medias={genre.medias}
-          searchParams={requestedType}
+          showTypeIcon={!requestedType}
+          showGenre={false}
           genreId={genre.id}
         />
       ))}
