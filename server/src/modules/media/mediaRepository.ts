@@ -9,7 +9,7 @@ class MediaRepository {
        WHERE ID = ?`,
       [id],
     );
-    return rows[0] ?? null;
+    return (rows[0] as Rows[number] | undefined) ?? null;
   }
 
   async readGenres(id: number) {
