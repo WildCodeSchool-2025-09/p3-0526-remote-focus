@@ -100,6 +100,7 @@ function SerieHeader({ serie }: SerieHeaderProps) {
                     key={platform.id}
                     src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
                     alt={platform.name}
+                    title={platform.name}
                     className="h-8 w-8 rounded object-contain"
                   />
                 ))}

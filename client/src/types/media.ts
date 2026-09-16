@@ -71,6 +71,7 @@ export type Serie = {
   id: number;
   name: string;
   type: string;
+  isAnime: boolean;
   originalName: string | null;
   poster: string | null;
   synopsis: string | null;

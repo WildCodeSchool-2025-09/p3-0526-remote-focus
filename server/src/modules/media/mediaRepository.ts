@@ -4,7 +4,7 @@ class MediaRepository {
   async read(id: number) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT ID, name, type, original_name, poster, synopsis, duration,
-              released_at, overall_rating, original_language, pegi, status
+              released_at, overall_rating, original_language, pegi, status, is_anime
        FROM media
        WHERE ID = ?`,
       [id],

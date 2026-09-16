@@ -64,8 +64,10 @@ function SerieDetail() {
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
       <Breadcrumb
         currentLabel={serieDetail.name}
-        categoryLabel="Séries"
-        categoryPath="/catalog?type=tv"
+        categoryLabel={serieDetail.isAnime ? "Animés" : "Séries"}
+        categoryPath={
+          serieDetail.isAnime ? "/catalog?type=anime" : "/catalog?type=tv"
+        }
       />
       <SerieHeader serie={serieDetail} />
       <SeasonList seasons={serieDetail.seasons} />

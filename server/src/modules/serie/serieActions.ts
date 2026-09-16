@@ -31,6 +31,7 @@ const read: RequestHandler = async (req, res, next) => {
       id: serie.ID,
       name: serie.name,
       type: serie.type,
+      isAnime: Boolean(serie.is_anime),
       originalName: serie.original_name,
       poster: serie.poster,
       synopsis: serie.synopsis,
