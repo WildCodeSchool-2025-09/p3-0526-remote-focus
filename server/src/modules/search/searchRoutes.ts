@@ -27,7 +27,7 @@ export async function browse(
     return;
   }
 
-  const validTypes = ["movie", "series", "anime"];
+  const validTypes = ["movie", "tv", "anime"];
   if (type && !validTypes.includes(type)) {
     res.status(400).json({ error: "type invalide" });
     return;

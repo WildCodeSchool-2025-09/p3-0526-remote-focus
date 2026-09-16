@@ -19,7 +19,7 @@ function Navbar() {
                  lg:flex-col lg:gap-2 lg:border-t-0 lg:border-r lg:px-4 lg:py-6 lg:max-w-max"
     >
       <NavLink to="/" end className="mb-8 hidden lg:block">
-        <img src={logoFocus} alt="Focus" width={100} />
+        <img src={logoFocus} alt="Focus" width={100} className="mx-auto" />
       </NavLink>
 
       <NavLink to="/" end className={linkClass}>

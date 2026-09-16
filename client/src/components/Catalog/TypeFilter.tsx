@@ -22,10 +22,10 @@ function TypeFilter() {
   function handleFilterChange(filter: string) {
     if (filter === "all") {
       searchParams.delete("type");
-      setSearchParams(searchParams);
     } else {
-      setSearchParams({ type: filter });
+      searchParams.set("type", filter);
     }
+    setSearchParams(searchParams);
   }
 
   return (

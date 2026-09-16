@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
+import TypeFilter from "../components/Catalog/TypeFilter";
 import ActorList from "../components/Search/ActorList";
 import MediaList from "../components/Search/MediaList";
 import { useSearch } from "../contexts/SearchContext";
@@ -33,6 +34,7 @@ const SearchResults = () => {
 
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
+  const activeType = searchParams.get("type") ?? undefined;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies:
   useEffect(() => {
@@ -43,7 +45,18 @@ const SearchResults = () => {
   }, []);
 
   useEffect(() => {
-    setSearchParams(trimmedQuery ? { q: trimmedQuery } : {}, { replace: true });
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        if (trimmedQuery) {
+          next.set("q", trimmedQuery);
+        } else {
+          next.delete("q");
+        }
+        return next;
+      },
+      { replace: true },
+    );
   }, [trimmedQuery, setSearchParams]);
 
   useEffect(() => {
@@ -59,7 +72,7 @@ const SearchResults = () => {
     setLoading(true);
     setError(false);
 
-    searchMedias(trimmedQuery)
+    searchMedias(trimmedQuery, 1, activeType)
       .then((results) => {
         if (!cancelled) {
           setSearchResults(results);
@@ -88,7 +101,7 @@ const SearchResults = () => {
     return () => {
       cancelled = true;
     };
-  }, [trimmedQuery, setHasNoResults]);
+  }, [trimmedQuery, activeType, setHasNoResults]);
 
   const handleClearSearch = () => {
     setSearchQuery("");
@@ -100,7 +113,7 @@ const SearchResults = () => {
     const nextPage = mediaPage + 1;
     setLoadingMoreMedia(true);
 
-    searchMedias(trimmedQuery, nextPage)
+    searchMedias(trimmedQuery, nextPage, activeType)
       .then((results) => {
         setSearchResults((previous) => ({
           ...previous,
@@ -136,6 +149,8 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-base-100 p-8 space-y-6">
+      <TypeFilter />
+
       {loading && <span className="loading loading-spinner text-primary" />}
 
       {!loading && error && (

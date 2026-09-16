@@ -17,7 +17,7 @@ const MediaList = ({ medias }: MediaListProps) => {
           <MediaCard
             key={media.id}
             media={{ ...media, topRank: null, isNew: false }}
-            className="card bg-base-200"
+            className="card"
           />
         ))}
       </div>
