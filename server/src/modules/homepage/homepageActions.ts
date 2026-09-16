@@ -1,20 +1,8 @@
 import type { RequestHandler } from "express";
 import type { EnrichedMedia, Media } from "../../types/Media/Media.types";
 
+import { isMediaNew } from "../catalog/catalogHelpers";
 import HomepageRepository from "./homepageRepository";
-
-const isMediaNew = (releasedAt: Date | string | null): boolean => {
-  if (releasedAt == null) {
-    return false;
-  }
-  const today = new Date();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const releasedAtDate = new Date(releasedAt);
-
-  return releasedAtDate >= thirtyDaysAgo && releasedAtDate <= today;
-};
 
 const enrichMedias = (medias: Media[]): EnrichedMedia[] => {
   return medias.map((media, index) => {

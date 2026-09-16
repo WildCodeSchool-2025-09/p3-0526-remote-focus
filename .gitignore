@@ -6,4 +6,3 @@ node_modules
 !.vscode/settings.json
 !.vscode/extensions.json
 .env
-database/seeds
