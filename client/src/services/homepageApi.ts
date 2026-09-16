@@ -1,4 +1,10 @@
-import type { HomepageData } from "../types/Homepage";
+import type { EnrichedMedia } from "../types/Catalog";
+
+export type HomepageData = {
+  films: EnrichedMedia[];
+  series: EnrichedMedia[];
+  animes: EnrichedMedia[];
+};
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
