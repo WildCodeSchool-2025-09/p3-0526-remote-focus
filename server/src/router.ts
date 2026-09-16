@@ -1,6 +1,6 @@
 import express from "express";
-import homepageActions from "./modules/homepage/homepageActions";
 import actorActions from "./modules/actor/actorActions";
+import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 
 const router = express.Router();

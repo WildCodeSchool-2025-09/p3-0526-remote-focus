@@ -1,7 +1,7 @@
 import request from "supertest";
 
-import app from "../../src/app";
 import databaseClient from "../../database/client";
+import app from "../../src/app";
 
 import type { Rows } from "../../database/client";
 

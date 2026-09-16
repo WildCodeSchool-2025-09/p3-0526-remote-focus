@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { Clapperboard, Sparkles, TvMinimalPlay } from "lucide-react";
+import { useEffect, useState } from "react";
 import Carousel from "../components/Catalog/Carousel";
 import MediaCard from "../components/Catalog/MediaCard";
 import MediaCardLoading from "../components/Catalog/MediaCardLoading";
-import { fetchHomepage, type HomepageData } from "../services/homepageApi";
+import { type HomepageData, fetchHomepage } from "../services/homepageApi";
 
 function Homepage() {
   const [homepageData, setHomepageData] = useState<HomepageData | null>(null);

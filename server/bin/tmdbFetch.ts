@@ -809,7 +809,10 @@ const isAnime = (detail: TvDetail): boolean =>
   (detail.genres ?? []).some((genre) => genre.id === ANIMATION_GENRE_ID) &&
   (detail.origin_country ?? []).includes(ANIME_ORIGIN_COUNTRY);
 
-const fetchTv = async (detail: TvDetail, anime: boolean): Promise<SeedMedia> => {
+const fetchTv = async (
+  detail: TvDetail,
+  anime: boolean,
+): Promise<SeedMedia> => {
   let synopsis = orNull(detail.overview);
 
   if (!synopsis) {
@@ -867,11 +870,7 @@ const collectTvShows = async (
 ): Promise<SeedMedia[]> => {
   // 1. Les fiches des candidats, en parallèle. Une boucle séquentielle
   //    n'utiliserait qu'un seul créneau de concurrence sur les dix.
-  const details = await mapWithProgress(
-    "Fiches",
-    candidateIds,
-    fetchTvDetail,
-  );
+  const details = await mapWithProgress("Fiches", candidateIds, fetchTvDetail);
 
   // 2. Filtrage, en conservant l'ordre de popularité de /discover.
   const selected: TvDetail[] = [];
@@ -963,7 +962,10 @@ const fetchPersons = async (): Promise<SeedPerson[]> => {
  * TMDB plafonne la pagination à 500 pages.
  */
 const pagesFor = (count: number, alreadyKnown: number) =>
-  Math.min(500, Math.ceil(((count + alreadyKnown) / 20) * DISCOVER_PAGE_FACTOR));
+  Math.min(
+    500,
+    Math.ceil(((count + alreadyKnown) / 20) * DISCOVER_PAGE_FACTOR),
+  );
 
 const main = async () => {
   const startedAt = Date.now();
