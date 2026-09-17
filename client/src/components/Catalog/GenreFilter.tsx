@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { fetchGenres } from "../../services/catalogService";
 import type { Genre } from "../../types/media";
 import Carousel from "./Carousel";
+import MediaCardLoading from "./MediaCardLoading";
 
 function GenreFilter() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -26,11 +26,53 @@ function GenreFilter() {
       });
   }, []);
 
+  function handleGenre(genreId: number) {
+    setSelectedGenres((currentSelectedGenres) => {
+      if (currentSelectedGenres.includes(genreId)) {
+        return currentSelectedGenres.filter((id) => id !== genreId);
+      }
+
+      return [...currentSelectedGenres, genreId];
+    });
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="carousel flex">
+          {Array.from({ length: 10 }, (_, index) => index + 1).map(
+            (loadingId) => (
+              <MediaCardLoading key={loadingId} />
+            ),
+          )}
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="m-12">
+        Une erreur est survenue lors du chargement du catalogue. Merci
+        d'actualiser la page.
+      </p>
+    );
+  }
+
   return (
     <div>
       <Carousel>
         {genres.map((genre) => (
-          <button type="button" key={genre.id} className="btn-genre-pill">
+          <button
+            type="button"
+            key={genre.id}
+            className={
+              selectedGenres.includes(genre.id)
+                ? "btn-genre-pill-active"
+                : "btn-genre-pill"
+            }
+            onClick={() => handleGenre(genre.id)}
+          >
             {genre.name}
           </button>
         ))}
