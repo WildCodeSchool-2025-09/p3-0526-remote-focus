@@ -54,7 +54,7 @@ const readDiscoverSections: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const browse: RequestHandler = async (req, res, next) => {
+const browse: RequestHandler = async (req, res, next) => {
   try {
     const requestedType = req.query.type;
     const requestedGenre = req.query.genre?.toString();
@@ -89,15 +89,33 @@ export const browse: RequestHandler = async (req, res, next) => {
       res.status(400).json({ error: "Invalid genre ID" });
       return;
     }
-    res.json({
+
+    const medias = await catalogRepository.readByFilters(
       type,
       genreIds,
       limit,
       offset,
+    );
+    const total = await catalogRepository.countByFilters(type, genreIds);
+    const totalPages = Math.ceil(total / limit);
+    const enrichedMedia = enrichRanking(medias);
+
+    res.json({
+      medias: enrichedMedia,
+      pagination: { total, page, limit, totalPages },
     });
   } catch (err) {
     next(err);
   }
 };
 
-export default { readDiscoverSections, browse };
+const browseGenres: RequestHandler = async (req, res, next) => {
+  try {
+    const genreList = await catalogRepository.readGenres();
+    res.json({ genreList });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { readDiscoverSections, browse, browseGenres };

@@ -1,3 +1,4 @@
+import type { RowDataPacket } from "mysql2";
 import databaseClient from "../../../database/client";
 
 import type { Media } from "../../types/Media/Media.types";
@@ -98,13 +99,28 @@ ${GENRE_NAME}
   async countByFilters(
     type: "movie" | "tv" | "anime" | null,
     genreIds: number[] | null,
-  ): Promise<Media[]> {
-    const [rows] = await databaseClient.query<Media[]>(
+  ): Promise<number> {
+    const genrePlaceHolders = genreIds
+      ? genreIds.map(() => "?").join(", ")
+      : "";
+    const [rows] = await databaseClient.query<
+      (RowDataPacket & { total: number })[]
+    >(
       `SELECT COUNT(DISTINCT m.ID) AS total
       FROM media AS m
       JOIN classify_as ON m.ID = classify_as.ID_media
-      WHERE ${MEDIA_TYPE}`,
-      [],
+      WHERE ${MEDIA_TYPE} 
+      ${genreIds ? `AND (classify_as.ID_genre IN (${genrePlaceHolders}))` : ""}`,
+      [type, type, type, type, ...(genreIds ?? [])],
+    );
+    return rows[0].total;
+  }
+
+  async readGenres() {
+    const [rows] = await databaseClient.query(
+      `SELECT ID AS id, name
+    FROM genre 
+    ORDER BY name`,
     );
     return rows;
   }

@@ -1,101 +1,114 @@
-import { afterEach, describe, expect, it, jest, test } from "@jest/globals";
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import supertest from "supertest";
 import databaseClient from "../../database/client";
 import type { Rows } from "../../database/client";
 import app from "../../src/app";
-import {
-  enrichRanking,
-  isMediaNew,
-} from "../../src/modules/catalog/catalogHelpers";
-import type { Media } from "../../src/types/Media/Media.types";
+import type { RowDataPacket } from "mysql2";
 
 afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe("isMediaNew function", () => {
-  test("Media released today should return true", () => {
-    const today = new Date();
-    expect(isMediaNew(today)).toBe(true);
-  });
-  test("Media released 92 days ago should return false", () => {
-    const ninetyTwoDaysAgo = new Date();
-    ninetyTwoDaysAgo.setDate(ninetyTwoDaysAgo.getDate() - 92);
-    expect(isMediaNew(ninetyTwoDaysAgo)).toBe(false);
-  });
-  test("Media released 58 days ago should return true", () => {
-    const fiftyEightDaysAgo = new Date();
-    fiftyEightDaysAgo.setDate(fiftyEightDaysAgo.getDate() - 58);
-    expect(isMediaNew(fiftyEightDaysAgo)).toBe(true);
-  });
-  test("Media released 90 days ago should return true", () => {
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-    expect(isMediaNew(ninetyDaysAgo)).toBe(true);
-  });
-  test("null param should return false", () => {
-    expect(isMediaNew(null)).toBe(false);
-  });
-});
-
-describe("enrichRanking function", () => {
-  test("First media should have topRank top3 and isNew true", () => {
-    const media1 = {
-      id: 1,
-      tmdbId: 23,
-      name: "Media1",
-      type: "type1",
-      releasedAt: "2026-09-15",
-      duration: 120,
-      poster: "poster.png",
-      synopsis: "synopsis of Media1",
-      overallRating: 9.7,
-      status: "Finished",
-      originalName: "",
-      originalLanguage: "",
-      pegi: "",
-      isAnime: false,
-      genreName: "",
-    } as Media;
-    const media2 = {
-      id: 2,
-      tmdbId: 45,
-      name: "Media2",
-      type: "type1",
-      releasedAt: "2026-09-14",
-      duration: 65,
-      poster: "poster.png",
-      synopsis: "synopsis of Media2",
-      overallRating: 8.9,
-      status: "Finished",
-      originalName: "",
-      originalLanguage: "",
-      pegi: "16",
-      isAnime: true,
-      genreName: "",
-    } as Media;
-    const medias = [media1, media2];
-    const enrichedMedias = enrichRanking(medias);
-    expect(enrichedMedias[0].topRank).toBe("top3");
-    expect(enrichedMedias[0].isNew).toBe(true);
-  });
-});
-
-describe("GET api/medias/discover", () => {
+describe("GET api/medias", () => {
   it("should return error : 400 on invalid type", async () => {
-    const response = await supertest(app).get(
-      "/api/medias/discover?type=fdsfdsd",
-    );
+    const response = await supertest(app).get("/api/medias?type=fdsfdsd");
+    expect(response.status).toBe(400);
+  });
+  it("should return error : 400 on invalid page", async () => {
+    const response = await supertest(app).get("/api/medias?page=0");
+    expect(response.status).toBe(400);
+  });
+  it("should return error : 400 on invalid genre", async () => {
+    const response = await supertest(app).get("/api/medias?genre=fdsqfd");
     expect(response.status).toBe(400);
   });
   it("should return http 200 status on valid type", async () => {
+    jest
+      .spyOn(databaseClient, "query")
+      .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([
+        [{ total: 0 } as RowDataPacket & { total: number }],
+        [],
+      ]);
+    const response = await supertest(app).get("/api/medias?type=movie");
+    expect(response.status).toBe(200);
+  });
+  it("should return 3 pages for 31 medias on valid type", async () => {
+    jest
+      .spyOn(databaseClient, "query")
+      .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([
+        [{ total: 31 } as RowDataPacket & { total: number }],
+        [],
+      ]);
+
+    const response = await supertest(app).get("/api/medias?type=anime");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body.pagination.total).toBe(31);
+    expect(response.body.pagination.page).toBe(1);
+    expect(response.body.pagination.limit).toBe(15);
+    expect(response.body.pagination.totalPages).toBe(3);
+  });
+  it("should pass on valid page request", async () => {
+    jest
+      .spyOn(databaseClient, "query")
+      .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([
+        [{ total: 31 } as RowDataPacket & { total: number }],
+        [],
+      ]);
+    const response = await supertest(app).get("/api/medias?type=movie&page=2");
+    expect(response.status).toBe(200);
+    expect(response.body.pagination.page).toBe(2);
+    expect(response.body.pagination.totalPages).toBe(3);
+  });
+  it("should pass on multiple genres requested", async () => {
+    jest
+      .spyOn(databaseClient, "query")
+      .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([
+        [{ total: 31 } as RowDataPacket & { total: number }],
+        [],
+      ]);
+    const response = await supertest(app).get("/api/medias?genre=2,5,8");
+    expect(response.status).toBe(200);
+  });
+  it("should pass multiple genres to the database", async () => {
+    const queryMock = jest
+      .spyOn(databaseClient, "query")
+      .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([
+        [{ total: 10 } as RowDataPacket & { total: number }],
+        [],
+      ]);
+
+    const response = await supertest(app).get("/api/medias?genre=2,5,8");
+
+    expect(response.status).toBe(200);
+
+    expect(queryMock).toHaveBeenNthCalledWith(1, expect.any(String), [
+      null,
+      null,
+      null,
+      null,
+      2,
+      5,
+      8,
+      15,
+      0,
+    ]);
+  });
+});
+describe("GET api/genres", () => {
+  it("should return http 200 status with valid datas", async () => {
     const rows = [] as Rows;
     jest
       .spyOn(databaseClient, "query")
       .mockImplementation(async () => [rows, []]);
-    const response = await supertest(app).get(
-      "/api/medias/discover?type=movie",
-    );
+    const response = await supertest(app).get("/api/genres");
     expect(response.status).toBe(200);
+    expect(response.body.genreList).toEqual([]);
   });
 });
