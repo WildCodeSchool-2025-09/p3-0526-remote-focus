@@ -1,4 +1,5 @@
 import type { DiscoverResponse } from "../types/Catalog";
+import type { Genre } from "../types/media";
 
 function fetchDiscover(
   type?: "movie" | "tv" | "anime",
@@ -15,4 +16,16 @@ function fetchDiscover(
   });
 }
 
-export default fetchDiscover;
+async function fetchGenres(): Promise<Genre[]> {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/genres`);
+
+  if (!response.ok) {
+    throw new Error(`${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return data.genreList;
+}
+
+export { fetchDiscover, fetchGenres };

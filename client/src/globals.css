@@ -128,6 +128,13 @@
   .carousel-nav-disabled {
     @apply flex-shrink-0 w-10 h-10 rounded-full border border-base-content/10 bg-base-100 text-base-content/30 flex items-center justify-center transition-colors;
   }
+  .btn-genre-pill {
+    @apply btn rounded-full border border-focus-cream/30 px-4 py-2 text-sm bg-focus-void;
+  }
+
+  .btn-genre-pill:hover {
+    @apply rounded-full border border-focus-yellow bg-focus-yellow px-4 py-2 text-sm font-semibold text-focus-void;
+  }
 }
 
 /* ================================================================== *
