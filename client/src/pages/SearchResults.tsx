@@ -96,7 +96,7 @@ const SearchResults = () => {
   const hasResults = allMedias.length > 0 || results.actors.length > 0;
 
   return (
-    <div className="min-h-screen bg-base-100 p-8 space-y-6">
+    <div className="space-y-6">
       <TypeFilter />
 
       {loading && <span className="loading loading-spinner text-primary" />}
