@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
 import TypeFilter from "../components/Catalog/TypeFilter";
@@ -7,35 +7,21 @@ import ActorList from "../components/Search/ActorList";
 import MediaList from "../components/Search/MediaList";
 import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
-import { searchMedias } from "../services/api";
-import type { SearchResults as SearchResultsType } from "../types/search";
+import useMediaSearch, { MIN_QUERY_LENGTH } from "../hooks/useMediaSearch";
 
 const DEBOUNCE_DELAY_MS = 400;
-const MIN_QUERY_LENGTH = 2;
-
-const emptyResults: SearchResultsType = {
-  films: [],
-  series: [],
-  animes: [],
-  actors: [],
-  hasMore: false,
-};
 
 const SearchResults = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { searchQuery, setSearchQuery, setHasNoResults } = useSearch();
-  const [searchResults, setSearchResults] =
-    useState<SearchResultsType>(emptyResults);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [mediaPage, setMediaPage] = useState(1);
-  const [loadingMoreMedia, setLoadingMoreMedia] = useState(false);
-  const searchGeneration = useRef(0);
 
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
   const activeType = searchParams.get("type") ?? undefined;
+
+  const { results, loading, loadingMore, error, hasMore, loadMore } =
+    useMediaSearch(trimmedQuery, activeType);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate le contexte depuis l'URL une seule fois au montage, pas à chaque frappe
   useEffect(() => {
@@ -61,49 +47,28 @@ const SearchResults = () => {
   }, [trimmedQuery, setSearchParams]);
 
   useEffect(() => {
-    searchGeneration.current += 1;
-    setMediaPage(1);
-
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
-      setSearchResults(emptyResults);
       setHasNoResults(false);
       return;
     }
 
-    let cancelled = false;
-    setLoading(true);
-    setError(false);
+    if (loading) {
+      return;
+    }
 
-    searchMedias(trimmedQuery, 1, activeType)
-      .then((results) => {
-        if (!cancelled) {
-          setSearchResults(results);
+    if (error) {
+      setHasNoResults(false);
+      return;
+    }
 
-          const noMatches =
-            results.films.length === 0 &&
-            results.series.length === 0 &&
-            results.animes.length === 0 &&
-            results.actors.length === 0;
+    const noMatches =
+      results.films.length === 0 &&
+      results.series.length === 0 &&
+      results.animes.length === 0 &&
+      results.actors.length === 0;
 
-          setHasNoResults(noMatches);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
-          setHasNoResults(false);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [trimmedQuery, activeType, setHasNoResults]);
+    setHasNoResults(noMatches);
+  }, [trimmedQuery, loading, error, results, setHasNoResults]);
 
   const handleClearSearch = () => {
     setSearchQuery("");
@@ -111,39 +76,12 @@ const SearchResults = () => {
     navigate("/catalog");
   };
 
-  const handleLoadMoreMedia = () => {
-    const nextPage = mediaPage + 1;
-    const generationAtStart = searchGeneration.current;
-    setLoadingMoreMedia(true);
-
-    searchMedias(trimmedQuery, nextPage, activeType)
-      .then((results) => {
-        if (searchGeneration.current !== generationAtStart) {
-          return;
-        }
-        setSearchResults((previous) => ({
-          ...previous,
-          films: [...previous.films, ...results.films],
-          series: [...previous.series, ...results.series],
-          animes: [...previous.animes, ...results.animes],
-          hasMore: results.hasMore,
-        }));
-        setMediaPage(nextPage);
-      })
-      .catch(() => {
-        if (searchGeneration.current === generationAtStart) {
-          setError(true);
-        }
-      })
-      .finally(() => setLoadingMoreMedia(false));
-  };
-
   const trimmedLower = trimmedQuery.toLowerCase();
 
   const allMedias = [
-    ...searchResults.films,
-    ...searchResults.series,
-    ...searchResults.animes,
+    ...results.films,
+    ...results.series,
+    ...results.animes,
   ].sort((a, b) => {
     const aStartsWithQuery = a.name.toLowerCase().startsWith(trimmedLower);
     const bStartsWithQuery = b.name.toLowerCase().startsWith(trimmedLower);
@@ -155,7 +93,7 @@ const SearchResults = () => {
     return a.name.localeCompare(b.name);
   });
 
-  const hasResults = allMedias.length > 0 || searchResults.actors.length > 0;
+  const hasResults = allMedias.length > 0 || results.actors.length > 0;
 
   return (
     <div className="min-h-screen bg-base-100 p-8 space-y-6">
@@ -192,18 +130,18 @@ const SearchResults = () => {
 
       {!loading && !error && hasResults && (
         <div className="space-y-8">
-          <ActorList actors={searchResults.actors} />
+          <ActorList actors={results.actors} />
           <MediaList medias={allMedias} />
 
-          {searchResults.hasMore && (
+          {hasMore && (
             <div className="flex justify-center">
               <button
                 type="button"
-                onClick={handleLoadMoreMedia}
-                disabled={loadingMoreMedia}
+                onClick={loadMore}
+                disabled={loadingMore}
                 className="btn-cta-pill"
               >
-                {loadingMoreMedia ? "Chargement…" : "Voir plus"}
+                {loadingMore ? "Chargement…" : "Voir plus"}
               </button>
             </div>
           )}
