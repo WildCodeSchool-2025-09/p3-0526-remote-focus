@@ -130,7 +130,11 @@
   }
 
   .btn-cta-pill {
-    @apply btn btn-outline btn-warning rounded-full;
+    @apply btn rounded-full border border-focus-yellow bg-transparent text-focus-yellow transition-colors;
+  }
+
+  .btn-cta-pill:hover {
+    @apply bg-focus-yellow text-focus-void;
   }
 }
 
