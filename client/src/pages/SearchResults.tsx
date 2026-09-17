@@ -8,7 +8,7 @@ import MediaList from "../components/Search/MediaList";
 import { useSearch } from "../contexts/SearchContext";
 import useDebounce from "../hooks/useDebounce";
 import { searchMedias } from "../services/api";
-import type { SearchResults as SearchResultsType } from "../types/Search";
+import type { SearchResults as SearchResultsType } from "../types/search";
 
 const DEBOUNCE_DELAY_MS = 400;
 const MIN_QUERY_LENGTH = 2;

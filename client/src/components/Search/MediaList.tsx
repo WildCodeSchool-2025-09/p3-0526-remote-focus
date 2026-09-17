@@ -1,4 +1,4 @@
-import type { Media } from "../../types/Search";
+import type { Media } from "../../types/search";
 import MediaCard from "../Catalog/MediaCard";
 
 type MediaListProps = {

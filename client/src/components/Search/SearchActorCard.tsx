@@ -1,4 +1,4 @@
-import type { Person } from "../../types/Search";
+import type { Person } from "../../types/search";
 
 type SearchActorCardProps = {
   person: Person;
