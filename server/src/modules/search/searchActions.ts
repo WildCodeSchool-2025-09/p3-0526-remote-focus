@@ -1,59 +1,42 @@
-import type { Media } from "../../types/Media/Media.types";
-import {
-  countMediaByTitle,
-  findMediaByTitle,
-  findPersonByName,
-} from "./searchRepository";
+import type { NextFunction, Request, Response } from "express";
+import type { SearchResult } from "./searchHelpers";
+import { browseResults } from "./searchHelpers";
 
-interface PersonDto {
-  id: number;
-  name: string;
-  photo: string | null;
-}
+const MIN_QUERY_LENGTH = 2;
 
-export interface SearchResult {
-  films: Media[];
-  series: Media[];
-  animes: Media[];
-  actors: PersonDto[];
-  hasMore: boolean;
-}
+const emptyResult: SearchResult = {
+  films: [],
+  series: [],
+  animes: [],
+  actors: [],
+  hasMore: false,
+};
 
-export async function browseResults(
-  q: string,
-  type: string | undefined,
-  page: number,
-  limit: number,
-): Promise<SearchResult> {
-  const offset = (page - 1) * limit;
+export async function browse(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  const q = (req.query.q as string)?.trim();
+  const type = req.query.type as string | undefined;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 20;
 
-  const [mediaRows, personRows, totalMedia] = await Promise.all([
-    findMediaByTitle(q, type, limit, offset),
-    findPersonByName(q, limit, 0),
-    countMediaByTitle(q, type),
-  ]);
-
-  const films: Media[] = [];
-  const series: Media[] = [];
-  const animes: Media[] = [];
-
-  for (const media of mediaRows) {
-    if (media.isAnime) animes.push(media);
-    else if (media.type === "movie") films.push(media);
-    else if (media.type === "tv") series.push(media);
+  if (!q || q.length < MIN_QUERY_LENGTH) {
+    res.status(200).json(emptyResult);
+    return;
   }
 
-  const actors: PersonDto[] = personRows.map((p) => ({
-    id: p.id,
-    name: p.name,
-    photo: p.photo,
-  }));
+  const validTypes = ["movie", "tv", "anime"];
+  if (type && !validTypes.includes(type)) {
+    res.status(400).json({ error: "type invalide" });
+    return;
+  }
 
-  return {
-    films,
-    series,
-    animes,
-    actors,
-    hasMore: offset + mediaRows.length < totalMedia,
-  };
+  try {
+    const data = await browseResults(q, type, page, limit);
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
 }
