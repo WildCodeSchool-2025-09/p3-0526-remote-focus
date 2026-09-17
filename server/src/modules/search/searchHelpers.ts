@@ -1,9 +1,5 @@
 import type { Media } from "../../types/Media/Media.types";
-import {
-  countMediaByTitle,
-  findMediaByTitle,
-  findPersonByName,
-} from "./searchRepository";
+import searchRepository from "./searchRepository";
 
 interface PersonDto {
   id: number;
@@ -28,9 +24,9 @@ export async function browseResults(
   const offset = (page - 1) * limit;
 
   const [mediaRows, personRows, totalMedia] = await Promise.all([
-    findMediaByTitle(q, type, limit, offset),
-    findPersonByName(q, limit, 0),
-    countMediaByTitle(q, type),
+    searchRepository.findMediaByTitle(q, type, limit, offset),
+    searchRepository.findPersonByName(q, limit, 0),
+    searchRepository.countMediaByTitle(q, type),
   ]);
 
   const films: Media[] = [];
