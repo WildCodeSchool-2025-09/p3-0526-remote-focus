@@ -1,5 +1,6 @@
 import express from "express";
 import actorActions from "./modules/actor/actorActions";
+import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 
 const router = express.Router();
@@ -14,6 +15,7 @@ import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 
+router.get("/api/medias/home", homepageActions.browseHomepage);
 /*
 router.get("/api/items", itemActions.browse);
 router.get("/api/items/:id", itemActions.read);

@@ -12,6 +12,7 @@ import "dotenv/config";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import zlib from "node:zlib";
 
 /* ================================================================== *
  * 1. CONFIGURATION
@@ -27,14 +28,30 @@ const FALLBACK_LANG = "en-US";
 const REGION = "FR";
 
 /** Nombre de médias à récupérer par catégorie. */
-const COUNTS = { movies: 10, series: 10, animes: 10 };
+/**
+ * Nombre de médias à AJOUTER à chaque run. Si un dump existe déjà,
+ * ceux qu'il contient sont ignorés et le script va chercher les
+ * suivants par ordre de popularité.
+ */
+const COUNTS = { movies: 300, series: 300, animes: 300 };
+
+/**
+ * Marge de candidats demandés à /discover. Beaucoup sont écartés :
+ * animés mélangés aux séries, séries trop longues, fiches incomplètes.
+ * 3 = on récupère trois fois plus de candidats que nécessaire.
+ */
+const DISCOVER_PAGE_FACTOR = 3;
 
 /** ID du genre "Animation" chez TMDB (ce n'est PAS un âge). */
 const ANIMATION_GENRE_ID = 16;
 const ANIME_ORIGIN_COUNTRY = "JP";
 
-/** Acteurs max par média. Infinity = tout le cast. */
-const CAST_LIMIT = Number.POSITIVE_INFINITY;
+/**
+ * Acteurs max par média. Infinity = tout le cast.
+ * Le plafond a un effet en cascade : moins d'acteurs retenus, donc
+ * moins de fiches personne à télécharger, donc un run bien plus court.
+ */
+const CAST_LIMIT = 20;
 
 /** Récupérer la biographie de chaque personne (1 requête par personne). */
 const FETCH_PERSON_DETAILS = true;
@@ -45,7 +62,7 @@ const FETCH_PERSON_DETAILS = true;
  */
 type EpisodeCastMode = "all" | "guests";
 
-const EPISODE_CAST_MODE = "all" as EpisodeCastMode;
+const EPISODE_CAST_MODE = "guests" as EpisodeCastMode;
 
 /** Écarte les séries fleuves (One Piece, Détective Conan…). */
 const MAX_EPISODES_PER_MEDIA = 200;
@@ -61,7 +78,12 @@ const CONCURRENCY = 10;
 const MAX_RETRIES = 4;
 
 const CACHE_DIR = path.join(__dirname, "../database/.tmdb-cache");
-const OUTPUT_FILE = path.join(__dirname, "../database/seeds/tmdb.json");
+/**
+ * Le dump est compressé : le JSON brut dépasse les limites de GitHub
+ * à cette volumétrie, et gzip le divise par huit environ.
+ * tmdbSeed.ts le décompresse en mémoire.
+ */
+const OUTPUT_FILE = path.join(__dirname, "../database/seeds/tmdb.json.gz");
 
 /* ================================================================== *
  * 2. TYPES
@@ -525,6 +547,41 @@ const dateOrNull = (value: string | null | undefined): string | null =>
 const platforms = new Map<number, SeedPlatform>();
 const personIds = new Set<number>();
 
+/* --- Dump existant --------------------------------------------------- *
+ * Le script est cumulatif : à chaque run, il repart du dump déjà produit,
+ * écarte les médias qu'il contient et ajoute COUNTS nouveaux titres.
+ * Supprimer tmdb.json.gz pour repartir de zéro.
+ */
+
+const loadExisting = (): SeedFile | null => {
+  if (!fs.existsSync(OUTPUT_FILE)) return null;
+
+  try {
+    const compressed = fs.readFileSync(OUTPUT_FILE);
+
+    return JSON.parse(zlib.gunzipSync(compressed).toString("utf8"));
+  } catch (error) {
+    console.error("Dump existant illisible, on repart de zéro.", error);
+    return null;
+  }
+};
+
+const existing = loadExisting();
+
+/** Clé d'unicité d'un média : films et séries partagent leur numérotation. */
+const mediaKey = (type: string, tmdbId: number) => `${type}:${tmdbId}`;
+
+const knownMedia = new Set(
+  (existing?.medias ?? []).map((media) => mediaKey(media.type, media.tmdb_id)),
+);
+
+const knownPersons = new Set(
+  (existing?.persons ?? []).map((person) => person.tmdb_id),
+);
+
+const isKnownMovie = (id: number) => knownMedia.has(mediaKey("movie", id));
+const isKnownTv = (id: number) => knownMedia.has(mediaKey("tv", id));
+
 /** Ne conserve que les acteurs, dans la limite de CAST_LIMIT. */
 const toCredits = (cast: CastMember[] | undefined): SeedCredit[] => {
   if (!cast) return [];
@@ -771,13 +828,12 @@ const fetchTv = async (
     .filter((number) => INCLUDE_SEASON_ZERO || number > 0)
     .sort((a, b) => a - b);
 
-  const seasons: SeedSeason[] = [];
-
-  for (const number of seasonNumbers) {
-    const season = await fetchSeason(detail.id, number);
-
-    if (season) seasons.push(season);
-  }
+  // En parallèle : le limiteur global de concurrence fait le garde-fou.
+  const seasons = (
+    await Promise.all(
+      seasonNumbers.map((number) => fetchSeason(detail.id, number)),
+    )
+  ).filter((season): season is SeedSeason => season !== null);
 
   return {
     tmdb_id: detail.id,
@@ -812,38 +868,49 @@ const collectTvShows = async (
   count: number,
   wantAnime: boolean,
 ): Promise<SeedMedia[]> => {
-  const medias: SeedMedia[] = [];
+  // 1. Les fiches des candidats, en parallèle. Une boucle séquentielle
+  //    n'utiliserait qu'un seul créneau de concurrence sur les dix.
+  const details = await mapWithProgress("Fiches", candidateIds, fetchTvDetail);
 
-  for (const id of candidateIds) {
-    if (medias.length >= count) break;
+  // 2. Filtrage, en conservant l'ordre de popularité de /discover.
+  const selected: TvDetail[] = [];
+  let skippedTooLong = 0;
 
-    const detail = await fetchTvDetail(id);
-
+  for (const detail of details) {
+    if (selected.length >= count) break;
     if (!detail) continue;
-
-    const anime = isAnime(detail);
-
-    if (anime !== wantAnime) continue;
+    if (isKnownTv(detail.id)) continue;
+    if (isAnime(detail) !== wantAnime) continue;
 
     if ((detail.number_of_episodes ?? 0) > MAX_EPISODES_PER_MEDIA) {
-      console.info(
-        `  ↷ ${detail.name} écarté (${detail.number_of_episodes} épisodes)`,
-      );
+      skippedTooLong += 1;
       continue;
     }
 
-    console.info(`  → ${detail.name}`);
-
-    medias.push(await fetchTv(detail, anime));
+    selected.push(detail);
   }
 
-  return medias;
+  if (skippedTooLong > 0) {
+    console.info(`  ↷ ${skippedTooLong} série(s) écartée(s) : trop d'épisodes`);
+  }
+
+  if (selected.length < count) {
+    console.warn(
+      `  ⚠ ${selected.length}/${count} seulement — augmentez DISCOVER_PAGE_FACTOR`,
+    );
+  }
+
+  // 3. Saisons et épisodes, en parallèle également.
+  return mapWithProgress("Saisons", selected, (detail) =>
+    fetchTv(detail, wantAnime),
+  );
 };
 
 /* --- Personnes ---------------------------------------------------------- */
 
 const fetchPersons = async (): Promise<SeedPerson[]> => {
-  const ids = [...personIds];
+  // Les fiches déjà présentes dans le dump ne sont pas retéléchargées.
+  const ids = [...personIds].filter((id) => !knownPersons.has(id));
 
   if (!FETCH_PERSON_DETAILS) {
     return ids.map((id) => ({
@@ -889,8 +956,39 @@ const fetchPersons = async (): Promise<SeedPerson[]> => {
  * 6. ORCHESTRATION
  * ================================================================== */
 
+/**
+ * Nombre de pages /discover à demander pour obtenir `count` médias.
+ * 20 résultats par page, multiplié par la marge de candidats.
+ * TMDB plafonne la pagination à 500 pages.
+ */
+const pagesFor = (count: number, alreadyKnown: number) =>
+  Math.min(
+    500,
+    Math.ceil(((count + alreadyKnown) / 20) * DISCOVER_PAGE_FACTOR),
+  );
+
 const main = async () => {
   const startedAt = Date.now();
+
+  // Ce qui est déjà en stock, par catégorie : sert à calculer la
+  // profondeur de pagination nécessaire pour trouver du nouveau.
+  const previous = existing?.medias ?? [];
+  const knownCounts = {
+    movies: previous.filter((media) => media.type === "movie").length,
+    series: previous.filter((media) => media.type === "tv" && !media.is_anime)
+      .length,
+    animes: previous.filter((media) => media.type === "tv" && media.is_anime)
+      .length,
+  };
+
+  if (existing) {
+    console.info(
+      `Dump existant : ${previous.length} média(s), ${existing.persons.length} personne(s)`,
+    );
+    console.info(
+      `On y ajoute ${COUNTS.movies} film(s), ${COUNTS.series} série(s), ${COUNTS.animes} animé(s)\n`,
+    );
+  }
 
   console.info("① Genres");
   const genres = await fetchGenres();
@@ -899,18 +997,28 @@ const main = async () => {
   const movieIds = await discover(
     "/discover/movie",
     { "vote_count.gte": 300 },
-    2,
+    pagesFor(COUNTS.movies, knownCounts.movies),
   );
 
+  const newMovieIds = movieIds
+    .filter((id) => !isKnownMovie(id))
+    .slice(0, COUNTS.movies);
+
+  if (newMovieIds.length < COUNTS.movies) {
+    console.warn(
+      `  ⚠ ${newMovieIds.length}/${COUNTS.movies} seulement — augmentez DISCOVER_PAGE_FACTOR`,
+    );
+  }
+
   const movies = (
-    await mapWithProgress("Films", movieIds.slice(0, COUNTS.movies), fetchMovie)
+    await mapWithProgress("Films", newMovieIds, fetchMovie)
   ).filter((movie): movie is SeedMedia => movie !== null);
 
   console.info("③ Séries (animés exclus)");
   const seriesCandidates = await discover(
     "/discover/tv",
     { "vote_count.gte": 100 },
-    3,
+    pagesFor(COUNTS.series, knownCounts.series),
   );
   const series = await collectTvShows(seriesCandidates, COUNTS.series, false);
 
@@ -921,23 +1029,67 @@ const main = async () => {
       with_genres: ANIMATION_GENRE_ID,
       with_origin_country: ANIME_ORIGIN_COUNTRY,
     },
-    3,
+    pagesFor(COUNTS.animes, knownCounts.animes),
   );
   const animes = await collectTvShows(animeCandidates, COUNTS.animes, true);
 
-  console.info(`⑤ Personnes (${personIds.size} uniques)`);
+  console.info(`⑤ Personnes (${personIds.size} référencées)`);
   const persons = await fetchPersons();
+
+  /* --- Fusion avec le dump existant --------------------------------- *
+   * Les entrées existantes sont conservées en tête, les nouvelles
+   * ajoutées à la suite. Cet ordre garantit que les id auto-incrémentés
+   * générés au seed restent identiques d'un run à l'autre : une fiche
+   * déjà en base ne change pas d'identifiant quand le catalogue grandit.
+   */
+
+  const mergeById = <T extends { tmdb_id: number }>(
+    before: T[],
+    after: T[],
+  ): T[] => {
+    const byId = new Map<number, T>();
+
+    for (const item of [...before, ...after]) {
+      if (!byId.has(item.tmdb_id)) byId.set(item.tmdb_id, item);
+    }
+
+    return [...byId.values()];
+  };
+
+  const newMedias = [...movies, ...series, ...animes];
+
+  const allMedias: SeedMedia[] = [...previous];
+  const seenMedia = new Set(
+    previous.map((media) => mediaKey(media.type, media.tmdb_id)),
+  );
+
+  for (const media of newMedias) {
+    const key = mediaKey(media.type, media.tmdb_id);
+
+    if (seenMedia.has(key)) continue;
+
+    seenMedia.add(key);
+    allMedias.push(media);
+  }
 
   const output: SeedFile = {
     generated_at: new Date().toISOString(),
-    genres,
-    platforms: [...platforms.values()],
-    persons,
-    medias: [...movies, ...series, ...animes],
+    genres: mergeById(existing?.genres ?? [], genres),
+    platforms: mergeById(existing?.platforms ?? [], [...platforms.values()]),
+    persons: mergeById(existing?.persons ?? [], persons),
+    medias: allMedias,
   };
 
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2), "utf8");
+
+  // Pas d'indentation : le fichier n'est pas destiné à être lu à l'œil,
+  // et gzip travaille sur du contenu plus compact.
+  const raw = Buffer.from(JSON.stringify(output), "utf8");
+  const compressed = zlib.gzipSync(raw, { level: 9 });
+
+  fs.writeFileSync(OUTPUT_FILE, compressed);
+
+  const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
 
   const seasonCount = output.medias.reduce(
     (total, media) => total + media.seasons.length,
@@ -954,11 +1106,14 @@ const main = async () => {
   console.info(`
 ✔ Terminé en ${Math.round((Date.now() - startedAt) / 1000)}s
   Requêtes API : ${requestCount}
-  Médias       : ${output.medias.length} (${movies.length} films, ${series.length} séries, ${animes.length} animés)
+  Ajoutés      : ${newMedias.length} média(s), ${persons.length} personne(s)
+  ─────────────
+  Médias       : ${output.medias.length}
   Saisons      : ${seasonCount}
   Épisodes     : ${episodeCount}
-  Personnes    : ${persons.length}
+  Personnes    : ${output.persons.length}
   Plateformes  : ${output.platforms.length}
+  Poids        : ${mb(compressed.length)} compressé (${mb(raw.length)} brut)
   Fichier      : ${OUTPUT_FILE}
 `);
 };
