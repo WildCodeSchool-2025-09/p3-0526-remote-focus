@@ -3,10 +3,12 @@ import { fetchGenres } from "../../services/catalogService";
 import type { Genre } from "../../types/media";
 import Carousel from "./Carousel";
 import MediaCardLoading from "./MediaCardLoading";
+import { useSearchParams } from "react-router";
 
 function GenreFilter() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+  //   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -26,14 +28,24 @@ function GenreFilter() {
       });
   }, []);
 
-  function handleGenre(genreId: number) {
-    setSelectedGenres((currentSelectedGenres) => {
-      if (currentSelectedGenres.includes(genreId)) {
-        return currentSelectedGenres.filter((id) => id !== genreId);
-      }
+  console.log(
+    searchParams
+      .get("genre")
+      ?.split(",")
+      .map((genreParam) => Number(genreParam)),
+  );
 
-      return [...currentSelectedGenres, genreId];
-    });
+  function handleGenre(genreId: number) {
+    const urlGenres: number[] =
+      searchParams
+        .get("genre")
+        ?.split(",")
+        .map((genreParam) => Number(genreParam)) ?? [];
+    const updatedGenres = urlGenres.includes(genreId)
+      ? urlGenres.filter((id) => id !== genreId)
+      : [...urlGenres, genreId];
+
+    setSearchParams({ genre: updatedGenres.join(",") });
   }
 
   if (isLoading) {
@@ -66,11 +78,11 @@ function GenreFilter() {
           <button
             type="button"
             key={genre.id}
-            className={
-              selectedGenres.includes(genre.id)
-                ? "btn-genre-pill-active"
-                : "btn-genre-pill"
-            }
+            // className={
+            //   selectedGenres.includes(genre.id)
+            //     ? "btn-genre-pill-active"
+            //     : "btn-genre-pill"
+            // }
             onClick={() => handleGenre(genre.id)}
           >
             {genre.name}
