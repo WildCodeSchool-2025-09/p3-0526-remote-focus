@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import mediaRepository from "../media/mediaRepository";
+import seasonRepository from "./seasonRepository";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ const readEpisodes: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const episodes = await mediaRepository.readEpisodes(id);
+    const episodes = await seasonRepository.readEpisodes(id);
 
     res.json(
       episodes.map((episode) => ({
@@ -36,7 +36,7 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const season = await mediaRepository.readSeason(id);
+    const season = await seasonRepository.read(id);
 
     if (season == null) {
       res.sendStatus(404);
@@ -44,9 +44,9 @@ const read: RequestHandler = async (req, res, next) => {
     }
 
     const [episodes, cast, duration] = await Promise.all([
-      mediaRepository.readEpisodes(id),
-      mediaRepository.readSeasonCast(id),
-      mediaRepository.readSeasonDuration(id),
+      seasonRepository.readEpisodes(id),
+      seasonRepository.readCast(id),
+      seasonRepository.readDuration(id),
     ]);
 
     res.json({
