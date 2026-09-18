@@ -1,28 +1,41 @@
+import { Fragment } from "react";
 import { Link } from "react-router";
 
-type BreadcrumbProps = {
-  currentLabel: string;
+type BreadcrumbItem = {
+  label: string;
+  to?: string;
 };
 
-function Breadcrumb({ currentLabel }: BreadcrumbProps) {
+type BreadcrumbProps = {
+  items: BreadcrumbItem[];
+};
+
+function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav
       aria-label="Fil d'Ariane"
       className="flex flex-wrap items-center gap-2 text-sm text-[#9FB4BD]"
     >
-      <Link to="/" className="hover:text-[#F5F5F0]">
-        Accueil
-      </Link>
-      <span className="text-[#5E7079]">›</span>
-      <Link to="/catalog" className="hover:text-[#F5F5F0]">
-        Catalogue
-      </Link>
-      <span className="text-[#5E7079]">›</span>
-      <Link to="/catalog?type=movie" className="hover:text-[#F5F5F0]">
-        Films
-      </Link>
-      <span className="text-[#5E7079]">›</span>
-      <span className="font-medium text-[#F2B705]">{currentLabel}</span>
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+
+        return (
+          <Fragment key={item.label}>
+            {item.to != null && !isLast ? (
+              <Link to={item.to} className="hover:text-[#F5F5F0]">
+                {item.label}
+              </Link>
+            ) : (
+              <span
+                className={isLast ? "font-medium text-[#F2B705]" : undefined}
+              >
+                {item.label}
+              </span>
+            )}
+            {!isLast && <span className="text-[#5E7079]">›</span>}
+          </Fragment>
+        );
+      })}
     </nav>
   );
 }
