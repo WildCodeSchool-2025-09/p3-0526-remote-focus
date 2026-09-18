@@ -5,7 +5,7 @@ import TypeFilter from "../components/Catalog/TypeFilter";
 function Catalog() {
   return (
     <>
-      <h1>Catalogue</h1>
+      <h1 className="hidden">Catalogue</h1>
 
       <TypeFilter />
       <GenreFilter />

@@ -30,7 +30,7 @@ function TypeFilter() {
   }
 
   return (
-    <search className="flex gap-8 border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10">
+    <search className="flex gap-8 border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10 text-xs md:text-base">
       <button
         type="button"
         className={getButtonClasses("all")}
