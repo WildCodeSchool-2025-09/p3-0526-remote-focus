@@ -1,6 +1,16 @@
 import databaseClient, { type Rows } from "../../../database/client";
 
 class ActorRepository {
+  async read(id: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT ID, name, photo, biography
+       FROM person
+       WHERE ID = ?`,
+      [id],
+    );
+    return rows[0] ?? null;
+  }
+
   async readFilmography(personId: number, excludeMediaId: number) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT m.ID, m.name, m.poster, m.type, m.released_at,
