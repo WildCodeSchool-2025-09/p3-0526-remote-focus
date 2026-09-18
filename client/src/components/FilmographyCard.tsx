@@ -1,10 +1,10 @@
 import type { FilmographyItem } from "../types/media";
 
-type MediaCardProps = {
+type FilmographyCardProps = {
   item: FilmographyItem;
 };
 
-function MediaCard({ item }: MediaCardProps) {
+function FilmographyCard({ item }: FilmographyCardProps) {
   return (
     <div className="flex w-[120px] shrink-0 flex-col gap-2 md:w-[170px]">
       {item.poster != null ? (
@@ -24,5 +24,4 @@ function MediaCard({ item }: MediaCardProps) {
     </div>
   );
 }
-
-export default MediaCard;
+export default FilmographyCard;

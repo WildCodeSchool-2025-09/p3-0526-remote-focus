@@ -3,14 +3,15 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
-import MovieHeader from "../components/movie/MovieHeader";
-import { fetchMedia } from "../services/api";
-import type { Media } from "../types/media";
+import SeasonList from "../components/serie/SeasonList";
+import SerieHeader from "../components/serie/SerieHeader";
+import { fetchSerie } from "../services/api";
+import type { Serie } from "../types/media";
 
-function MovieDetail() {
+function SerieDetail() {
   const { id } = useParams();
 
-  const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
+  const [serieDetail, setSerieDetail] = useState<Serie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
@@ -25,15 +26,15 @@ function MovieDetail() {
     setLoading(true);
     setError(null);
 
-    fetchMedia(Number(id))
+    fetchSerie(Number(id))
       .then((data) => {
         if (active) {
-          setMediaDetail(data);
+          setSerieDetail(data);
         }
       })
       .catch(() => {
         if (active) {
-          setError("Ce film est introuvable.");
+          setError("Cette série est introuvable.");
         }
       })
       .finally(() => {
@@ -55,29 +56,32 @@ function MovieDetail() {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
 
-  if (error != null || mediaDetail == null) {
+  if (error != null || serieDetail == null) {
     return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
-  }
-
-  if (mediaDetail.type !== "movie") {
-    return <p className="p-8 text-focus-muted">Ce média n'est pas un film.</p>;
   }
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
-      <Breadcrumb currentLabel={mediaDetail.name} />
-      <MovieHeader media={mediaDetail} />
+      <Breadcrumb
+        currentLabel={serieDetail.name}
+        categoryLabel={serieDetail.isAnime ? "Animés" : "Séries"}
+        categoryPath={
+          serieDetail.isAnime ? "/catalog?type=anime" : "/catalog?type=tv"
+        }
+      />
+      <SerieHeader serie={serieDetail} />
+      <SeasonList seasons={serieDetail.seasons} />
       <CastList
-        cast={mediaDetail.cast}
-        castTotal={mediaDetail.castTotal}
+        cast={serieDetail.cast}
+        castTotal={serieDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={mediaDetail.id} />
+        <KnownFrom personId={selectedPersonId} mediaId={serieDetail.id} />
       )}
     </div>
   );
 }
 
-export default MovieDetail;
+export default SerieDetail;
