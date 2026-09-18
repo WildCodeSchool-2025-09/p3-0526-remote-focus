@@ -46,7 +46,7 @@ function MediaCard({
   } else if (media.isAnime) {
     urlDetails = "animes";
   } else if (media.type === "tv") {
-    urlDetails = "tv";
+    urlDetails = "series";
   }
 
   const linkTo = urlDetails ? `/${urlDetails}/${media.id}` : "/catalogue";

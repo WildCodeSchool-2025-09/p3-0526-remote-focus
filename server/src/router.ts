@@ -2,12 +2,16 @@ import express from "express";
 import actorActions from "./modules/actor/actorActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
+import * as searchActions from "./modules/search/searchActions";
+import seasonActions from "./modules/season/seasonActions";
+import serieActions from "./modules/serie/serieActions";
 
 const router = express.Router();
 
 /* ************************************************************************* */
 // Define Your API Routes Here
 /* ************************************************************************* */
+router.get("/api/medias/search", searchActions.browse);
 
 // Define item-related routes
 /* import itemActions from "./modules/item/itemActions.old";*/
@@ -25,6 +29,8 @@ router.post("/api/items", itemActions.add);
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/actors/:id", actorActions.read);
+router.get("/api/series/:id", serieActions.read);
+router.get("/api/seasons/:id/episodes", seasonActions.readEpisodes);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
 export default router;

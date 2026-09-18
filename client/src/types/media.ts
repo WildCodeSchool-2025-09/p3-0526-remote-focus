@@ -53,3 +53,48 @@ export type PersonDetail = {
   photo: string | null;
   biography: string | null;
 };
+
+export type Season = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  poster: string | null;
+  releasedAt: string | null;
+  synopsis: string | null;
+  isFinished: boolean;
+  episodeCount: number;
+};
+
+export type Episode = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  releasedAt: string | null;
+  synopsis: string | null;
+  duration: number | null;
+};
+
+export type Serie = {
+  id: number;
+  name: string;
+  type: string;
+  isAnime: boolean;
+  originalName: string | null;
+  poster: string | null;
+  synopsis: string | null;
+  status: string | null;
+  releasedAt: string | null;
+  overallRating: string | null;
+  originalLanguage: string | null;
+  pegi: string | null;
+  totalDuration: number | null;
+  averageEpisodeDuration: number | null;
+  episodeCount: number;
+  seasons: Season[];
+  genres: Genre[];
+  platforms: Platform[];
+  cast: CastMember[];
+  castTotal: number;
+  userStatus: string | null;
+  userRating: number | null;
+};
