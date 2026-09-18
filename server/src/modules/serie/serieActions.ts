@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import mediaRepository from "../media/mediaRepository";
+import seasonRepository from "../season/seasonRepository";
 
 const read: RequestHandler = async (req, res, next) => {
   try {
@@ -23,8 +24,8 @@ const read: RequestHandler = async (req, res, next) => {
         mediaRepository.readPlatforms(id),
         mediaRepository.readCast(id),
         mediaRepository.countCast(id),
-        mediaRepository.readSeasons(id),
-        mediaRepository.readDurations(id),
+        seasonRepository.readByMedia(id),
+        seasonRepository.readDurationByMedia(id),
       ]);
 
     res.json({
