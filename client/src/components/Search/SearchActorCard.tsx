@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { Person } from "../../types/search";
 
 type SearchActorCardProps = {
@@ -6,7 +7,10 @@ type SearchActorCardProps = {
 
 const SearchActorCard = ({ person }: SearchActorCardProps) => {
   return (
-    <div className="carousel-item flex w-24 shrink-0 flex-col items-center gap-2 text-center">
+    <Link
+      to={`/actors/${person.id}`}
+      className="carousel-item flex w-24 shrink-0 flex-col items-center gap-2 text-center"
+    >
       {person.photo != null ? (
         <img
           src={`https://image.tmdb.org/t/p/w185${person.photo}`}
@@ -21,7 +25,7 @@ const SearchActorCard = ({ person }: SearchActorCardProps) => {
       <span className="text-sm font-medium leading-snug line-clamp-2">
         {person.name}
       </span>
-    </div>
+    </Link>
   );
 };
 
