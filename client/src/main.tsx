@@ -9,6 +9,7 @@ import Homepage from "./pages/Homepage";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import SerieDetail from "./pages/SerieDetail";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,14 @@ const router = createBrowserRouter([
       {
         path: "movies/:id",
         element: <MovieDetail />,
+      },
+      {
+        path: "series/:id",
+        element: <SerieDetail />,
+      },
+      {
+        path: "animes/:id",
+        element: <SerieDetail />,
       },
     ],
   },
