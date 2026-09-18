@@ -8,7 +8,6 @@ import { useSearchParams } from "react-router";
 function GenreFilter() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
-  //   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -28,24 +27,24 @@ function GenreFilter() {
       });
   }, []);
 
-  console.log(
+  const urlGenres: number[] =
     searchParams
       .get("genre")
       ?.split(",")
-      .map((genreParam) => Number(genreParam)),
-  );
+      .map((genreParam) => Number(genreParam)) ?? [];
 
   function handleGenre(genreId: number) {
-    const urlGenres: number[] =
-      searchParams
-        .get("genre")
-        ?.split(",")
-        .map((genreParam) => Number(genreParam)) ?? [];
     const updatedGenres = urlGenres.includes(genreId)
       ? urlGenres.filter((id) => id !== genreId)
       : [...urlGenres, genreId];
 
-    setSearchParams({ genre: updatedGenres.join(",") });
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    updatedGenres.length > 0
+      ? newSearchParams.set("genre", updatedGenres.join(","))
+      : newSearchParams.delete("genre");
+
+    setSearchParams(newSearchParams);
   }
 
   if (isLoading) {
@@ -78,11 +77,11 @@ function GenreFilter() {
           <button
             type="button"
             key={genre.id}
-            // className={
-            //   selectedGenres.includes(genre.id)
-            //     ? "btn-genre-pill-active"
-            //     : "btn-genre-pill"
-            // }
+            className={
+              urlGenres.includes(genre.id)
+                ? "btn-genre-pill-active"
+                : "btn-genre-pill"
+            }
             onClick={() => handleGenre(genre.id)}
           >
             {genre.name}
