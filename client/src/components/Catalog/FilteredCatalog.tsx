@@ -66,8 +66,8 @@ function FilteredCatalog() {
     );
   }
 
-  if (!medias) {
-    return null;
+  if (medias.length === 0) {
+    return <p className="m-12">Aucun média ne correspond à votre recherche</p>;
   }
 
   return (
@@ -77,7 +77,7 @@ function FilteredCatalog() {
           key={media.id}
           media={media}
           className={"catalog-carousel-item w-48 lg:w-60"}
-          showTypeIcon={true}
+          showTypeIcon={!type}
           showGenre={false}
         />
       ))}

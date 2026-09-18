@@ -95,7 +95,7 @@ function GenreFilter() {
         <button
           type="button"
           onClick={handleClearGenre}
-          className="absolute inset-x-0 top-full mt-1 text-center text-sm hover:underline"
+          className="absolute inset-x-0 top-full mt-1 text-center text-sm hover:underline hover:text-focus-cream text-focus-muted-dark"
         >
           Réinitialiser les genres et revenir au catalogue général
         </button>
