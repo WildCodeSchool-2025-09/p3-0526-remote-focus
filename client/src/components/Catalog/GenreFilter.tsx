@@ -97,7 +97,7 @@ function GenreFilter() {
           onClick={handleClearGenre}
           className="absolute inset-x-0 top-full mt-1 text-center text-sm hover:underline"
         >
-          Réinitialiser les genres
+          Réinitialiser les genres et revenir au catalogue général
         </button>
       ) : null}
     </div>

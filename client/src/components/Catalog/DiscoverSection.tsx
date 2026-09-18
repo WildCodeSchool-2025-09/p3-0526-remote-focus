@@ -4,11 +4,7 @@ import { fetchDiscover } from "../../services/catalogService";
 import type { DiscoverResponse } from "../../types/Catalog";
 import MediaCardLoading from "./MediaCardLoading";
 import MediaSection from "./MediaSection";
-
-type MediaType = "movie" | "tv" | "anime";
-function isValidMediaType(type: string): type is MediaType {
-  return ["movie", "tv", "anime"].includes(type);
-}
+import { isValidMediaType } from "../../hooks/catalogUtils";
 
 function DiscoverSection() {
   const [searchParams] = useSearchParams();

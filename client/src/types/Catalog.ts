@@ -21,6 +21,8 @@ export type EnrichedMedia = Media & {
   isNew: boolean;
 };
 
+export type MediaType = "movie" | "tv" | "anime";
+
 export type GenreSection = {
   id: number;
   name: string;
