@@ -1,4 +1,7 @@
-import type { DiscoverResponse } from "../types/Catalog";
+import type {
+  DiscoverResponse,
+  PaginatedMediaResponse,
+} from "../types/Catalog";
 import type { Genre } from "../types/media";
 
 function fetchDiscover(
@@ -32,7 +35,7 @@ async function fetchPaginateMedias(
   genres: number[],
   type?: "movie" | "tv" | "anime",
   page?: number,
-) {
+): Promise<PaginatedMediaResponse> {
   const params = new URLSearchParams();
   let urlRequested = `${import.meta.env.VITE_API_URL}/api/medias`;
   if (genres.length > 0) {

@@ -47,6 +47,12 @@ function GenreFilter() {
     setSearchParams(newSearchParams);
   }
 
+  function handleClearGenre() {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete("genre");
+    setSearchParams(newSearchParams);
+  }
+
   if (isLoading) {
     return (
       <>
@@ -69,25 +75,31 @@ function GenreFilter() {
       </p>
     );
   }
-
+  const pillClasses = (isActive: boolean) =>
+    `${isActive ? "btn-genre-pill-active" : "btn-genre-pill"} !min-h-0 !h-8 !px-3 !py-1`;
   return (
-    <div>
+    <div className="relative">
       <Carousel>
         {genres.map((genre) => (
           <button
             type="button"
             key={genre.id}
-            className={
-              urlGenres.includes(genre.id)
-                ? "btn-genre-pill-active"
-                : "btn-genre-pill"
-            }
+            className={pillClasses(urlGenres.includes(genre.id))}
             onClick={() => handleGenre(genre.id)}
           >
             {genre.name}
           </button>
         ))}
       </Carousel>
+      {urlGenres.length > 0 ? (
+        <button
+          type="button"
+          onClick={handleClearGenre}
+          className="absolute inset-x-0 top-full mt-1 text-center text-sm hover:underline"
+        >
+          Réinitialiser les genres
+        </button>
+      ) : null}
     </div>
   );
 }
