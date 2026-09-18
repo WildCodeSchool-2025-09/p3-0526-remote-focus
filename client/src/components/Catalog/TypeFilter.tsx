@@ -20,12 +20,13 @@ function TypeFilter() {
   }
 
   function handleFilterChange(filter: string) {
+    const newSearchParams = new URLSearchParams(searchParams);
     if (filter === "all") {
-      searchParams.delete("type");
+      newSearchParams.delete("type");
     } else {
-      searchParams.set("type", filter);
+      newSearchParams.set("type", filter);
     }
-    setSearchParams(searchParams);
+    setSearchParams(newSearchParams);
   }
 
   return (

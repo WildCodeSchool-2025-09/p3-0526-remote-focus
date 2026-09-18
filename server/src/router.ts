@@ -18,6 +18,8 @@ router.get("/api/medias/search", searchActions.browse);
 import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
+router.get("/api/medias", catalogActions.browse);
+router.get("/api/genres", catalogActions.browseGenres);
 
 router.get("/api/medias/home", homepageActions.browseHomepage);
 /*

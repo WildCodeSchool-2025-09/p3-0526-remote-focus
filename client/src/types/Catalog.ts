@@ -33,7 +33,24 @@ export type DiscoverResponse = {
   genreSections: GenreSection[];
 };
 
+export type Pagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type PaginatedMediaResponse = {
+  medias: EnrichedMedia[];
+  pagination: Pagination;
+};
+
 export type LikedGenre = {
   id: number;
   name: string;
 };
+
+export interface Genre {
+  id: number;
+  name: string;
+}
