@@ -12,6 +12,7 @@ import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import SerieDetail from "./pages/SerieDetail";
+import Register from "./pages/Register";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "animes/:id",
         element: <SerieDetail />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },

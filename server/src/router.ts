@@ -2,9 +2,13 @@ import express from "express";
 import actorActions from "./modules/actor/actorActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
+<<<<<<< HEAD
 import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
+=======
+import userActions from "./modules/user/userActions";
+>>>>>>> US-AUTH-01
 
 const router = express.Router();
 
@@ -13,14 +17,15 @@ const router = express.Router();
 /* ************************************************************************* */
 router.get("/api/medias/search", searchActions.browse);
 
-// Define item-related routes
-/* import itemActions from "./modules/item/itemActions.old";*/
 import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
+<<<<<<< HEAD
 router.get("/api/medias", catalogActions.browse);
 router.get("/api/genres", catalogActions.browseGenres);
 
+=======
+>>>>>>> US-AUTH-01
 router.get("/api/medias/home", homepageActions.browseHomepage);
 /*
 router.get("/api/items", itemActions.browse);
@@ -33,5 +38,7 @@ router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/series/:id", serieActions.read);
 router.get("/api/seasons/:id/episodes", seasonActions.readEpisodes);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+
+router.post("/api/users", userActions.add);
 
 export default router;
