@@ -1,5 +1,7 @@
 import { type FormEvent, useRef, useState } from "react";
 
+import { registerUser } from "../services/authApi";
+
 function RegisterForm() {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -10,9 +12,14 @@ function RegisterForm() {
   const passwordConfirmationRef = useRef<HTMLInputElement>(null);
 
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    setError(null);
+    setSuccessMessage(null);
 
     if (
       firstNameRef.current === null ||
@@ -26,6 +33,8 @@ function RegisterForm() {
       setError("Impossible de récupérer les champs du formulaire.");
       return;
     }
+
+    const form = event.currentTarget;
 
     const firstName = firstNameRef.current.value.trim();
     const lastName = lastNameRef.current.value.trim();
@@ -52,15 +61,26 @@ function RegisterForm() {
       return;
     }
 
-    setError(null);
+    setIsLoading(true);
 
-    console.log("Formulaire valide", {
-      firstName,
-      lastName,
-      bornAt,
-      login,
-      email,
-    });
+    try {
+      const data = await registerUser({
+        firstName,
+        lastName: lastName === "" ? null : lastName,
+        email,
+        bornAt,
+        login,
+        password,
+      });
+
+      setSuccessMessage(`Compte créé avec l'identifiant ${data.insertId}.`);
+
+      form.reset();
+    } catch {
+      setError("Impossible de créer le compte.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -159,9 +179,13 @@ function RegisterForm() {
         />
       </div>
 
-      {error !== null && <p>{error}</p>}
+      {error !== null && <p role="alert">{error}</p>}
 
-      <button type="submit">Créer mon compte</button>
+      {successMessage !== null && <output>{successMessage}</output>}
+
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? "Création en cours..." : "Créer mon compte"}
+      </button>
     </form>
   );
 }
