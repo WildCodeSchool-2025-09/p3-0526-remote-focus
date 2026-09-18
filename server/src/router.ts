@@ -2,6 +2,7 @@ import express from "express";
 import actorActions from "./modules/actor/actorActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
+import userActions from "./modules/user/userActions";
 
 const router = express.Router();
 
@@ -9,12 +10,9 @@ const router = express.Router();
 // Define Your API Routes Here
 /* ************************************************************************* */
 
-// Define item-related routes
-/* import itemActions from "./modules/item/itemActions.old";*/
 import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
-
 router.get("/api/medias/home", homepageActions.browseHomepage);
 /*
 router.get("/api/items", itemActions.browse);
@@ -25,5 +23,7 @@ router.post("/api/items", itemActions.add);
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+
+router.post("/api/users", userActions.add);
 
 export default router;
