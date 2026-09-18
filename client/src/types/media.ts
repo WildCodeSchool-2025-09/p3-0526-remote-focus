@@ -46,3 +46,10 @@ export type FilmographyItem = {
   releasedAt: string | null;
   characterName: string | null;
 };
+
+export type PersonDetail = {
+  id: number;
+  name: string;
+  photo: string | null;
+  biography: string | null;
+};
