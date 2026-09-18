@@ -24,6 +24,7 @@ router.post("/api/items", itemActions.add);
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
+router.get("/api/actors/:id", actorActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
 export default router;
