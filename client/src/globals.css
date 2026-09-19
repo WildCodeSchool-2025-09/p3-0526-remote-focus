@@ -144,6 +144,13 @@
   .btn-genre-pill-active:hover {
     @apply rounded-full border border-focus-coral bg-focus-coral text-xs font-semibold text-focus-cream;
   }
+  .btn-cta-pill {
+    @apply btn rounded-full border border-focus-yellow bg-transparent text-focus-yellow transition-colors;
+  }
+
+  .btn-cta-pill:hover {
+    @apply bg-focus-yellow text-focus-void;
+  }
 }
 
 /* ================================================================== *
