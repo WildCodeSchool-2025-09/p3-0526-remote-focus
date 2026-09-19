@@ -1,8 +1,8 @@
 import { useSearchParams } from "react-router";
 import DiscoverSection from "../components/Catalog/DiscoverSection";
+import FilteredCatalog from "../components/Catalog/FilteredCatalog";
 import GenreFilter from "../components/Catalog/GenreFilter";
 import TypeFilter from "../components/Catalog/TypeFilter";
-import FilteredCatalog from "../components/Catalog/FilteredCatalog";
 
 function Catalog() {
   const [searchParams] = useSearchParams();

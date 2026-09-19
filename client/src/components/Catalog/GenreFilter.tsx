@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { fetchGenres } from "../../services/catalogService";
 import type { Genre } from "../../types/media";
 import Carousel from "./Carousel";
 import MediaCardLoading from "./MediaCardLoading";
-import { useSearchParams } from "react-router";
 
 function GenreFilter() {
   const [searchParams, setSearchParams] = useSearchParams();

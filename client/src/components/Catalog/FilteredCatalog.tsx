@@ -1,16 +1,16 @@
-import { useSearchParams } from "react-router";
-import { getPaginationPages, isValidMediaType } from "../../hooks/catalogUtils";
-import { useEffect, useMemo, useState } from "react";
-import type { EnrichedMedia, Pagination } from "../../types/Catalog";
-import { fetchPaginateMedias } from "../../services/catalogService";
-import MediaCardLoading from "./MediaCardLoading";
-import MediaCard from "./MediaCard";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
+import { getPaginationPages, isValidMediaType } from "../../hooks/catalogUtils";
+import { fetchPaginateMedias } from "../../services/catalogService";
+import type { EnrichedMedia, Pagination } from "../../types/Catalog";
+import MediaCard from "./MediaCard";
+import MediaCardLoading from "./MediaCardLoading";
 
 function FilteredCatalog() {
   const [searchParams, setSearchParams] = useSearchParams();

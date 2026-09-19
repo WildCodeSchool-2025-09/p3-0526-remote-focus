@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, jest } from "@jest/globals";
+import type { RowDataPacket } from "mysql2";
 import supertest from "supertest";
 import databaseClient from "../../database/client";
 import type { Rows } from "../../database/client";
 import app from "../../src/app";
-import type { RowDataPacket } from "mysql2";
 
 afterEach(() => {
   jest.restoreAllMocks();
