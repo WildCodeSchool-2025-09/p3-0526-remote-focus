@@ -83,6 +83,22 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
           <ActionButton label="Vu" color="#17B890" icon={Check} />
+          {season.platforms.length > 0 && (
+            <>
+              <div className="hidden h-12 w-px bg-white/15 md:block" />
+              <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
+                {season.platforms.map((platform) => (
+                  <img
+                    key={platform.id}
+                    src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
+                    alt={platform.name}
+                    title={platform.name}
+                    className="h-8 w-8 rounded object-contain"
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

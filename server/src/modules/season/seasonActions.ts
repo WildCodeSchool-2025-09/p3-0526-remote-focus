@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import seasonRepository from "./seasonRepository";
+import mediaRepository from "../media/mediaRepository";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
@@ -43,10 +44,11 @@ const read: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const [episodes, cast, duration] = await Promise.all([
+    const [episodes, cast, duration, platforms] = await Promise.all([
       seasonRepository.readEpisodes(id),
       seasonRepository.readCast(id),
       seasonRepository.readDuration(id),
+      mediaRepository.readPlatforms(season.ID_media),
     ]);
 
     res.json({
@@ -69,6 +71,12 @@ const read: RequestHandler = async (req, res, next) => {
         originalLanguage: season.original_language,
         isAnime: Boolean(season.is_anime),
       },
+      platforms: platforms.map((platform) => ({
+        id: platform.ID,
+        name: platform.name,
+        logo: platform.logo,
+        url: platform.url,
+      })),
       episodes: episodes.map((episode) => ({
         id: episode.ID,
         name: episode.name,

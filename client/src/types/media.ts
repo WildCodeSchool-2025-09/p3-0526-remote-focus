@@ -112,6 +112,7 @@ export type SeasonDetail = {
   };
   episodes: Episode[];
   cast: CastMember[];
+  platforms: Platform[];
   userStatus: string | null;
   userRating: number | null;
 };
