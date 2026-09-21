@@ -48,7 +48,7 @@ class UserRepository {
           email,
           born_at,
           login,
-          password
+          hashed_password
         )
         VALUES (?, ?, ?, ?, ?, ?)
       `,
@@ -58,7 +58,7 @@ class UserRepository {
         user.email,
         user.bornAt,
         user.login,
-        user.password,
+        user.hashedPassword,
       ],
     );
 

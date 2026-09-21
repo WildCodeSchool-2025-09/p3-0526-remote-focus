@@ -4,5 +4,5 @@ export interface RegisterUserInput {
   email: string;
   bornAt: string;
   login: string;
-  password: string;
+  hashedPassword: string;
 }

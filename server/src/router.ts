@@ -13,6 +13,7 @@ const router = express.Router();
 /* ************************************************************************* */
 
 import catalogActions from "./modules/catalog/catalogActions";
+import hashPassword from "./middlewares/hashPassword";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 router.get("/api/medias/home", homepageActions.browseHomepage);
@@ -26,6 +27,12 @@ router.post("/api/items", itemActions.add);
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
-router.post("/api/users", validateRegister, checkAvailability, userActions.add);
+router.post(
+  "/api/users",
+  validateRegister,
+  checkAvailability,
+  hashPassword,
+  userActions.add,
+);
 
 export default router;
