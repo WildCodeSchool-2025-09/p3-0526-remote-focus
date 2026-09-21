@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
+import ActorFilmography from "../components/actor/ActorFilmography";
 import ActorHeader from "../components/actor/ActorHeader";
 import { fetchPerson } from "../services/api";
 import type { PersonDetail } from "../types/media";
@@ -81,6 +82,7 @@ function ActorDetail() {
       </div>
 
       <ActorHeader person={person} />
+      <ActorFilmography personId={person.id} />
     </div>
   );
 }
