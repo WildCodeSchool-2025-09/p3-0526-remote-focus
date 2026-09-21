@@ -70,7 +70,7 @@ function RegisterForm() {
         password,
       });
 
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
