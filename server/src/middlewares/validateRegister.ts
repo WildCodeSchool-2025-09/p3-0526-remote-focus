@@ -1,7 +1,8 @@
 import type { RequestHandler } from "express";
 
 const validateRegister: RequestHandler = (req, res, next) => {
-  const { firstName, lastName, email, bornAt, login, password } = req.body;
+  const { firstName, lastName, email, bornAt, login, password, genreIds } =
+    req.body;
 
   if (
     typeof firstName !== "string" ||
@@ -30,7 +31,7 @@ const validateRegister: RequestHandler = (req, res, next) => {
     email.trim().length > 255
   ) {
     res.status(400).json({
-      error: "L'adresse email est obligatoire.",
+      error: "L'adresse e-mail est obligatoire.",
     });
     return;
   }
@@ -39,7 +40,7 @@ const validateRegister: RequestHandler = (req, res, next) => {
 
   if (!emailPattern.test(email.trim())) {
     res.status(400).json({
-      error: "Le format de l'adresse email est invalide.",
+      error: "Le format de l'adresse e-mail est invalide.",
     });
     return;
   }
@@ -78,7 +79,21 @@ const validateRegister: RequestHandler = (req, res, next) => {
     password.length > 255
   ) {
     res.status(400).json({
-      error: "Le mot de passe doit contenir au moins 8 caractères.",
+      error: "Le mot de passe doit contenir entre 8 et 255 caractères.",
+    });
+    return;
+  }
+
+  if (
+    !Array.isArray(genreIds) ||
+    genreIds.length === 0 ||
+    !genreIds.every(
+      (genreId: unknown) =>
+        typeof genreId === "number" && Number.isInteger(genreId) && genreId > 0,
+    )
+  ) {
+    res.status(400).json({
+      error: "Sélectionnez au moins un genre valide.",
     });
     return;
   }
@@ -90,6 +105,7 @@ const validateRegister: RequestHandler = (req, res, next) => {
     bornAt,
     login: login.trim(),
     password,
+    genreIds: [...new Set(genreIds)],
   };
 
   next();

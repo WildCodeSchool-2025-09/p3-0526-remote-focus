@@ -7,7 +7,7 @@ const add: RequestHandler = async (req, res, next) => {
   try {
     const newUser: RegisterUserInput = {
       firstName: req.body.firstName,
-      lastName: req.body.lastName === "" ? null : req.body.lastName,
+      lastName: req.body.lastName,
       email: req.body.email,
       bornAt: req.body.bornAt,
       login: req.body.login,
@@ -15,6 +15,8 @@ const add: RequestHandler = async (req, res, next) => {
     };
 
     const insertId = await UserRepository.create(newUser);
+
+    await UserRepository.addLikedGenres(insertId, req.body.genreIds);
 
     res.status(201).json({
       insertId,

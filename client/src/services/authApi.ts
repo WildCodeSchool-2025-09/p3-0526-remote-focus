@@ -5,6 +5,7 @@ export interface RegisterPayload {
   bornAt: string;
   login: string;
   password: string;
+  genreIds: number[];
 }
 
 interface RegisterResponse {

@@ -64,6 +64,7 @@ class UserRepository {
 
     return result.insertId;
   }
+
   async emailExists(email: string): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
       "SELECT ID FROM user_ WHERE email = ? LIMIT 1",
@@ -80,6 +81,26 @@ class UserRepository {
     );
 
     return rows.length > 0;
+  }
+  async addLikedGenres(userId: number, genreIds: number[]): Promise<void> {
+    if (genreIds.length === 0) {
+      return;
+    }
+
+    const placeholders = genreIds.map(() => "(?, ?)").join(", ");
+
+    const values = genreIds.flatMap((genreId) => [userId, genreId]);
+
+    await databaseClient.query<Result>(
+      `
+        INSERT INTO like_ (
+          ID_user,
+          ID_genre
+        )
+        VALUES ${placeholders}
+      `,
+      values,
+    );
   }
 }
 

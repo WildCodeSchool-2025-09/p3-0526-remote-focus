@@ -5,6 +5,7 @@ import mediaActions from "./modules/media/mediaActions";
 import userActions from "./modules/user/userActions";
 import validateRegister from "./middlewares/validateRegister";
 import checkAvailability from "./middlewares/checkAvailability";
+import genreActions from "./modules/genre/genreActions";
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ router.post("/api/items", itemActions.add);
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get("/api/genres", genreActions.browse);
 
 router.post(
   "/api/users",
