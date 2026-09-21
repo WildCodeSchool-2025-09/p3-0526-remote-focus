@@ -91,3 +91,27 @@ export type Serie = {
   userStatus: string | null;
   userRating: number | null;
 };
+
+export type SeasonDetail = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  poster: string | null;
+  hasOwnPoster: boolean;
+  synopsis: string | null;
+  releasedAt: string | null;
+  isFinished: boolean;
+  totalDuration: number | null;
+  episodeCount: number;
+  serie: {
+    id: number;
+    name: string;
+    poster: string | null;
+    originalLanguage: string | null;
+    isAnime: boolean;
+  };
+  episodes: Episode[];
+  cast: CastMember[];
+  userStatus: string | null;
+  userRating: number | null;
+};

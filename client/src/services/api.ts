@@ -1,4 +1,10 @@
-import type { Episode, FilmographyItem, Media, Serie } from "../types/media";
+import type {
+  Episode,
+  FilmographyItem,
+  Media,
+  SeasonDetail,
+  Serie,
+} from "../types/media";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
@@ -27,6 +33,16 @@ export async function fetchEpisodes(seasonId: number): Promise<Episode[]> {
 
   if (!response.ok) {
     throw new Error("Épisodes indisponibles");
+  }
+
+  return response.json();
+}
+
+export async function fetchSeason(id: number): Promise<SeasonDetail> {
+  const response = await fetch(`${API_URL}/api/seasons/${id}`);
+
+  if (!response.ok) {
+    throw new Error(`Saison ${id} introuvable`);
   }
 
   return response.json();
