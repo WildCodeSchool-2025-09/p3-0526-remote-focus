@@ -45,4 +45,27 @@ describe("GET /api/actors/:id", () => {
       biography: "Formé au théâtre...",
     });
   });
+
+  it("should return null fields instead of an error when data is missing", async () => {
+    const rows = [
+      {
+        ID: 2,
+        name: "Gérard Menvussa",
+        photo: null,
+        biography: null,
+      },
+    ] as Rows;
+    jest
+      .spyOn(databaseClient, "query")
+      .mockImplementationOnce(async () => [rows, []]);
+
+    const response = await supertest(app).get("/api/actors/2");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      id: 2,
+      name: "Gérard Menvussa",
+      photo: null,
+      biography: null,
+    });
+  });
 });
