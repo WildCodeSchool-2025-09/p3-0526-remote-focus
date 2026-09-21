@@ -1,3 +1,5 @@
+import type { Media as CatalogMedia } from "./Catalog";
+
 export type Genre = {
   id: number;
   name: string;
@@ -38,13 +40,13 @@ export type Media = {
   userRating: number | null;
 };
 
-export type FilmographyItem = {
-  id: number;
-  name: string;
-  poster: string | null;
-  type: string;
-  releasedAt: string | null;
+export type FilmographyItem = CatalogMedia & {
   characterName: string | null;
+};
+
+export type FilmographyPage = {
+  items: FilmographyItem[];
+  hasMore: boolean;
 };
 
 export type PersonDetail = {
