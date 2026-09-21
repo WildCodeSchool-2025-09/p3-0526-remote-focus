@@ -1,8 +1,8 @@
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import ActionButton from "../components/ActionButton";
 import Breadcrumb from "../components/Breadcrumb";
+import ActorHeader from "../components/actor/ActorHeader";
 import { fetchPerson } from "../services/api";
 import type { PersonDetail } from "../types/media";
 
@@ -80,29 +80,7 @@ function ActorDetail() {
         </button>
       </div>
 
-      <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
-        {person.photo != null ? (
-          <img
-            src={`https://image.tmdb.org/t/p/w500${person.photo}`}
-            alt={person.name}
-            className="h-48 w-32 rounded-lg object-cover md:h-[396px] md:w-[264px]"
-          />
-        ) : (
-          <div className="h-48 w-32 rounded-lg bg-white/10 md:h-[396px] md:w-[264px]" />
-        )}
-
-        <div className="flex min-w-0 flex-col gap-4 md:gap-6">
-          <h1 className="text-2xl font-bold md:text-4xl">{person.name}</h1>
-
-          {person.biography != null && (
-            <p className="max-w-[660px] text-base leading-relaxed text-[#C9D6DB]">
-              {person.biography}
-            </p>
-          )}
-
-          <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-        </div>
-      </div>
+      <ActorHeader person={person} />
     </div>
   );
 }
