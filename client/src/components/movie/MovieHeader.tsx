@@ -25,7 +25,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
   };
 
   return (
-    <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
+    <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
       {media.poster != null && (
         <img
           src={`https://image.tmdb.org/t/p/w500${media.poster}`}

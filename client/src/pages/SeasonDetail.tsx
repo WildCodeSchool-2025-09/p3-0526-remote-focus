@@ -4,6 +4,7 @@ import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
 import { fetchSeason } from "../services/api";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
+import SeasonHeader from "../components/season/SeasonHeader";
 
 function SeasonDetail() {
   const { seasonId } = useParams();
@@ -61,9 +62,7 @@ function SeasonDetail() {
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
-      <h1 className="text-2xl font-bold md:text-4xl">
-        {seasonDetail.serie.name} - Saison {seasonDetail.number}
-      </h1>
+      <SeasonHeader season={seasonDetail} />
       <CastList
         cast={seasonDetail.cast}
         castTotal={seasonDetail.cast.length}
