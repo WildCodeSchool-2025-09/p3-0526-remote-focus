@@ -11,6 +11,10 @@ interface RegisterResponse {
   insertId: number;
 }
 
+interface ApiErrorResponse {
+  error?: string;
+}
+
 export async function registerUser(
   payload: RegisterPayload,
 ): Promise<RegisterResponse> {
@@ -23,7 +27,9 @@ export async function registerUser(
   });
 
   if (!response.ok) {
-    throw new Error("La création du compte a échoué.");
+    const errorData = (await response.json()) as ApiErrorResponse;
+
+    throw new Error(errorData.error ?? "La création du compte a échoué.");
   }
 
   return (await response.json()) as RegisterResponse;

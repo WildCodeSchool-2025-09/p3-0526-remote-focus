@@ -1,3 +1,4 @@
+import type { RowDataPacket } from "mysql2";
 import databaseClient from "../../../database/client";
 
 import type { Result } from "../../../database/client";
@@ -62,6 +63,23 @@ class UserRepository {
     );
 
     return result.insertId;
+  }
+  async emailExists(email: string): Promise<boolean> {
+    const [rows] = await databaseClient.query<RowDataPacket[]>(
+      "SELECT ID FROM user_ WHERE email = ? LIMIT 1",
+      [email],
+    );
+
+    return rows.length > 0;
+  }
+
+  async loginExists(login: string): Promise<boolean> {
+    const [rows] = await databaseClient.query<RowDataPacket[]>(
+      "SELECT ID FROM user_ WHERE login = ? LIMIT 1",
+      [login],
+    );
+
+    return rows.length > 0;
   }
 }
 

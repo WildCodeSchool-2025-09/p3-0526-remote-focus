@@ -1,5 +1,5 @@
 import { type FormEvent, useRef, useState } from "react";
-
+import { useNavigate } from "react-router";
 import { registerUser } from "../services/authApi";
 
 function RegisterForm() {
@@ -12,14 +12,13 @@ function RegisterForm() {
   const passwordConfirmationRef = useRef<HTMLInputElement>(null);
 
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setError(null);
-    setSuccessMessage(null);
 
     if (
       firstNameRef.current === null ||
@@ -33,8 +32,6 @@ function RegisterForm() {
       setError("Impossible de récupérer les champs du formulaire.");
       return;
     }
-
-    const form = event.currentTarget;
 
     const firstName = firstNameRef.current.value.trim();
     const lastName = lastNameRef.current.value.trim();
@@ -64,7 +61,7 @@ function RegisterForm() {
     setIsLoading(true);
 
     try {
-      const data = await registerUser({
+      await registerUser({
         firstName,
         lastName: lastName === "" ? null : lastName,
         email,
@@ -73,11 +70,13 @@ function RegisterForm() {
         password,
       });
 
-      setSuccessMessage(`Compte créé avec l'identifiant ${data.insertId}.`);
-
-      form.reset();
-    } catch {
-      setError("Impossible de créer le compte.");
+      navigate("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Impossible de créer le compte.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -180,8 +179,6 @@ function RegisterForm() {
       </div>
 
       {error !== null && <p role="alert">{error}</p>}
-
-      {successMessage !== null && <output>{successMessage}</output>}
 
       <button type="submit" disabled={isLoading}>
         {isLoading ? "Création en cours..." : "Créer mon compte"}

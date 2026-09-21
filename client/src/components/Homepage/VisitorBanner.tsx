@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 function VisitorBanner() {
   return (
     <section className="mx-auto mt-6 w-[88%] rounded-box bg-base-200 px-5 py-4 md:w-[82%] md:px-6 md:py-5">
@@ -12,9 +14,9 @@ function VisitorBanner() {
           </p>
         </div>
 
-        <button type="button" className="btn btn-primary btn-sm md:btn-md">
+        <Link to="/register" className="btn btn-primary btn-sm md:btn-md">
           Créer mon compte
-        </button>
+        </Link>
       </div>
     </section>
   );
