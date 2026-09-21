@@ -20,10 +20,10 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
     setLoading(true);
     setError(null);
 
-    fetchFilmography(personId, mediaId)
+    fetchFilmography(personId, { excludeMediaId: mediaId })
       .then((data) => {
         if (active) {
-          setItems(data);
+          setItems(data.items);
         }
       })
       .catch(() => {

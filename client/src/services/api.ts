@@ -1,6 +1,6 @@
 import type {
   Episode,
-  FilmographyItem,
+  FilmographyPage,
   Media,
   PersonDetail,
   Serie,
@@ -69,12 +69,23 @@ export async function fetchEpisodes(seasonId: number): Promise<Episode[]> {
   return response.json();
 }
 
+type FetchFilmographyOptions = {
+  page?: number;
+  excludeMediaId?: number;
+};
+
 export async function fetchFilmography(
   personId: number,
-  excludeMediaId: number,
-): Promise<FilmographyItem[]> {
+  { page = 1, excludeMediaId }: FetchFilmographyOptions = {},
+): Promise<FilmographyPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  if (excludeMediaId != null) {
+    params.set("exclude", String(excludeMediaId));
+  }
+
   const response = await fetch(
-    `${API_URL}/api/actors/${personId}/filmography?exclude=${excludeMediaId}`,
+    `${API_URL}/api/actors/${personId}/filmography?${params}`,
   );
 
   if (!response.ok) {
