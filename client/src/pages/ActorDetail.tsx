@@ -1,6 +1,6 @@
-import { Heart } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import ActionButton from "../components/ActionButton";
 import Breadcrumb from "../components/Breadcrumb";
 import { fetchPerson } from "../services/api";
@@ -8,6 +8,7 @@ import type { PersonDetail } from "../types/media";
 
 function ActorDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [person, setPerson] = useState<PersonDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +46,10 @@ function ActorDetail() {
     };
   }, [id]);
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
@@ -55,13 +60,25 @@ function ActorDetail() {
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
-      <Breadcrumb
-        items={[
-          { label: "Accueil", to: "/" },
-          { label: "Catalogue", to: "/catalog" },
-          { label: person.name },
-        ]}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <Breadcrumb
+          items={[
+            { label: "Accueil", to: "/" },
+            { label: "Catalogue", to: "/catalog" },
+            { label: person.name },
+          ]}
+        />
+
+        <button
+          type="button"
+          onClick={handleGoBack}
+          aria-label="Retour"
+          className="flex shrink-0 items-center gap-2 rounded-full border border-white/30 p-2.5 text-sm transition-colors hover:border-[#F2B705] hover:text-[#F2B705] lg:px-4 lg:py-2"
+        >
+          <ArrowLeft size={16} />
+          <span className="hidden lg:inline">Retour</span>
+        </button>
+      </div>
 
       <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
         {person.photo != null ? (
