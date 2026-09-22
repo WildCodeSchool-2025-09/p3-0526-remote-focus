@@ -26,6 +26,7 @@ function TypeFilter() {
     } else {
       newSearchParams.set("type", filter);
     }
+    newSearchParams.delete("page");
     setSearchParams(newSearchParams);
   }
 

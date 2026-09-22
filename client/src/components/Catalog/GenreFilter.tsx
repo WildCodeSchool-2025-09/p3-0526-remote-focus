@@ -44,6 +44,8 @@ function GenreFilter() {
       ? newSearchParams.set("genre", updatedGenres.join(","))
       : newSearchParams.delete("genre");
 
+    newSearchParams.delete("page");
+
     setSearchParams(newSearchParams);
   }
 
