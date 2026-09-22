@@ -59,7 +59,7 @@ function ActorDetail() {
   }
 
   return (
-    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
+    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4">
       <div className="flex items-start justify-between gap-4">
         <Breadcrumb
           items={[

@@ -4,8 +4,8 @@ import useMediaQuery from "../../hooks/useMediaQuery";
 import type { PersonDetail } from "../../types/media";
 
 const WORD_LIMIT_DESKTOP = 150;
-const WORD_LIMIT_MOBILE = 60;
-const WORD_LIMIT_SMALL_MOBILE = 30;
+const WORD_LIMIT_MOBILE = 50;
+const WORD_LIMIT_SMALL_MOBILE = 12;
 
 type ActorInfoProps = {
   person: PersonDetail;
@@ -14,7 +14,7 @@ type ActorInfoProps = {
 function ActorInfo({ person }: ActorInfoProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const isSmallMobile = useMediaQuery("(max-width: 425px)");
+  const isSmallMobile = useMediaQuery("(max-width: 767px)");
 
   if (person.biography == null) {
     return null;
