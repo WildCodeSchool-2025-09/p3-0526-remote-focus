@@ -7,6 +7,16 @@ const WORD_LIMIT_DESKTOP = 150;
 const WORD_LIMIT_MOBILE = 50;
 const WORD_LIMIT_SMALL_MOBILE = 12;
 
+function getWordLimit(isDesktop: boolean, isSmallMobile: boolean): number {
+  if (isDesktop) {
+    return WORD_LIMIT_DESKTOP;
+  }
+  if (isSmallMobile) {
+    return WORD_LIMIT_SMALL_MOBILE;
+  }
+  return WORD_LIMIT_MOBILE;
+}
+
 type ActorInfoProps = {
   person: PersonDetail;
 };
@@ -20,11 +30,7 @@ function ActorInfo({ person }: ActorInfoProps) {
     return null;
   }
 
-  const wordLimit = isDesktop
-    ? WORD_LIMIT_DESKTOP
-    : isSmallMobile
-      ? WORD_LIMIT_SMALL_MOBILE
-      : WORD_LIMIT_MOBILE;
+  const wordLimit = getWordLimit(isDesktop, isSmallMobile);
   const words = person.biography.trim().split(/\s+/);
   const isTruncatable = words.length > wordLimit;
   const displayedText =
