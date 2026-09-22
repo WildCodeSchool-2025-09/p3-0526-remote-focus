@@ -2,12 +2,14 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import type { Season } from "../../types/media";
 import SeasonEpisodes from "./SeasonEpisodes";
+import { Link } from "react-router";
 
 type SeasonListProps = {
   seasons: Season[];
+  serieId: number;
 };
 
-function SeasonList({ seasons }: SeasonListProps) {
+function SeasonList({ seasons, serieId }: SeasonListProps) {
   const [openSeasonId, setOpenSeasonId] = useState<number | null>(null);
   const [visitedSeasonIds, setVisitedSeasonIds] = useState<number[]>([]);
 
@@ -57,6 +59,12 @@ function SeasonList({ seasons }: SeasonListProps) {
               {visitedSeasonIds.includes(season.id) && (
                 <div className={isOpen ? "" : "hidden"}>
                   <SeasonEpisodes seasonId={season.id} />
+                  <Link
+                    to={`/series/${serieId}/seasons/${season.id}`}
+                    className="block border-t border-white/10 px-4 py-3 text-sm text-[#F2B705] hover:underline md:px-6"
+                  >
+                    Voir la saison →
+                  </Link>
                 </div>
               )}
             </div>

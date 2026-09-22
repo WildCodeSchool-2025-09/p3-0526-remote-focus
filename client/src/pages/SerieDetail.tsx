@@ -70,7 +70,7 @@ function SerieDetail() {
         }
       />
       <SerieHeader serie={serieDetail} />
-      <SeasonList seasons={serieDetail.seasons} />
+      <SeasonList seasons={serieDetail.seasons} serieId={serieDetail.id} />
       <CastList
         cast={serieDetail.cast}
         castTotal={serieDetail.castTotal}
