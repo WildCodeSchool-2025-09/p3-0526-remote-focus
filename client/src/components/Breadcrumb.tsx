@@ -15,23 +15,26 @@ function Breadcrumb({
   parentLabel,
   parentPath,
 }: BreadcrumbProps) {
+  const hasParent = parentLabel != null && parentPath != null;
   return (
     <nav
       aria-label="Fil d'Ariane"
       className="flex flex-wrap items-center gap-2 text-sm text-[#9FB4BD]"
     >
-      <Link to="/" className="hover:text-[#F5F5F0]">
-        Accueil
-      </Link>
-      <span className="text-[#5E7079]">›</span>
-      <Link to="/catalog" className="hover:text-[#F5F5F0]">
-        Catalogue
-      </Link>
-      <span className="text-[#5E7079]">›</span>
+      <span className={hasParent ? "hidden md:contents" : "contents"}>
+        <Link to="/" className="hover:text-[#F5F5F0]">
+          Accueil
+        </Link>
+        <span className="text-[#5E7079]">›</span>
+        <Link to="/catalog" className="hover:text-[#F5F5F0]">
+          Catalogue
+        </Link>
+        <span className="text-[#5E7079]">›</span>
+      </span>
       <Link to={categoryPath} className="hover:text-[#F5F5F0]">
         {categoryLabel}
       </Link>
-      {parentLabel != null && parentPath != null && (
+      {hasParent && (
         <>
           <span className="text-[#5E7079]">›</span>
           <Link to={parentPath} className="hover:text-[#F5F5F0]">
