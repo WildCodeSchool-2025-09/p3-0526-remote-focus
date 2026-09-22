@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+import Header from "./components/Header";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -6,7 +7,8 @@ function App() {
     <div className="min-h-screen lg:flex">
       <Navbar />
 
-      <main className="min-h-screen flex-1 p-6 pb-24 lg:pb-6 lg:w-[79dvw]">
+      <main className="min-h-screen flex-1 p-6 pb-24 lg:w-[79dvw] lg:pb-6">
+        <Header />
         <Outlet />
       </main>
     </div>

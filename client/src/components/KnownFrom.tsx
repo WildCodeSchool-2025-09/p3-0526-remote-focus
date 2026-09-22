@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchFilmography } from "../services/api";
 import type { FilmographyItem } from "../types/media";
-import MediaCard from "./MediaCard";
+import FilmographyCard from "./FilmographyCard";
 
 type KnownFromProps = {
   personId: number;
@@ -58,7 +58,7 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
       {items.length > 0 && (
         <div className="flex gap-4 overflow-x-auto pb-2 md:gap-5">
           {items.map((item) => (
-            <MediaCard key={item.id} item={item} />
+            <FilmographyCard key={item.id} item={item} />
           ))}
         </div>
       )}
