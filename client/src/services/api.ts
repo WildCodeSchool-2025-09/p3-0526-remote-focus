@@ -7,7 +7,7 @@ import type {
 } from "../types/media";
 import type { SearchResults } from "../types/search";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
+export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
 const searchMedias = async (
   query: string,
