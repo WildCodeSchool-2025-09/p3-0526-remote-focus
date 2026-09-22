@@ -2,8 +2,8 @@ import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Serie } from "../../types/media";
 import ActionButton from "../ActionButton";
-import SerieInfo from "./SerieInfo";
 import PlatformList from "../PlatformList";
+import SerieInfo from "./SerieInfo";
 
 type SerieHeaderProps = {
   serie: Serie;

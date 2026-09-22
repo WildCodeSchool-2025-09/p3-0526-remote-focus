@@ -3,8 +3,8 @@ import { useState } from "react";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
-import MovieInfo from "./MovieInfo";
 import PlatformList from "../PlatformList";
+import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
   media: Media;

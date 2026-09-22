@@ -1,11 +1,11 @@
 import type { RequestHandler } from "express";
-import mediaRepository from "../media/mediaRepository";
-import seasonRepository from "./seasonRepository";
 import {
   formatCast,
   formatEpisodes,
   formatPlatforms,
 } from "../../utils/formatters";
+import mediaRepository from "../media/mediaRepository";
+import seasonRepository from "./seasonRepository";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
