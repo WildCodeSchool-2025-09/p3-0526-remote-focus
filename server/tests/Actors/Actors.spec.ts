@@ -42,7 +42,7 @@ describe("GET api/actors/:id/known-for", () => {
 
     expect(response.body).toEqual({
       mode: "top-rated",
-      media: [
+      medias: [
         {
           id: 852,
           name: "Berserk",
@@ -112,7 +112,7 @@ describe("GET api/actors/:id/known-for", () => {
 
     expect(res.json).toHaveBeenCalledWith({
       mode: "seen",
-      media: [
+      medias: [
         {
           id: 852,
           name: "Berserk",

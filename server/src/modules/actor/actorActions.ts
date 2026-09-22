@@ -79,7 +79,7 @@ const readKnownFor: RequestHandler = async (req, res, next) => {
 
     res.json({
       mode: userId ? "seen" : "top-rated",
-      media: medias.map((media) => ({
+      medias: medias.map((media) => ({
         id: media.ID,
         name: media.name,
         poster: media.poster,
