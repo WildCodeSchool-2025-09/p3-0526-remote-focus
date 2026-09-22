@@ -1,8 +1,9 @@
 import databaseClient, { type Rows } from "../../../database/client";
+import type { PersonRow } from "../../types/Person/Person.types";
 
 class ActorRepository {
   async read(id: number) {
-    const [rows] = await databaseClient.query<Rows>(
+    const [rows] = await databaseClient.query<PersonRow[]>(
       `SELECT ID, name, photo, biography
        FROM person
        WHERE ID = ?`,
