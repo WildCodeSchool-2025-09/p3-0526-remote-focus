@@ -26,6 +26,7 @@ describe("GET api/medias", () => {
     jest
       .spyOn(databaseClient, "query")
       .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([[], []])
       .mockResolvedValueOnce([
         [{ total: 0 } as RowDataPacket & { total: number }],
         [],
@@ -36,6 +37,7 @@ describe("GET api/medias", () => {
   it("should return 3 pages for 31 medias on valid type", async () => {
     jest
       .spyOn(databaseClient, "query")
+      .mockResolvedValueOnce([[], []])
       .mockResolvedValueOnce([[], []])
       .mockResolvedValueOnce([
         [{ total: 31 } as RowDataPacket & { total: number }],
@@ -55,6 +57,7 @@ describe("GET api/medias", () => {
     jest
       .spyOn(databaseClient, "query")
       .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([[], []])
       .mockResolvedValueOnce([
         [{ total: 31 } as RowDataPacket & { total: number }],
         [],
@@ -68,6 +71,7 @@ describe("GET api/medias", () => {
     jest
       .spyOn(databaseClient, "query")
       .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([[], []])
       .mockResolvedValueOnce([
         [{ total: 31 } as RowDataPacket & { total: number }],
         [],
@@ -79,6 +83,7 @@ describe("GET api/medias", () => {
     const queryMock = jest
       .spyOn(databaseClient, "query")
       .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([[], []])
       .mockResolvedValueOnce([
         [{ total: 10 } as RowDataPacket & { total: number }],
         [],
@@ -88,7 +93,7 @@ describe("GET api/medias", () => {
 
     expect(response.status).toBe(200);
 
-    expect(queryMock).toHaveBeenNthCalledWith(1, expect.any(String), [
+    expect(queryMock).toHaveBeenNthCalledWith(2, expect.any(String), [
       null,
       null,
       null,

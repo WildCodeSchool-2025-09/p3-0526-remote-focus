@@ -52,6 +52,7 @@ function GenreFilter() {
   function handleClearGenre() {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.delete("genre");
+    newSearchParams.delete("page");
     setSearchParams(newSearchParams);
   }
 
