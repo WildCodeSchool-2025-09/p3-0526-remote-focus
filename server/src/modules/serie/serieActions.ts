@@ -25,7 +25,7 @@ const read: RequestHandler = async (req, res, next) => {
         mediaRepository.readCast(id),
         mediaRepository.countCast(id),
         seasonRepository.readByMedia(id),
-        seasonRepository.readDurationByMedia(id),
+        seasonRepository.sumDurationByMedia(id),
       ]);
 
     res.json({

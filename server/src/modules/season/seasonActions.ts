@@ -47,7 +47,7 @@ const read: RequestHandler = async (req, res, next) => {
     const [episodes, cast, duration, platforms] = await Promise.all([
       seasonRepository.readEpisodes(id),
       seasonRepository.readCast(id),
-      seasonRepository.readDuration(id),
+      seasonRepository.sumDuration(id),
       mediaRepository.readPlatforms(season.ID_media),
     ]);
 
