@@ -4,7 +4,7 @@ import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
 import KnownFrom from "../components/KnownFrom";
-import SeasonHeader from "../components/season/SeasonHeader";
+import SeasonHeader from "../components/Season/SeasonHeader";
 import useFetch from "../hooks/useFetch";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
 
