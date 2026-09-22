@@ -1,54 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
 import KnownFrom from "../components/KnownFrom";
 import SeasonHeader from "../components/season/SeasonHeader";
-import { fetchSeason } from "../services/api";
+import useFetch from "../hooks/useFetch";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
 
 function SeasonDetail() {
   const { seriesId, seasonId } = useParams();
 
-  const [seasonDetail, setSeasonDetail] = useState<SeasonDetailType | null>(
-    null,
+  const {
+    data: seasonDetail,
+    loading,
+    error,
+  } = useFetch<SeasonDetailType>(
+    seriesId != null && seasonId != null
+      ? `/api/series/${seriesId}/seasons/${seasonId}`
+      : null,
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (seriesId == null || seasonId == null) {
-      return;
-    }
-
-    let active = true;
-
-    setLoading(true);
-    setError(null);
-
-    fetchSeason(Number(seriesId), Number(seasonId))
-      .then((data) => {
-        if (active) {
-          setSeasonDetail(data);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setError("Cette saison est introuvable.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [seriesId, seasonId]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);
@@ -59,7 +31,9 @@ function SeasonDetail() {
   }
 
   if (error != null || seasonDetail == null) {
-    return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
+    return (
+      <p className="p-8 text-focus-muted">Cette saison est introuvable.</p>
+    );
   }
 
   return (
