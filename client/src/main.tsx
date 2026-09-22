@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         element: <SerieDetail />,
       },
       {
-        path: "series/:id/seasons/:seasonId",
+        path: "series/:seriesId/seasons/:seasonId",
         element: <SeasonDetail />,
       },
       {

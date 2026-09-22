@@ -30,25 +30,26 @@ const readEpisodes: RequestHandler = async (req, res, next) => {
 
 const read: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const seriesId = Number(req.params.id);
+    const seasonId = Number(req.params.seasonId);
 
-    if (Number.isNaN(id)) {
+    if (Number.isNaN(seriesId) || Number.isNaN(seasonId)) {
       res.sendStatus(400);
       return;
     }
 
-    const season = await seasonRepository.read(id);
+    const season = await seasonRepository.read(seasonId);
 
-    if (season == null) {
+    if (season == null || season.ID_media !== seriesId) {
       res.sendStatus(404);
       return;
     }
 
     const [episodes, cast, duration, platforms] = await Promise.all([
-      seasonRepository.readEpisodes(id),
-      seasonRepository.readCast(id),
-      seasonRepository.sumDuration(id),
-      mediaRepository.readPlatforms(season.ID_media),
+      seasonRepository.readEpisodes(seasonId),
+      seasonRepository.readCast(seasonId),
+      seasonRepository.sumDuration(seasonId),
+      mediaRepository.readPlatforms(seriesId),
     ]);
 
     res.json({

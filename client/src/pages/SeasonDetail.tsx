@@ -9,7 +9,7 @@ import { fetchSeason } from "../services/api";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
 
 function SeasonDetail() {
-  const { seasonId } = useParams();
+  const { seriesId, seasonId } = useParams();
 
   const [seasonDetail, setSeasonDetail] = useState<SeasonDetailType | null>(
     null,
@@ -19,7 +19,7 @@ function SeasonDetail() {
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (seasonId == null) {
+    if (seriesId == null || seasonId == null) {
       return;
     }
 
@@ -28,7 +28,7 @@ function SeasonDetail() {
     setLoading(true);
     setError(null);
 
-    fetchSeason(Number(seasonId))
+    fetchSeason(Number(seriesId), Number(seasonId))
       .then((data) => {
         if (active) {
           setSeasonDetail(data);
@@ -48,7 +48,7 @@ function SeasonDetail() {
     return () => {
       active = false;
     };
-  }, [seasonId]);
+  }, [seriesId, seasonId]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);

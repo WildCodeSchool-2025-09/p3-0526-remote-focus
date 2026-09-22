@@ -59,11 +59,16 @@ export async function fetchEpisodes(seasonId: number): Promise<Episode[]> {
   return response.json();
 }
 
-export async function fetchSeason(id: number): Promise<SeasonDetail> {
-  const response = await fetch(`${API_URL}/api/seasons/${id}`);
+export async function fetchSeason(
+  seriesId: number,
+  seasonId: number,
+): Promise<SeasonDetail> {
+  const response = await fetch(
+    `${API_URL}/api/series/${seriesId}/seasons/${seasonId}`,
+  );
 
   if (!response.ok) {
-    throw new Error(`Saison ${id} introuvable`);
+    throw new Error(`Saison ${seasonId} introuvable`);
   }
 
   return response.json();
