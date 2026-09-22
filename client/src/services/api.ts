@@ -5,8 +5,29 @@ import type {
   SeasonDetail,
   Serie,
 } from "../types/media";
+import type { SearchResults } from "../types/search";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
+
+const searchMedias = async (
+  query: string,
+  page = 1,
+  type?: string,
+): Promise<SearchResults> => {
+  const params = new URLSearchParams({ q: query, page: String(page) });
+
+  if (type) {
+    params.set("type", type);
+  }
+
+  const response = await fetch(`${API_URL}/api/medias/search?${params}`);
+
+  if (!response.ok) {
+    throw new Error("la recherche a échoué");
+  }
+
+  return response.json();
+};
 
 export async function fetchMedia(id: number): Promise<Media> {
   const response = await fetch(`${API_URL}/api/medias/${id}`);
@@ -62,3 +83,5 @@ export async function fetchFilmography(
 
   return response.json();
 }
+
+export { searchMedias };
