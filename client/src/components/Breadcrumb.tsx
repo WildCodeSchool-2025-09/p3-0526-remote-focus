@@ -1,49 +1,46 @@
 import { Link } from "react-router";
 
-type BreadcrumbProps = {
-  currentLabel: string;
-  categoryLabel?: string;
-  categoryPath?: string;
-  parentLabel?: string;
-  parentPath?: string;
+type BreadcrumbItem = {
+  label: string;
+  path?: string;
 };
 
-function Breadcrumb({
-  currentLabel,
-  categoryLabel = "Films",
-  categoryPath = "/catalog?type=movie",
-  parentLabel,
-  parentPath,
-}: BreadcrumbProps) {
-  const hasParent = parentLabel != null && parentPath != null;
+type BreadcrumbProps = {
+  items: BreadcrumbItem[];
+};
+
+function Breadcrumb({ items }: BreadcrumbProps) {
+  const isLong = items.length > 4;
+
   return (
     <nav
       aria-label="Fil d'Ariane"
       className="flex flex-wrap items-center gap-2 text-sm text-[#9FB4BD]"
     >
-      <span className={hasParent ? "hidden md:contents" : "contents"}>
-        <Link to="/" className="hover:text-[#F5F5F0]">
-          Accueil
-        </Link>
-        <span className="text-[#5E7079]">›</span>
-        <Link to="/catalog" className="hover:text-[#F5F5F0]">
-          Catalogue
-        </Link>
-        <span className="text-[#5E7079]">›</span>
-      </span>
-      <Link to={categoryPath} className="hover:text-[#F5F5F0]">
-        {categoryLabel}
-      </Link>
-      {hasParent && (
-        <>
-          <span className="text-[#5E7079]">›</span>
-          <Link to={parentPath} className="hover:text-[#F5F5F0]">
-            {parentLabel}
-          </Link>
-        </>
-      )}
-      <span className="text-[#5E7079]">›</span>
-      <span className="font-medium text-[#F2B705]">{currentLabel}</span>
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+        const isHiddenOnMobile = isLong && index < 2;
+
+        return (
+          <span
+            key={item.path ?? item.label}
+            className={isHiddenOnMobile ? "hidden md:contents" : "contents"}
+          >
+            {isLast ? (
+              <span aria-current="page" className="font-medium text-[#F2B705]">
+                {item.label}
+              </span>
+            ) : item.path != null ? (
+              <Link to={item.path} className="hover:text-[#F5F5F0]">
+                {item.label}
+              </Link>
+            ) : (
+              <span>{item.label}</span>
+            )}
+            {!isLast && <span className="text-[#5E7079]">›</span>}
+          </span>
+        );
+      })}
     </nav>
   );
 }
