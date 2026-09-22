@@ -25,7 +25,12 @@ function ActorHeader({ person }: ActorHeaderProps) {
 
         <ActorInfo person={person} />
 
-        <ActionButton label="Favoris" color="#E83658" icon={Heart} />
+        <ActionButton
+          label="Favoris"
+          color="#E83658"
+          icon={Heart}
+          align="start"
+        />
       </div>
     </div>
   );

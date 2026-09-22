@@ -4,11 +4,19 @@ type ActionButtonProps = {
   label: string;
   color: string;
   icon: LucideIcon;
+  align?: "center" | "start";
 };
 
-function ActionButton({ label, color, icon: Icon }: ActionButtonProps) {
+function ActionButton({
+  label,
+  color,
+  icon: Icon,
+  align = "center",
+}: ActionButtonProps) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div
+      className={`flex flex-col gap-2 ${align === "start" ? "items-start" : "items-center"}`}
+    >
       <button
         type="button"
         disabled
