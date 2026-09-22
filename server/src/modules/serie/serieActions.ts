@@ -1,6 +1,11 @@
 import type { RequestHandler } from "express";
 import mediaRepository from "../media/mediaRepository";
 import seasonRepository from "../season/seasonRepository";
+import {
+  formatCast,
+  formatGenres,
+  formatPlatforms,
+} from "../../utils/formatters";
 
 const read: RequestHandler = async (req, res, next) => {
   try {
@@ -58,23 +63,9 @@ const read: RequestHandler = async (req, res, next) => {
         isFinished: Boolean(season.is_finished),
         episodeCount: Number(season.episode_count),
       })),
-      genres: genres.map((genre) => ({
-        id: genre.ID,
-        name: genre.name,
-      })),
-      platforms: platforms.map((platform) => ({
-        id: platform.ID,
-        name: platform.name,
-        logo: platform.logo,
-        url: platform.url,
-      })),
-      cast: cast.map((person) => ({
-        id: person.ID,
-        name: person.name,
-        photo: person.photo,
-        characterName: person.personnage_name,
-        role: person.role,
-      })),
+      genres: formatGenres(genres),
+      platforms: formatPlatforms(platforms),
+      cast: formatCast(cast),
       castTotal,
       userStatus: null,
       userRating: null,

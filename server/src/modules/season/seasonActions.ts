@@ -1,6 +1,11 @@
 import type { RequestHandler } from "express";
 import mediaRepository from "../media/mediaRepository";
 import seasonRepository from "./seasonRepository";
+import {
+  formatCast,
+  formatEpisodes,
+  formatPlatforms,
+} from "../../utils/formatters";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
@@ -13,16 +18,7 @@ const readEpisodes: RequestHandler = async (req, res, next) => {
 
     const episodes = await seasonRepository.readEpisodes(id);
 
-    res.json(
-      episodes.map((episode) => ({
-        id: episode.ID,
-        name: episode.name,
-        number: episode.number,
-        releasedAt: episode.released_at,
-        synopsis: episode.synopsis,
-        duration: episode.duration,
-      })),
-    );
+    res.json(formatEpisodes(episodes));
   } catch (err) {
     next(err);
   }
@@ -72,27 +68,9 @@ const read: RequestHandler = async (req, res, next) => {
         originalLanguage: season.original_language,
         isAnime: Boolean(season.is_anime),
       },
-      platforms: platforms.map((platform) => ({
-        id: platform.ID,
-        name: platform.name,
-        logo: platform.logo,
-        url: platform.url,
-      })),
-      episodes: episodes.map((episode) => ({
-        id: episode.ID,
-        name: episode.name,
-        number: episode.number,
-        releasedAt: episode.released_at,
-        synopsis: episode.synopsis,
-        duration: episode.duration,
-      })),
-      cast: cast.map((person) => ({
-        id: person.ID,
-        name: person.name,
-        photo: person.photo,
-        characterName: person.personnage_name,
-        role: person.role,
-      })),
+      platforms: formatPlatforms(platforms),
+      episodes: formatEpisodes(episodes),
+      cast: formatCast(cast),
       userStatus: null,
       userRating: null,
     });
