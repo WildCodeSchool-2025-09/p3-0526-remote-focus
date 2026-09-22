@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
+import EpisodeList from "../components/EpisodeList";
 import KnownFrom from "../components/KnownFrom";
+import SeasonHeader from "../components/season/SeasonHeader";
 import { fetchSeason } from "../services/api";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
-import SeasonHeader from "../components/season/SeasonHeader";
-import EpisodeList from "../components/EpisodeList";
-import Breadcrumb from "../components/Breadcrumb";
 
 function SeasonDetail() {
   const { seasonId } = useParams();

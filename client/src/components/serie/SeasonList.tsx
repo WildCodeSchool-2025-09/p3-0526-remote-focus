@@ -1,8 +1,8 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 import type { Season } from "../../types/media";
 import SeasonEpisodes from "./SeasonEpisodes";
-import { Link } from "react-router";
 
 type SeasonListProps = {
   seasons: Season[];

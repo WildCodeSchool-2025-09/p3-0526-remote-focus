@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
-import seasonRepository from "./seasonRepository";
 import mediaRepository from "../media/mediaRepository";
+import seasonRepository from "./seasonRepository";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
