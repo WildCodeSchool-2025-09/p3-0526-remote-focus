@@ -136,7 +136,13 @@ function FilteredCatalog() {
                   }
                   className="text-base-content"
                 >
-                  {pageNumber}
+                  {pagination.page === pageNumber ? (
+                    <strong className="underline underline-offset-4 text-focus-yellow">
+                      {pageNumber}
+                    </strong>
+                  ) : (
+                    pageNumber
+                  )}
                 </button>
               ),
           )}

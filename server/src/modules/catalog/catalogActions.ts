@@ -1,7 +1,11 @@
 import type { RequestHandler } from "express";
 
 import userRepository from "../user/userRepository";
-import { createGenreSections, enrichRanking } from "./catalogHelpers";
+import {
+  createGenreSections,
+  enrichRanking,
+  isMediaNew,
+} from "./catalogHelpers";
 import catalogRepository from "./catalogRepository";
 
 const readDiscoverSections: RequestHandler = async (req, res, next) => {
@@ -90,6 +94,9 @@ const browse: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    const topRated = await catalogRepository.readTopRated(type);
+    const enrichedTopRated = enrichRanking(topRated);
+
     const medias = await catalogRepository.readByFilters(
       type,
       genreIds,
@@ -98,7 +105,16 @@ const browse: RequestHandler = async (req, res, next) => {
     );
     const total = await catalogRepository.countByFilters(type, genreIds);
     const totalPages = Math.ceil(total / limit);
-    const enrichedMedia = enrichRanking(medias);
+    const enrichedMedia = medias.map((media) => {
+      const rankedMedia = enrichedTopRated.find(
+        (rankedMedia) => rankedMedia.id === media.id,
+      );
+      return {
+        ...media,
+        isNew: isMediaNew(media.releasedAt),
+        topRank: rankedMedia ? rankedMedia.topRank : null,
+      };
+    });
 
     res.json({
       medias: enrichedMedia,
