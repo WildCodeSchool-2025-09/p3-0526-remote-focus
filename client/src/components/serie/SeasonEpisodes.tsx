@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { fetchEpisodes } from "../../services/api";
+import useFetch from "../../hooks/useFetch";
 import type { Episode } from "../../types/media";
 import EpisodeList from "../EpisodeList";
 
@@ -8,44 +7,22 @@ type SeasonEpisodesProps = {
 };
 
 function SeasonEpisodes({ seasonId }: SeasonEpisodesProps) {
-  const [episodes, setEpisodes] = useState<Episode[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    setLoading(true);
-    setError(null);
-
-    fetchEpisodes(seasonId)
-      .then((data) => {
-        if (active) {
-          setEpisodes(data);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setError("Épisodes indisponibles.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [seasonId]);
+  const {
+    data: episodes,
+    loading,
+    error,
+  } = useFetch<Episode[]>(`/api/seasons/${seasonId}/episodes`);
 
   if (loading) {
     return <p className="px-4 pb-4 text-sm text-[#9FB4BD]">Chargement…</p>;
   }
 
-  if (error != null) {
-    return <p className="px-4 pb-4 text-sm text-[#9FB4BD]">{error}</p>;
+  if (error != null || episodes == null) {
+    return (
+      <p className="px-4 pb-4 text-sm text-[#9FB4BD]">
+        Épisodes indisponibles.
+      </p>
+    );
   }
 
   if (episodes.length === 0) {
