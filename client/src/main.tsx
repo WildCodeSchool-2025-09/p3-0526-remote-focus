@@ -8,11 +8,11 @@ import App from "./App";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import Homepage from "./pages/Homepage";
+import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
-import Login from "./pages/Login";
 import SerieDetail from "./pages/SerieDetail";
 
 const router = createBrowserRouter([

@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { registerUser } from "../../services/authApi";
-import { fetchGenres, type Genre } from "../../services/genreApi";
+import { type Genre, fetchGenres } from "../../services/genreApi";
 import GenreSelector from "./GenreSelector";
 
 const inputClassName =

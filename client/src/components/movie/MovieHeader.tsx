@@ -2,8 +2,8 @@ import { Check, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import MovieInfo from "./MovieInfo";
 import ActionButton from "../ActionButton";
+import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
   media: Media;
