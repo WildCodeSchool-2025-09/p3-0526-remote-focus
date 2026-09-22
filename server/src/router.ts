@@ -20,16 +20,12 @@ import catalogActions from "./modules/catalog/catalogActions";
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 
 router.get("/api/medias/home", homepageActions.browseHomepage);
-/*
-router.get("/api/items", itemActions.browse);
-router.get("/api/items/:id", itemActions.read);
-router.post("/api/items", itemActions.add); 
-*/
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/series/:id", serieActions.read);
 router.get("/api/seasons/:id/episodes", seasonActions.readEpisodes);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 export default router;

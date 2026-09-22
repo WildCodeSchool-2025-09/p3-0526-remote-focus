@@ -44,7 +44,7 @@ export type FilmographyItem = {
   poster: string | null;
   type: string;
   releasedAt: string | null;
-  characterName: string | null;
+  characterName: string[];
 };
 
 export type Season = {
