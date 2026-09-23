@@ -7,6 +7,7 @@ import SeasonList from "../components/serie/SeasonList";
 import SerieHeader from "../components/serie/SerieHeader";
 import { fetchSerie } from "../services/api";
 import type { Serie } from "../types/media";
+import useSelectedActor from "../hooks/useSelectedActor";
 
 function SerieDetail() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ function SerieDetail() {
   const [serieDetail, setSerieDetail] = useState<Serie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
+  const { selectedPersonId, handleSelectPerson } = useSelectedActor();
 
   useEffect(() => {
     if (id == null) {
@@ -47,10 +48,6 @@ function SerieDetail() {
       active = false;
     };
   }, [id]);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;

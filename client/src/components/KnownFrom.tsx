@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchFilmography } from "../services/api";
-import type { FilmographyItem } from "../types/media";
 import FilmographyCard from "./FilmographyCard";
+import type { KnownForMedia, KnownForResponse } from "../types/media";
 
 type KnownFromProps = {
   personId: number;
@@ -9,7 +9,8 @@ type KnownFromProps = {
 };
 
 function KnownFrom({ personId, mediaId }: KnownFromProps) {
-  const [items, setItems] = useState<FilmographyItem[]>([]);
+  const [items, setItems] = useState<KnownForMedia[]>([]);
+  const [mode, setMode] = useState<"top-rated" | "seen">("top-rated");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +23,8 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
     fetchFilmography(personId, mediaId)
       .then((data) => {
         if (active) {
-          setItems(data);
+          setItems(data.medias);
+          setMode(data.mode);
         }
       })
       .catch(() => {
@@ -44,7 +46,7 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
   return (
     <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-white/10 bg-[#0F242F] p-4 md:gap-5 md:p-6">
       <h3 className="text-base font-semibold md:text-lg">
-        Vous le connaissez déjà dans :
+        {mode === "seen" ? "Vous le connaissez déjà dans :" : "Connu pour :"}
       </h3>
 
       {loading && <p className="text-sm text-[#9FB4BD]">Chargement…</p>}
@@ -52,7 +54,12 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
       {error != null && <p className="text-sm text-[#9FB4BD]">{error}</p>}
 
       {!loading && error == null && items.length === 0 && (
-        <p className="text-sm text-[#9FB4BD]">Aucun autre titre à afficher.</p>
+        <p className="text-sm text-[#9FB4BD]">
+          {" "}
+          {mode === "seen"
+            ? "Vous n'avez rien vu avec cet acteur."
+            : "Aucun titre à afficher."}
+        </p>
       )}
 
       {items.length > 0 && (

@@ -1,7 +1,7 @@
-import type { FilmographyItem } from "../types/media";
+import type { KnownForMedia } from "../types/media";
 
 type FilmographyCardProps = {
-  item: FilmographyItem;
+  item: KnownForMedia;
 };
 
 function FilmographyCard({ item }: FilmographyCardProps) {
@@ -19,7 +19,7 @@ function FilmographyCard({ item }: FilmographyCardProps) {
 
       <div className="flex flex-col gap-0.5">
         <span className="text-base font-semibold">{item.name}</span>
-        <span className="text-sm text-[#F2B705]">{item.characterName}</span>
+        <span className="text-sm text-[#F2B705]">{item.characterNames}</span>
       </div>
     </div>
   );

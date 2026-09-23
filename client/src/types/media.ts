@@ -38,15 +38,6 @@ export type Media = {
   userRating: number | null;
 };
 
-export type FilmographyItem = {
-  id: number;
-  name: string;
-  poster: string | null;
-  type: string;
-  releasedAt: string | null;
-  characterName: string[];
-};
-
 export type Season = {
   id: number;
   name: string | null;
@@ -90,4 +81,19 @@ export type Serie = {
   castTotal: number;
   userStatus: string | null;
   userRating: number | null;
+};
+
+export type KnownForMedia = {
+  id: number;
+  name: string;
+  poster: string;
+  type: string;
+  releasedAt: string;
+  characterNames: string[];
+};
+
+export type KnownForResponse = {
+  mode: "top-rated" | "seen";
+  medias: KnownForMedia[];
+  pagination: null; // temporairement
 };

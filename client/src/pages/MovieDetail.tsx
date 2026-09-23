@@ -6,6 +6,7 @@ import KnownFrom from "../components/KnownFrom";
 import MovieHeader from "../components/movie/MovieHeader";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
+import useSelectedActor from "../hooks/useSelectedActor";
 
 function MovieDetail() {
   const { id } = useParams();
@@ -13,7 +14,7 @@ function MovieDetail() {
   const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
+  const { selectedPersonId, handleSelectPerson } = useSelectedActor();
 
   useEffect(() => {
     if (id == null) {
@@ -46,10 +47,6 @@ function MovieDetail() {
       active = false;
     };
   }, [id]);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;

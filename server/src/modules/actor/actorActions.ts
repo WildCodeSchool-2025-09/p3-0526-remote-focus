@@ -51,9 +51,6 @@ const readKnownFor: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    if (userId) {
-    }
-
     const medias = userId
       ? await actorRepository.readSeenWithActor(
           personId,
