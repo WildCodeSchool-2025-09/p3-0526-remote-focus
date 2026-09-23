@@ -2,13 +2,16 @@ import { useEffect, useState } from "react";
 import { fetchFilmography } from "../services/api";
 import FilmographyCard from "./FilmographyCard";
 import type { KnownForMedia } from "../types/media";
+import { Link } from "react-router";
+import { MoveRight } from "lucide-react";
 
-type KnownFromProps = {
+type KnownForProps = {
   personId: number;
   mediaId: number;
+  onClose: () => void;
 };
 
-function KnownFrom({ personId, mediaId }: KnownFromProps) {
+function ActorKnownForWidget({ personId, mediaId, onClose }: KnownForProps) {
   const [items, setItems] = useState<KnownForMedia[]>([]);
   const [mode, setMode] = useState<"top-rated" | "seen">("top-rated");
   const [page, setPage] = useState(1);
@@ -88,21 +91,27 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
       {items.length > 0 && (
         <div className="flex gap-4 overflow-x-auto pb-2 md:gap-5">
           {items.map((item) => (
-            <FilmographyCard key={item.id} item={item} />
+            <FilmographyCard key={item.id} item={item} onNavigate={onClose} />
           ))}
+          {mode === "seen" && page < totalPages && !loading && (
+            <button
+              className="w-[120px] shrink-0 flex-col gap-2 md:w-[170px] self-center text-sm font-semibold text-focus-cream hover:underline underline-offset-8 hover:text-focus-yellow"
+              type="button"
+              onClick={handleLoadMore}
+            >
+              Voir plus ...
+            </button>
+          )}
         </div>
       )}
-      {mode === "seen" && page < totalPages && !loading && (
-        <button
-          type="button"
-          onClick={handleLoadMore}
-          className="self-center text-sm font-semibold text-focus-yellow hover:underline"
-        >
-          Voir plus
-        </button>
-      )}
+      <Link
+        to={`/actors/${personId}`}
+        className="flex gap-3 items-center text-sm text-focus-cream hover:text-focus-yellow"
+      >
+        Voir la fiche complète de l'acteur <MoveRight size={14} />
+      </Link>
     </div>
   );
 }
 
-export default KnownFrom;
+export default ActorKnownForWidget;

@@ -20,7 +20,7 @@ class ActorRepository {
 
   async readTopRatedByActor(personId: number, excludeMediaId: number) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating,
+      `SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime,
         mp.personnage_name AS characterNames
       FROM media AS m 
       JOIN media_person AS mp ON mp.ID_media = m.ID 
@@ -42,7 +42,7 @@ class ActorRepository {
     offset = 0,
   ) {
     const [rows] = await databaseClient.query<Rows>(
-      `(SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating,
+      `(SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime,
         mp.personnage_name AS characterNames
      FROM media AS m
      JOIN media_person AS mp ON mp.ID_media = m.ID
@@ -54,7 +54,7 @@ class ActorRepository {
 
      UNION ALL
 
-     (SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating,
+     (SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime,
         GROUP_CONCAT(DISTINCT ep.personnage_name SEPARATOR ', ') AS characterNames
      FROM media AS m
      JOIN season AS s ON s.ID_media = m.ID
@@ -65,7 +65,7 @@ class ActorRepository {
        AND ep.role = 'actor'
        AND eu.ID_user = ?
        AND m.ID <> ?
-     GROUP BY m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating) 
+     GROUP BY m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime) 
      ORDER BY overall_rating DESC LIMIT ? OFFSET ?`,
       [
         personId,

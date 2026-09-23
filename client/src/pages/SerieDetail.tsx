@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import KnownFrom from "../components/KnownFrom";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import SeasonList from "../components/serie/SeasonList";
 import SerieHeader from "../components/serie/SerieHeader";
 import { fetchSerie } from "../services/api";
@@ -15,7 +15,8 @@ function SerieDetail() {
   const [serieDetail, setSerieDetail] = useState<Serie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { selectedPersonId, handleSelectPerson } = useSelectedActor();
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   useEffect(() => {
     if (id == null) {
@@ -75,7 +76,11 @@ function SerieDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={serieDetail.id} />
+        <ActorKnownForWidget
+          personId={selectedPersonId}
+          mediaId={serieDetail.id}
+          onClose={handleCloseActorWidget}
+        />
       )}
     </div>
   );

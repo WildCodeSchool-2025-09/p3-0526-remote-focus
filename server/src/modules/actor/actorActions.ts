@@ -82,6 +82,7 @@ const readKnownFor: RequestHandler = async (req, res, next) => {
         poster: media.poster,
         type: media.type,
         releasedAt: media.released_at,
+        isAnime: media.is_anime,
         characterNames: media.characterNames?.split(", ").filter(Boolean) ?? [],
       })),
       pagination: userId ? { total, page, limit, totalPages } : null,

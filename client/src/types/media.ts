@@ -88,6 +88,7 @@ export type KnownForMedia = {
   name: string;
   poster: string;
   type: string;
+  isAnime: boolean;
   releasedAt: string;
   characterNames: string[];
 };

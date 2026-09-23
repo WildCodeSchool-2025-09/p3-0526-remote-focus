@@ -9,9 +9,14 @@ function useSelectedActor() {
     );
   };
 
+  const handleCloseActorWidget = () => {
+    setSelectedPersonId(null);
+  };
+
   return {
     selectedPersonId,
     handleSelectPerson,
+    handleCloseActorWidget,
   };
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import KnownFrom from "../components/KnownFrom";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import MovieHeader from "../components/movie/MovieHeader";
 import { fetchMedia } from "../services/api";
 import type { Media } from "../types/media";
@@ -14,7 +14,8 @@ function MovieDetail() {
   const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { selectedPersonId, handleSelectPerson } = useSelectedActor();
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   useEffect(() => {
     if (id == null) {
@@ -71,7 +72,11 @@ function MovieDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={mediaDetail.id} />
+        <ActorKnownForWidget
+          personId={selectedPersonId}
+          mediaId={mediaDetail.id}
+          onClose={handleCloseActorWidget}
+        />
       )}
     </div>
   );
