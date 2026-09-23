@@ -3,8 +3,9 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { registerUser } from "../../services/authApi";
-import { fetchGenres, type Genre } from "../../services/genreApi";
+import { fetchGenres } from "../../services/genreApi";
 import type { RegisterFormErrors } from "../../types/Auth";
+import type { Genre } from "../../types/Genre";
 import { validateRegisterForm } from "../../utils/validateRegisterForm";
 import FieldError from "./FieldError";
 import GenreSelector from "./GenreSelector";
@@ -151,12 +152,23 @@ function RegisterForm() {
         },
       });
     } catch (error) {
-      setErrors({
-        form:
-          error instanceof Error
-            ? error.message
-            : "Impossible de créer le compte.",
-      });
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Impossible de créer le compte.";
+
+      if (/déjà utilis[ée]/i.test(message) && /pseudo|login/i.test(message)) {
+        setErrors({ login: message });
+        loginRef.current?.focus();
+      } else if (
+        /déjà utilis[ée]/i.test(message) &&
+        /e-?mail|adresse électronique/i.test(message)
+      ) {
+        setErrors({ email: message });
+        emailRef.current?.focus();
+      } else {
+        setErrors({ form: message });
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-import type { Genre } from "../../services/genreApi";
+import type { Genre } from "../../types/Genre";
 
 interface GenreSelectorProps {
   genres: Genre[];

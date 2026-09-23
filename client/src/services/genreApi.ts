@@ -1,7 +1,4 @@
-export interface Genre {
-  id: number;
-  name: string;
-}
+import type { Genre } from "../types/Genre";
 
 export async function fetchGenres(): Promise<Genre[]> {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/api/genres`);

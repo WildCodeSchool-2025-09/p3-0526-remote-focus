@@ -1,3 +1,5 @@
+import type { Genre } from "./Genre";
+
 export type Media = {
   id: number;
   tmdbId: number;
@@ -33,7 +35,4 @@ export type DiscoverResponse = {
   genreSections: GenreSection[];
 };
 
-export type LikedGenre = {
-  id: number;
-  name: string;
-};
+export type LikedGenre = Genre;
