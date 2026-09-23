@@ -10,7 +10,7 @@ function Catalog() {
 
   return (
     <>
-      <h1 className="hidden">Catalogue</h1>
+      <h1 className="sr-only">Catalogue</h1>
 
       <TypeFilter />
       <GenreFilter />

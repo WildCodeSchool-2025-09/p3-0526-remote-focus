@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { getPaginationPages, isValidMediaType } from "../../hooks/catalogUtils";
 import { fetchPaginateMedias } from "../../services/catalogService";
 import type { EnrichedMedia, Pagination } from "../../types/Catalog";
+import { getPaginationPages, isValidMediaType } from "../../utils/catalogUtils";
 import MediaCard from "./MediaCard";
 import MediaCardLoading from "./MediaCardLoading";
 

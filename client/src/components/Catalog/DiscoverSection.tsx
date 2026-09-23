@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
-import { isValidMediaType } from "../../hooks/catalogUtils";
 import { fetchDiscover } from "../../services/catalogService";
 import type { DiscoverResponse } from "../../types/Catalog";
+import { isValidMediaType } from "../../utils/catalogUtils";
 import MediaCardLoading from "./MediaCardLoading";
 import MediaSection from "./MediaSection";
 

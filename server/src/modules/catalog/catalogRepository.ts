@@ -1,6 +1,7 @@
 import type { RowDataPacket } from "mysql2";
 import databaseClient from "../../../database/client";
 
+import type { LikedGenre } from "../../types/Genre/Genre.types";
 import type { Media } from "../../types/Media/Media.types";
 
 const MEDIA_COLUMNS = `
@@ -116,8 +117,8 @@ ${GENRE_NAME}
     return rows[0].total;
   }
 
-  async readGenres() {
-    const [rows] = await databaseClient.query(
+  async readGenres(): Promise<LikedGenre[]> {
+    const [rows] = await databaseClient.query<LikedGenre[]>(
       `SELECT ID AS id, name
     FROM genre 
     ORDER BY name`,

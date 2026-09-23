@@ -3,8 +3,8 @@ import type { RequestHandler } from "express";
 import userRepository from "../user/userRepository";
 import {
   createGenreSections,
+  enrichMedias,
   enrichRanking,
-  isMediaNew,
 } from "./catalogHelpers";
 import catalogRepository from "./catalogRepository";
 
@@ -105,16 +105,7 @@ const browse: RequestHandler = async (req, res, next) => {
     );
     const total = await catalogRepository.countByFilters(type, genreIds);
     const totalPages = Math.ceil(total / limit);
-    const enrichedMedia = medias.map((media) => {
-      const rankedMedia = enrichedTopRated.find(
-        (rankedMedia) => rankedMedia.id === media.id,
-      );
-      return {
-        ...media,
-        isNew: isMediaNew(media.releasedAt),
-        topRank: rankedMedia ? rankedMedia.topRank : null,
-      };
-    });
+    const enrichedMedia = enrichMedias(medias, enrichedTopRated);
 
     res.json({
       medias: enrichedMedia,
