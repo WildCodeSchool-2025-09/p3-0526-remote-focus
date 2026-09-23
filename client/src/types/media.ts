@@ -92,8 +92,15 @@ export type KnownForMedia = {
   characterNames: string[];
 };
 
+export type KnownForPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
 export type KnownForResponse = {
   mode: "top-rated" | "seen";
   medias: KnownForMedia[];
-  pagination: null; // temporairement
+  pagination: KnownForPagination | null;
 };

@@ -19,7 +19,15 @@ function FilmographyCard({ item }: FilmographyCardProps) {
 
       <div className="flex flex-col gap-0.5">
         <span className="text-base font-semibold">{item.name}</span>
-        <span className="text-sm text-[#F2B705]">{item.characterNames}</span>
+        {item.characterNames.length === 0 ? (
+          <span className="text-sm text-focus-yellow/30">
+            Personnage inconnu
+          </span>
+        ) : (
+          <span className="text-sm text-focus-yellow">
+            {item.characterNames.join(", ")}
+          </span>
+        )}
       </div>
     </div>
   );

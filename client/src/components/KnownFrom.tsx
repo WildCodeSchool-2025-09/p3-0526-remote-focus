@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchFilmography } from "../services/api";
 import FilmographyCard from "./FilmographyCard";
-import type { KnownForMedia, KnownForResponse } from "../types/media";
+import type { KnownForMedia } from "../types/media";
 
 type KnownFromProps = {
   personId: number;
@@ -11,20 +11,25 @@ type KnownFromProps = {
 function KnownFrom({ personId, mediaId }: KnownFromProps) {
   const [items, setItems] = useState<KnownForMedia[]>([]);
   const [mode, setMode] = useState<"top-rated" | "seen">("top-rated");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
+    setPage(1);
+    setItems([]);
     setLoading(true);
     setError(null);
 
-    fetchFilmography(personId, mediaId)
+    fetchFilmography(personId, mediaId, 1)
       .then((data) => {
         if (active) {
           setItems(data.medias);
           setMode(data.mode);
+          setTotalPages(data.pagination?.totalPages ?? 1);
         }
       })
       .catch(() => {
@@ -42,6 +47,24 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
       active = false;
     };
   }, [personId, mediaId]);
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+
+    setLoading(true);
+
+    fetchFilmography(personId, mediaId, nextPage)
+      .then((data) => {
+        setItems((currentItems) => [...currentItems, ...data.medias]);
+        setPage(nextPage);
+      })
+      .catch(() => {
+        setError("Impossible de charger les médias suivants.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-white/10 bg-[#0F242F] p-4 md:gap-5 md:p-6">
@@ -68,6 +91,15 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
             <FilmographyCard key={item.id} item={item} />
           ))}
         </div>
+      )}
+      {mode === "seen" && page < totalPages && !loading && (
+        <button
+          type="button"
+          onClick={handleLoadMore}
+          className="self-center text-sm font-semibold text-focus-yellow hover:underline"
+        >
+          Voir plus
+        </button>
       )}
     </div>
   );

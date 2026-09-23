@@ -34,7 +34,7 @@ const readFilmography: RequestHandler = async (req, res, next) => {
 const readKnownFor: RequestHandler = async (req, res, next) => {
   try {
     const personId = Number(req.params.id);
-    const userId = req.user?.id;
+    const userId = req.user?.id ?? Number(req.query.user); // TODO : remove condition when we'll have the authentication middleware
     const exclude = Number(req.query.exclude);
     const page = req.query.page ? Number(req.query.page) : 1;
     const limit = 10;

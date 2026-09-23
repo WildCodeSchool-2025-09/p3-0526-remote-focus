@@ -56,9 +56,10 @@ export async function fetchEpisodes(seasonId: number): Promise<Episode[]> {
 export async function fetchFilmography(
   personId: number,
   excludeMediaId: number,
+  page = 1,
 ): Promise<KnownForResponse> {
   const response = await fetch(
-    `${API_URL}/api/actors/${personId}/known-for?exclude=${excludeMediaId}`,
+    `${API_URL}/api/actors/${personId}/known-for?exclude=${excludeMediaId}&page=${page}&user=1`,
   );
 
   if (!response.ok) {
