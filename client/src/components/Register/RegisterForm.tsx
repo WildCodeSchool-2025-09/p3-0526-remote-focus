@@ -26,7 +26,16 @@ function RegisterForm() {
   const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
   const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordConfirmationVisible, setIsPasswordConfirmationVisible] =
+    useState(false);
+  const handlePasswordVisibility = () => {
+    setIsPasswordVisible((currentValue) => !currentValue);
+  };
 
+  const handlePasswordConfirmationVisibility = () => {
+    setIsPasswordConfirmationVisible((currentValue) => !currentValue);
+  };
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -251,21 +260,36 @@ function RegisterForm() {
           Mot de passe
         </label>
 
-        <input
-          ref={passwordRef}
-          id="password"
-          name="password"
-          type="password"
-          className={inputClassName}
-          minLength={8}
-          maxLength={255}
-          autoComplete="new-password"
-          required
-          aria-invalid={errors.password !== undefined}
-          aria-describedby={
-            errors.password !== undefined ? "password-error" : undefined
-          }
-        />
+        <div className="relative">
+          <input
+            ref={passwordRef}
+            id="password"
+            name="password"
+            type={isPasswordVisible ? "text" : "password"}
+            className={`${inputClassName} pr-10`}
+            minLength={8}
+            maxLength={255}
+            autoComplete="new-password"
+            required
+            aria-invalid={errors.password !== undefined}
+            aria-describedby={
+              errors.password !== undefined ? "password-error" : undefined
+            }
+          />
+
+          <button
+            type="button"
+            onClick={handlePasswordVisibility}
+            aria-label={
+              isPasswordVisible
+                ? "Masquer le mot de passe"
+                : "Afficher le mot de passe"
+            }
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
+          >
+            {isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
 
         <FieldError id="password-error" message={errors.password} />
       </div>
@@ -275,23 +299,42 @@ function RegisterForm() {
           Confirmer le mot de passe
         </label>
 
-        <input
-          ref={passwordConfirmationRef}
-          id="passwordConfirmation"
-          name="passwordConfirmation"
-          type="password"
-          className={inputClassName}
-          minLength={8}
-          maxLength={255}
-          autoComplete="new-password"
-          required
-          aria-invalid={errors.passwordConfirmation !== undefined}
-          aria-describedby={
-            errors.passwordConfirmation !== undefined
-              ? "passwordConfirmation-error"
-              : undefined
-          }
-        />
+        <div className="relative">
+          <input
+            ref={passwordConfirmationRef}
+            id="passwordConfirmation"
+            name="passwordConfirmation"
+            type={isPasswordConfirmationVisible ? "text" : "password"}
+            className={`${inputClassName} pr-10`}
+            minLength={8}
+            maxLength={255}
+            autoComplete="new-password"
+            required
+            aria-invalid={errors.passwordConfirmation !== undefined}
+            aria-describedby={
+              errors.passwordConfirmation !== undefined
+                ? "passwordConfirmation-error"
+                : undefined
+            }
+          />
+
+          <button
+            type="button"
+            onClick={handlePasswordConfirmationVisibility}
+            aria-label={
+              isPasswordConfirmationVisible
+                ? "Masquer la confirmation du mot de passe"
+                : "Afficher la confirmation du mot de passe"
+            }
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
+          >
+            {isPasswordConfirmationVisible ? (
+              <EyeOff size={18} />
+            ) : (
+              <Eye size={18} />
+            )}
+          </button>
+        </div>
 
         <FieldError
           id="passwordConfirmation-error"
