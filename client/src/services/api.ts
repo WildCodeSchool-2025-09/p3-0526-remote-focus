@@ -1,8 +1,8 @@
 import type {
+  Actor,
   Episode,
   FilmographyItem,
   Media,
-  PersonDetail,
   Serie,
 } from "../types/media";
 import type { SearchResults } from "../types/search";
@@ -39,7 +39,7 @@ export async function fetchMedia(id: number): Promise<Media> {
   return response.json();
 }
 
-export async function fetchPerson(id: number): Promise<PersonDetail> {
+export async function fetchActor(id: number): Promise<Actor> {
   const response = await fetch(`${API_URL}/api/actors/${id}`);
 
   if (!response.ok) {

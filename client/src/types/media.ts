@@ -47,7 +47,7 @@ export type FilmographyItem = {
   characterName: string | null;
 };
 
-export type PersonDetail = {
+export type Actor = {
   id: number;
   name: string;
   photo: string | null;
