@@ -1,9 +1,12 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
-
+import { Eye, EyeOff } from "lucide-react";
 import { registerUser } from "../../services/authApi";
-import { type Genre, fetchGenres } from "../../services/genreApi";
+import { fetchGenres, type Genre } from "../../services/genreApi";
+import type { RegisterFormErrors } from "../../types/Auth";
+import FieldError from "./FieldError";
 import GenreSelector from "./GenreSelector";
+import { validateRegisterForm } from "../../utils/validateRegisterForm";
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-cyan-950 bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
@@ -21,7 +24,7 @@ function RegisterForm() {
 
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -32,15 +35,17 @@ function RegisterForm() {
         setGenres(data);
       })
       .catch((error) => {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("Impossible de récupérer les genres.");
-        }
+        setErrors((currentErrors) => ({
+          ...currentErrors,
+          genres:
+            error instanceof Error
+              ? error.message
+              : "Impossible de récupérer les genres.",
+        }));
       });
   }, []);
 
-  const toggleGenre = (genreId: number) => {
+  const handleGenreToggle = (genreId: number) => {
     setSelectedGenreIds((currentGenreIds) => {
       if (currentGenreIds.includes(genreId)) {
         return currentGenreIds.filter((id) => id !== genreId);
@@ -53,7 +58,7 @@ function RegisterForm() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setError(null);
+    setErrors({});
 
     if (
       firstNameRef.current === null ||
@@ -64,7 +69,9 @@ function RegisterForm() {
       passwordRef.current === null ||
       passwordConfirmationRef.current === null
     ) {
-      setError("Impossible de récupérer les champs du formulaire.");
+      setErrors({
+        form: "Impossible de récupérer les champs du formulaire.",
+      });
       return;
     }
 
@@ -75,26 +82,20 @@ function RegisterForm() {
     const email = emailRef.current.value.trim();
     const password = passwordRef.current.value;
     const passwordConfirmation = passwordConfirmationRef.current.value;
+    const formValues = {
+      firstName,
+      lastName,
+      bornAt,
+      login,
+      email,
+      password,
+      passwordConfirmation,
+    };
 
-    if (
-      firstName === "" ||
-      bornAt === "" ||
-      login === "" ||
-      email === "" ||
-      password === "" ||
-      passwordConfirmation === ""
-    ) {
-      setError("Tous les champs obligatoires doivent être remplis.");
-      return;
-    }
+    const validationErrors = validateRegisterForm(formValues);
 
-    if (password !== passwordConfirmation) {
-      setError("Les mots de passe ne correspondent pas.");
-      return;
-    }
-
-    if (selectedGenreIds.length === 0) {
-      setError("Sélectionnez au moins un genre.");
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -117,11 +118,12 @@ function RegisterForm() {
         },
       });
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("Impossible de créer le compte.");
-      }
+      setErrors({
+        form:
+          error instanceof Error
+            ? error.message
+            : "Impossible de créer le compte.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +132,7 @@ function RegisterForm() {
   return (
     <form
       onSubmit={handleSubmit}
+      noValidate
       className="w-full max-w-sm space-y-4 md:rounded-2xl md:bg-base-200 md:p-8 md:shadow-xl"
     >
       <h1 className="mb-6 text-2xl font-bold text-base-content">
@@ -150,7 +153,13 @@ function RegisterForm() {
           maxLength={100}
           autoComplete="given-name"
           required
+          aria-invalid={errors.firstName !== undefined}
+          aria-describedby={
+            errors.firstName !== undefined ? "firstName-error" : undefined
+          }
         />
+
+        <FieldError id="firstName-error" message={errors.firstName} />
       </div>
 
       <div>
@@ -182,7 +191,13 @@ function RegisterForm() {
           className={`${inputClassName} [color-scheme:dark]`}
           autoComplete="bday"
           required
+          aria-invalid={errors.bornAt !== undefined}
+          aria-describedby={
+            errors.bornAt !== undefined ? "bornAt-error" : undefined
+          }
         />
+
+        <FieldError id="bornAt-error" message={errors.bornAt} />
       </div>
 
       <div>
@@ -199,7 +214,13 @@ function RegisterForm() {
           maxLength={50}
           autoComplete="username"
           required
+          aria-invalid={errors.login !== undefined}
+          aria-describedby={
+            errors.login !== undefined ? "login-error" : undefined
+          }
         />
+
+        <FieldError id="login-error" message={errors.login} />
       </div>
 
       <div>
@@ -216,7 +237,13 @@ function RegisterForm() {
           maxLength={255}
           autoComplete="email"
           required
+          aria-invalid={errors.email !== undefined}
+          aria-describedby={
+            errors.email !== undefined ? "email-error" : undefined
+          }
         />
+
+        <FieldError id="email-error" message={errors.email} />
       </div>
 
       <div>
@@ -234,7 +261,13 @@ function RegisterForm() {
           maxLength={255}
           autoComplete="new-password"
           required
+          aria-invalid={errors.password !== undefined}
+          aria-describedby={
+            errors.password !== undefined ? "password-error" : undefined
+          }
         />
+
+        <FieldError id="password-error" message={errors.password} />
       </div>
 
       <div>
@@ -252,21 +285,36 @@ function RegisterForm() {
           maxLength={255}
           autoComplete="new-password"
           required
+          aria-invalid={errors.passwordConfirmation !== undefined}
+          aria-describedby={
+            errors.passwordConfirmation !== undefined
+              ? "passwordConfirmation-error"
+              : undefined
+          }
+        />
+
+        <FieldError
+          id="passwordConfirmation-error"
+          message={errors.passwordConfirmation}
         />
       </div>
 
-      <GenreSelector
-        genres={genres}
-        selectedGenreIds={selectedGenreIds}
-        onToggle={toggleGenre}
-      />
+      <div>
+        <GenreSelector
+          genres={genres}
+          selectedGenreIds={selectedGenreIds}
+          onToggle={handleGenreToggle}
+        />
 
-      {error !== null && (
+        <FieldError id="genres-error" message={errors.genres} />
+      </div>
+
+      {errors.form !== undefined && (
         <p
           role="alert"
           className="rounded-md bg-error/15 px-3 py-2 text-sm text-error"
         >
-          {error}
+          {errors.form}
         </p>
       )}
 
