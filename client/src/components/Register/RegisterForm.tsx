@@ -1,12 +1,13 @@
+import { Check, Eye, EyeOff, X } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Eye, EyeOff } from "lucide-react";
+
 import { registerUser } from "../../services/authApi";
 import { fetchGenres, type Genre } from "../../services/genreApi";
 import type { RegisterFormErrors } from "../../types/Auth";
+import { validateRegisterForm } from "../../utils/validateRegisterForm";
 import FieldError from "./FieldError";
 import GenreSelector from "./GenreSelector";
-import { validateRegisterForm } from "../../utils/validateRegisterForm";
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-cyan-950 bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
@@ -26,17 +27,21 @@ function RegisterForm() {
   const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
   const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordConfirmationVisible, setIsPasswordConfirmationVisible] =
     useState(false);
-  const handlePasswordVisibility = () => {
-    setIsPasswordVisible((currentValue) => !currentValue);
-  };
 
-  const handlePasswordConfirmationVisibility = () => {
-    setIsPasswordConfirmationVisible((currentValue) => !currentValue);
-  };
+  const [passwordValue, setPasswordValue] = useState("");
+  const [passwordConfirmationValue, setPasswordConfirmationValue] =
+    useState("");
+
   const navigate = useNavigate();
+
+  const isPasswordConfirmationFilled = passwordConfirmationValue.length > 0;
+
+  const isPasswordMatching =
+    isPasswordConfirmationFilled && passwordValue === passwordConfirmationValue;
 
   useEffect(() => {
     fetchGenres()
@@ -53,6 +58,24 @@ function RegisterForm() {
         }));
       });
   }, []);
+
+  const handlePasswordVisibility = () => {
+    setIsPasswordVisible((currentValue) => !currentValue);
+  };
+
+  const handlePasswordConfirmationVisibility = () => {
+    setIsPasswordConfirmationVisible((currentValue) => !currentValue);
+  };
+
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordValue(event.target.value);
+  };
+
+  const handlePasswordConfirmationChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setPasswordConfirmationValue(event.target.value);
+  };
 
   const handleGenreToggle = (genreId: number) => {
     setSelectedGenreIds((currentGenreIds) => {
@@ -91,6 +114,7 @@ function RegisterForm() {
     const email = emailRef.current.value.trim();
     const password = passwordRef.current.value;
     const passwordConfirmation = passwordConfirmationRef.current.value;
+
     const formValues = {
       firstName,
       lastName,
@@ -271,6 +295,7 @@ function RegisterForm() {
             maxLength={255}
             autoComplete="new-password"
             required
+            onChange={handlePasswordChange}
             aria-invalid={errors.password !== undefined}
             aria-describedby={
               errors.password !== undefined ? "password-error" : undefined
@@ -305,18 +330,51 @@ function RegisterForm() {
             id="passwordConfirmation"
             name="passwordConfirmation"
             type={isPasswordConfirmationVisible ? "text" : "password"}
-            className={`${inputClassName} pr-10`}
+            className={`${inputClassName} pr-16`}
             minLength={8}
             maxLength={255}
             autoComplete="new-password"
             required
-            aria-invalid={errors.passwordConfirmation !== undefined}
+            onChange={handlePasswordConfirmationChange}
+            aria-invalid={
+              errors.passwordConfirmation !== undefined ||
+              (isPasswordConfirmationFilled && !isPasswordMatching)
+            }
             aria-describedby={
               errors.passwordConfirmation !== undefined
                 ? "passwordConfirmation-error"
                 : undefined
             }
           />
+
+          {isPasswordConfirmationFilled && (
+            <span
+              className="absolute right-10 top-1/2 -translate-y-1/2"
+              aria-live="polite"
+            >
+              {isPasswordMatching ? (
+                <>
+                  <Check
+                    size={18}
+                    className="text-success"
+                    aria-hidden="true"
+                  />
+
+                  <span className="sr-only">
+                    Les mots de passe correspondent.
+                  </span>
+                </>
+              ) : (
+                <>
+                  <X size={18} className="text-error" aria-hidden="true" />
+
+                  <span className="sr-only">
+                    Les mots de passe ne correspondent pas.
+                  </span>
+                </>
+              )}
+            </span>
+          )}
 
           <button
             type="button"
