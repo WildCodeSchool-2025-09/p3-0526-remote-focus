@@ -65,7 +65,7 @@ class UserRepository {
     return result.insertId;
   }
 
-  async emailExists(email: string): Promise<boolean> {
+  async findByEmail(email: string): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
       "SELECT ID FROM user_ WHERE email = ? LIMIT 1",
       [email],
@@ -74,7 +74,7 @@ class UserRepository {
     return rows.length > 0;
   }
 
-  async loginExists(login: string): Promise<boolean> {
+  async findByLogin(login: string): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
       "SELECT ID FROM user_ WHERE login = ? LIMIT 1",
       [login],

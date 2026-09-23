@@ -1,7 +1,11 @@
+import AccountCreatedAlert from "../components/Register/AccountCreatedAlert";
+
 function Login() {
   return (
     <main>
-      <h1>Coucou login</h1>
+      <AccountCreatedAlert />
+
+      <h1>Connexion</h1>
     </main>
   );
 }

@@ -111,7 +111,11 @@ function RegisterForm() {
         genreIds: selectedGenreIds,
       });
 
-      navigate("/login");
+      navigate("/login", {
+        state: {
+          accountCreated: true,
+        },
+      });
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

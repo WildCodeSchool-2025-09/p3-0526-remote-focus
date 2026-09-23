@@ -99,10 +99,6 @@
     @apply rounded-full bg-focus-teal-dark;
   }
 }
-input {
-  color: black;
-  background-color: white;
-}
 
 /* ================================================================== *
  * Composants réutilisables

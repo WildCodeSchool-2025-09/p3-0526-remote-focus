@@ -6,7 +6,7 @@ const checkAvailability: RequestHandler = async (req, res, next) => {
   try {
     const { email, login } = req.body;
 
-    const emailAlreadyExists = await userRepository.emailExists(email);
+    const emailAlreadyExists = await userRepository.findByEmail(email);
 
     if (emailAlreadyExists) {
       res.status(409).json({
@@ -15,7 +15,7 @@ const checkAvailability: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const loginAlreadyExists = await userRepository.loginExists(login);
+    const loginAlreadyExists = await userRepository.findByLogin(login);
 
     if (loginAlreadyExists) {
       res.status(409).json({
