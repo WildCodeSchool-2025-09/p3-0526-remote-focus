@@ -10,7 +10,7 @@ import FieldError from "./FieldError";
 import GenreSelector from "./GenreSelector";
 
 const inputClassName =
-  "mt-1 w-full rounded-md border border-cyan-950 bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
+  "mt-1 w-full rounded-md border border-focus-line/50 bg-base-200 md:bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
 
 const labelClassName = "block text-xs font-medium text-base-content/70";
 
