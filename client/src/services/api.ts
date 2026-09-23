@@ -59,7 +59,7 @@ export async function fetchFilmography(
   page = 1,
 ): Promise<KnownForResponse> {
   const response = await fetch(
-    `${API_URL}/api/actors/${personId}/known-for?exclude=${excludeMediaId}&page=${page}&user=1`,
+    `${API_URL}/api/actors/${personId}/known-for?exclude=${excludeMediaId}&page=${page}&user=33`,
   );
 
   if (!response.ok) {
