@@ -34,7 +34,7 @@ function MediaSection({
           ))}
           {genreId !== undefined && (
             <Link
-              to="" // add a link to catalog page with genre filters when done
+              to={`/catalog?genre=${genreId}`}
               className="catalog-carousel-item items-center justify-center bg-focus-surface/60 text-focus-muted-dark/60 rounded-box hover:bg-focus-surface hover:text-focus-muted transition-colors"
             >
               Voir tout
