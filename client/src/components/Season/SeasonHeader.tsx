@@ -9,7 +9,7 @@ type SeasonHeaderProps = {
   season: SeasonDetail;
 };
 
-const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
+const PILL = "rounded-full border border-base-content/30 px-4 py-2 text-sm";
 
 function SeasonHeader({ season }: SeasonHeaderProps) {
   const year = season.releasedAt
@@ -50,14 +50,15 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
             onClick={handleToggleMeta}
             aria-expanded={isMetaOpen}
             aria-label="Afficher plus d'informations"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
-            style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-base-content/30 text-sm md:hidden ${
+              isMetaOpen ? "text-primary" : "text-base-content"
+            }`}
           >
             {isMetaOpen ? "⌃" : "⌄"}
           </button>
 
           <div
-            className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
+            className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-base-content/15 bg-base-200 p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
           >
             {season.episodeCount > 0 && (
               <span className={PILL}>
@@ -76,7 +77,7 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
 
       <div className="col-span-2 row-start-2 flex flex-col gap-4 md:col-span-1 md:col-start-2">
         {season.synopsis != null && (
-          <p className="max-w-[660px] text-base leading-relaxed text-[#C9D6DB]">
+          <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
             {season.synopsis}
           </p>
         )}
