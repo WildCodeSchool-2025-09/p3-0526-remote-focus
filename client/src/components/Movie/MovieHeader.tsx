@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
+import PlatformList from "../PlatformList";
 import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
@@ -85,23 +86,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
           <ActionButton label="Vu" color="#17B890" icon={Check} />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
-
-          {media.platforms.length > 0 && (
-            <>
-              <div className="hidden h-12 w-px bg-white/15 md:block" />
-              <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
-                {media.platforms.map((platform) => (
-                  <img
-                    key={platform.id}
-                    src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
-                    alt={platform.name}
-                    title={platform.name}
-                    className="h-8 w-8 rounded object-contain"
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          <PlatformList platforms={media.platforms} />
         </div>
       </div>
     </div>

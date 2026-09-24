@@ -2,6 +2,7 @@ import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Serie } from "../../types/media";
 import ActionButton from "../ActionButton";
+import PlatformList from "../PlatformList";
 import SerieInfo from "./SerieInfo";
 
 type SerieHeaderProps = {
@@ -90,23 +91,7 @@ function SerieHeader({ serie }: SerieHeaderProps) {
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
           <ActionButton label="Vu" color="#17B890" icon={Check} />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
-
-          {serie.platforms.length > 0 && (
-            <>
-              <div className="hidden h-12 w-px bg-white/15 md:block" />
-              <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
-                {serie.platforms.map((platform) => (
-                  <img
-                    key={platform.id}
-                    src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
-                    alt={platform.name}
-                    title={platform.name}
-                    className="h-8 w-8 rounded object-contain"
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          <PlatformList platforms={serie.platforms} />
         </div>
       </div>
     </div>

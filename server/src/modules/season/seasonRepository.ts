@@ -67,7 +67,7 @@ class SeasonRepository {
     return Number(rows[0].total);
   }
 
-  async readDuration(id: number) {
+  async sumDuration(id: number) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT SUM(duration) AS total_duration,
               COUNT(ID) AS episode_count
@@ -78,7 +78,7 @@ class SeasonRepository {
     return rows[0];
   }
 
-  async readDurationByMedia(mediaId: number) {
+  async sumDurationByMedia(mediaId: number) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT SUM(e.duration) AS total_duration,
               AVG(e.duration) AS average_duration,
