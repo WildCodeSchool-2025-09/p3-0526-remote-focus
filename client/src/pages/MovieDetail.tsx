@@ -2,7 +2,6 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import ActorKnownForWidget from "../components/ActorKnownForWidget";
-// import { fetchMedia } from "../services/api";
 import MovieHeader from "../components/Movie/MovieHeader";
 import type { Media } from "../types/media";
 import useSelectedActor from "../hooks/useSelectedActor";

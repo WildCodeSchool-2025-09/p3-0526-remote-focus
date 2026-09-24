@@ -3,7 +3,6 @@ import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
 import ActorKnownForWidget from "../components/ActorKnownForWidget";
-// import { fetchSeason } from "../services/api";
 import SeasonHeader from "../components/Season/SeasonHeader";
 import useFetch from "../hooks/useFetch";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";

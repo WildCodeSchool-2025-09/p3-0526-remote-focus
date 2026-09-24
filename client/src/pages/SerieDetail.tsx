@@ -2,7 +2,6 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import ActorKnownForWidget from "../components/ActorKnownForWidget";
-// import { fetchSerie } from "../services/api";
 import SeasonList from "../components/Serie/SeasonList";
 import SerieHeader from "../components/Serie/SerieHeader";
 import useFetch from "../hooks/useFetch";
