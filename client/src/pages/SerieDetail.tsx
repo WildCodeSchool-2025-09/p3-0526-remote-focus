@@ -34,11 +34,14 @@ function SerieDetail() {
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
         items={[
-          { label: "Accueil", path: "/" },
-          { label: "Catalogue", path: "/catalog" },
-          serieDetail.isAnime
-            ? { label: "Animés", path: "/catalog?type=anime" }
-            : { label: "Séries", path: "/catalog?type=tv" },
+          { label: "Accueil", to: "/" },
+          { label: "Catalogue", to: "/catalog" },
+          {
+            label: serieDetail.isAnime ? "Animés" : "Séries",
+            to: serieDetail.isAnime
+              ? "/catalog?type=anime"
+              : "/catalog?type=tv",
+          },
           { label: serieDetail.name },
         ]}
       />

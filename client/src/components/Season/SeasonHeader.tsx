@@ -1,4 +1,4 @@
-import { Check, Heart } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import { useState } from "react";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
@@ -54,7 +54,7 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
               isMetaOpen ? "text-primary" : "text-base-content"
             }`}
           >
-            {isMetaOpen ? "⌃" : "⌄"}
+            {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div

@@ -37,9 +37,9 @@ function MovieDetail() {
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
         items={[
-          { label: "Accueil", path: "/" },
-          { label: "Catalogue", path: "/catalog" },
-          { label: "Films", path: "/catalog?type=movie" },
+          { label: "Accueil", to: "/" },
+          { label: "Catalogue", to: "/catalog" },
+          { label: "Films", to: "/catalog?type=movie" },
           { label: mediaDetail.name },
         ]}
       />

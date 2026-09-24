@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 type BreadcrumbItem = {
   label: string;
-  path?: string;
+  to?: string;
 };
 
 type BreadcrumbProps = {
@@ -23,15 +23,15 @@ function Breadcrumb({ items }: BreadcrumbProps) {
 
         return (
           <span
-            key={item.path ?? item.label}
+            key={item.to ?? item.label}
             className={isHiddenOnMobile ? "hidden md:contents" : "contents"}
           >
             {isLast ? (
               <span aria-current="page" className="font-medium text-[#F2B705]">
                 {item.label}
               </span>
-            ) : item.path != null ? (
-              <Link to={item.path} className="hover:text-[#F5F5F0]">
+            ) : item.to != null ? (
+              <Link to={item.to} className="hover:text-[#F5F5F0]">
                 {item.label}
               </Link>
             ) : (

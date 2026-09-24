@@ -40,14 +40,14 @@ function SeasonDetail() {
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
         items={[
-          { label: "Accueil", path: "/" },
-          { label: "Catalogue", path: "/catalog" },
+          { label: "Accueil", to: "/" },
+          { label: "Catalogue", to: "/catalog" },
           seasonDetail.serie.isAnime
-            ? { label: "Animés", path: "/catalog?type=anime" }
-            : { label: "Séries", path: "/catalog?type=tv" },
+            ? { label: "Animés", to: "/catalog?type=anime" }
+            : { label: "Séries", to: "/catalog?type=tv" },
           {
             label: seasonDetail.serie.name,
-            path: `/${seasonDetail.serie.isAnime ? "animes" : "series"}/${seasonDetail.serie.id}`,
+            to: `/${seasonDetail.serie.isAnime ? "animes" : "series"}/${seasonDetail.serie.id}`,
           },
           { label: `Saison ${seasonDetail.number}` },
         ]}
@@ -61,7 +61,7 @@ function SeasonDetail() {
       </section>
       <CastList
         cast={seasonDetail.cast}
-        castTotal={seasonDetail.cast.length}
+        castTotal={seasonDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
       />

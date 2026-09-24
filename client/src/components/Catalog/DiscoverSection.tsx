@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
-import fetchDiscover from "../../services/catalogService";
+import { fetchDiscover } from "../../services/catalogService";
 import type { DiscoverResponse } from "../../types/Catalog";
+import { isValidMediaType } from "../../utils/catalogUtils";
 import MediaCardLoading from "./MediaCardLoading";
 import MediaSection from "./MediaSection";
-
-type MediaType = "movie" | "tv" | "anime";
-function isValidMediaType(type: string): type is MediaType {
-  return ["movie", "tv", "anime"].includes(type);
-}
 
 function DiscoverSection() {
   const [searchParams] = useSearchParams();

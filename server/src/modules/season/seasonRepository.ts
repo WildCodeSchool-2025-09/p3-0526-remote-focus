@@ -56,6 +56,17 @@ class SeasonRepository {
     return rows;
   }
 
+  async countCast(id: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(DISTINCT ep.ID_person) AS total
+       FROM episode_person AS ep
+       JOIN episode AS e ON e.ID = ep.ID_episode
+       WHERE e.ID_season = ? AND ep.role = 'actor'`,
+      [id],
+    );
+    return Number(rows[0].total);
+  }
+
   async sumDuration(id: number) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT SUM(duration) AS total_duration,

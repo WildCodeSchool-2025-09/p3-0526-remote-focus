@@ -47,6 +47,13 @@ export type FilmographyItem = {
   characterName: string | null;
 };
 
+export type Actor = {
+  id: number;
+  name: string;
+  photo: string | null;
+  biography: string | null;
+};
+
 export type Season = {
   id: number;
   name: string | null;
@@ -112,6 +119,7 @@ export type SeasonDetail = {
   };
   episodes: Episode[];
   cast: CastMember[];
+  castTotal: number;
   platforms: Platform[];
   userStatus: string | null;
   userRating: number | null;
