@@ -47,6 +47,13 @@ export type FilmographyItem = {
   characterName: string | null;
 };
 
+export type Actor = {
+  id: number;
+  name: string;
+  photo: string | null;
+  biography: string | null;
+};
+
 export type Season = {
   id: number;
   name: string | null;
