@@ -1,9 +1,9 @@
-import { Check, Heart, Plus, Star } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import MovieInfo from "./MovieInfo";
 import ActionButton from "../ActionButton";
+import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
   media: Media;
@@ -25,7 +25,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
   };
 
   return (
-    <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
+    <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
       {media.poster != null && (
         <img
           src={`https://image.tmdb.org/t/p/w500${media.poster}`}
@@ -53,7 +53,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
             style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
           >
-            {isMetaOpen ? "⌃" : "⌄"}
+            {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div

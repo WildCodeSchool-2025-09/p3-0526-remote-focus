@@ -121,3 +121,29 @@ export type KnownForResponse = {
   medias: KnownForMedia[];
   pagination: KnownForPagination | null;
 };
+
+export type SeasonDetail = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  poster: string | null;
+  hasOwnPoster: boolean;
+  synopsis: string | null;
+  releasedAt: string | null;
+  isFinished: boolean;
+  totalDuration: number | null;
+  episodeCount: number;
+  serie: {
+    id: number;
+    name: string;
+    poster: string | null;
+    originalLanguage: string | null;
+    isAnime: boolean;
+  };
+  episodes: Episode[];
+  cast: CastMember[];
+  castTotal: number;
+  platforms: Platform[];
+  userStatus: string | null;
+  userRating: number | null;
+};

@@ -1,4 +1,12 @@
-import type { Actor, Episode, Media, Serie } from "../types/media";
+import type {
+  Actor,
+  Episode,
+  FilmographyItem,
+  Media,
+  SeasonDetail,
+  Serie,
+} from "../types/media";
+
 import type { SearchResults } from "../types/search";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
@@ -58,6 +66,31 @@ export async function fetchEpisodes(seasonId: number): Promise<Episode[]> {
 
   if (!response.ok) {
     throw new Error("Épisodes indisponibles");
+  }
+
+  return response.json();
+}
+
+export async function fetchSeason(id: number): Promise<SeasonDetail> {
+  const response = await fetch(`${API_URL}/api/seasons/${id}`);
+
+  if (!response.ok) {
+    throw new Error(`Saison ${id} introuvable`);
+  }
+
+  return response.json();
+}
+
+export async function fetchFilmography(
+  personId: number,
+  excludeMediaId: number,
+): Promise<FilmographyItem[]> {
+  const response = await fetch(
+    `${API_URL}/api/actors/${personId}/filmography?exclude=${excludeMediaId}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Filmographie indisponible");
   }
 
   return response.json();
