@@ -38,6 +38,22 @@ export type Media = {
   userRating: number | null;
 };
 
+export type FilmographyItem = {
+  id: number;
+  name: string;
+  poster: string | null;
+  type: string;
+  releasedAt: string | null;
+  characterName: string | null;
+};
+
+export type Actor = {
+  id: number;
+  name: string;
+  photo: string | null;
+  biography: string | null;
+};
+
 export type Season = {
   id: number;
   name: string | null;

@@ -20,16 +20,18 @@ function TypeFilter() {
   }
 
   function handleFilterChange(filter: string) {
+    const newSearchParams = new URLSearchParams(searchParams);
     if (filter === "all") {
-      searchParams.delete("type");
+      newSearchParams.delete("type");
     } else {
-      searchParams.set("type", filter);
+      newSearchParams.set("type", filter);
     }
-    setSearchParams(searchParams);
+    newSearchParams.delete("page");
+    setSearchParams(newSearchParams);
   }
 
   return (
-    <search className="flex gap-4 sm:gap-8 overflow-x-auto scrollbar-none border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10">
+    <search className="flex gap-4 justify-center md:justify-start md:gap-8 border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10 text-xs md:text-base">
       <button
         type="button"
         className={getButtonClasses("all")}
