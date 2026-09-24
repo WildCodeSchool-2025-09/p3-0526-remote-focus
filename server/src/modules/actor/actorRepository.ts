@@ -1,5 +1,6 @@
 import databaseClient, { type Rows } from "../../../database/client";
 import type { Media } from "../../types/Media/Media.types";
+import type { PersonRow } from "../../types/Person/Person.types";
 
 export interface FilmographyRow extends Media {
   characterName: string | null;
@@ -7,7 +8,7 @@ export interface FilmographyRow extends Media {
 
 class ActorRepository {
   async read(id: number) {
-    const [rows] = await databaseClient.query<Rows>(
+    const [rows] = await databaseClient.query<PersonRow[]>(
       `SELECT ID, name, photo, biography
        FROM person
        WHERE ID = ?`,

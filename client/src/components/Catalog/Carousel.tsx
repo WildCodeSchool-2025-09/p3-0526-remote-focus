@@ -38,6 +38,20 @@ function Carousel({ children }: CarouselProps) {
 
   useEffect(() => {
     updateScrollButtons();
+
+    if (!carouselRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      updateScrollButtons();
+    });
+
+    observer.observe(carouselRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
   }, [updateScrollButtons]);
 
   return (

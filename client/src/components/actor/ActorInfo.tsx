@@ -1,35 +1,41 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import useMediaQuery from "../../hooks/useMediaQuery";
-import type { PersonDetail } from "../../types/media";
+import type { Actor } from "../../types/media";
 
 const WORD_LIMIT_DESKTOP = 150;
 const WORD_LIMIT_MOBILE = 50;
 const WORD_LIMIT_SMALL_MOBILE = 12;
 
+function getWordLimit(isDesktop: boolean, isSmallMobile: boolean): number {
+  if (isDesktop) {
+    return WORD_LIMIT_DESKTOP;
+  }
+  if (isSmallMobile) {
+    return WORD_LIMIT_SMALL_MOBILE;
+  }
+  return WORD_LIMIT_MOBILE;
+}
+
 type ActorInfoProps = {
-  person: PersonDetail;
+  actor: Actor;
 };
 
-function ActorInfo({ person }: ActorInfoProps) {
+function ActorInfo({ actor }: ActorInfoProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isSmallMobile = useMediaQuery("(max-width: 767px)");
 
-  if (person.biography == null) {
+  if (actor.biography == null) {
     return null;
   }
 
-  const wordLimit = isDesktop
-    ? WORD_LIMIT_DESKTOP
-    : isSmallMobile
-      ? WORD_LIMIT_SMALL_MOBILE
-      : WORD_LIMIT_MOBILE;
-  const words = person.biography.trim().split(/\s+/);
+  const wordLimit = getWordLimit(isDesktop, isSmallMobile);
+  const words = actor.biography.trim().split(/\s+/);
   const isTruncatable = words.length > wordLimit;
   const displayedText =
     isExpanded || !isTruncatable
-      ? person.biography
+      ? actor.biography
       : `${words.slice(0, wordLimit).join(" ")}…`;
 
   const handleToggle = () => {

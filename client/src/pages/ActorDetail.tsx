@@ -4,14 +4,14 @@ import { useNavigate, useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import ActorFilmography from "../components/actor/ActorFilmography";
 import ActorHeader from "../components/actor/ActorHeader";
-import { fetchPerson } from "../services/api";
-import type { PersonDetail } from "../types/media";
+import { fetchActor } from "../services/api";
+import type { Actor } from "../types/media";
 
 function ActorDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [person, setPerson] = useState<PersonDetail | null>(null);
+  const [actor, setActor] = useState<Actor | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,10 +25,10 @@ function ActorDetail() {
     setLoading(true);
     setError(null);
 
-    fetchPerson(Number(id))
+    fetchActor(Number(id))
       .then((data) => {
         if (active) {
-          setPerson(data);
+          setActor(data);
         }
       })
       .catch(() => {
@@ -55,7 +55,7 @@ function ActorDetail() {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
 
-  if (error != null || person == null) {
+  if (error != null || actor == null) {
     return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
   }
 
@@ -66,7 +66,7 @@ function ActorDetail() {
           items={[
             { label: "Accueil", to: "/" },
             { label: "Catalogue", to: "/catalog" },
-            { label: person.name },
+            { label: actor.name },
           ]}
         />
 
@@ -81,8 +81,8 @@ function ActorDetail() {
         </button>
       </div>
 
-      <ActorHeader person={person} />
-      <ActorFilmography personId={person.id} />
+      <ActorHeader actor={actor} />
+      <ActorFilmography personId={actor.id} />
     </div>
   );
 }

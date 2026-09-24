@@ -49,7 +49,7 @@ export type FilmographyPage = {
   hasMore: boolean;
 };
 
-export type PersonDetail = {
+export type Actor = {
   id: number;
   name: string;
   photo: string | null;

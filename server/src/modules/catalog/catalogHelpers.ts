@@ -60,3 +60,20 @@ export const createGenreSections = (
   });
   return genreSections;
 };
+
+export const enrichMedias = (
+  medias: Media[],
+  enrichedTopRated: EnrichedMedia[],
+): EnrichedMedia[] => {
+  return medias.map((media) => {
+    const rankedMedia = enrichedTopRated.find(
+      (rankedMedia) => rankedMedia.id === media.id,
+    );
+
+    return {
+      ...media,
+      isNew: isMediaNew(media.releasedAt),
+      topRank: rankedMedia ? rankedMedia.topRank : null,
+    };
+  });
+};
