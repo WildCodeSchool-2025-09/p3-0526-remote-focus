@@ -2,22 +2,24 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
+import EpisodeList from "../components/EpisodeList";
 import KnownFrom from "../components/KnownFrom";
-import SeasonList from "../components/serie/SeasonList";
-import SerieHeader from "../components/serie/SerieHeader";
-import { fetchSerie } from "../services/api";
-import type { Serie } from "../types/media";
+import SeasonHeader from "../components/season/SeasonHeader";
+import { fetchSeason } from "../services/api";
+import type { SeasonDetail as SeasonDetailType } from "../types/media";
 
-function SerieDetail() {
-  const { id } = useParams();
+function SeasonDetail() {
+  const { seasonId } = useParams();
 
-  const [serieDetail, setSerieDetail] = useState<Serie | null>(null);
+  const [seasonDetail, setSeasonDetail] = useState<SeasonDetailType | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (id == null) {
+    if (seasonId == null) {
       return;
     }
 
@@ -26,15 +28,15 @@ function SerieDetail() {
     setLoading(true);
     setError(null);
 
-    fetchSerie(Number(id))
+    fetchSeason(Number(seasonId))
       .then((data) => {
         if (active) {
-          setSerieDetail(data);
+          setSeasonDetail(data);
         }
       })
       .catch(() => {
         if (active) {
-          setError("Cette série est introuvable.");
+          setError("Cette saison est introuvable.");
         }
       })
       .finally(() => {
@@ -46,7 +48,7 @@ function SerieDetail() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [seasonId]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);
@@ -56,7 +58,7 @@ function SerieDetail() {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
 
-  if (error != null || serieDetail == null) {
+  if (error != null || seasonDetail == null) {
     return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
   }
 
@@ -66,28 +68,37 @@ function SerieDetail() {
         items={[
           { label: "Accueil", to: "/" },
           { label: "Catalogue", to: "/catalog" },
+          seasonDetail.serie.isAnime
+            ? { label: "Animés", to: "/catalog?type=anime" }
+            : { label: "Séries", to: "/catalog?type=tv" },
           {
-            label: serieDetail.isAnime ? "Animés" : "Séries",
-            to: serieDetail.isAnime
-              ? "/catalog?type=anime"
-              : "/catalog?type=tv",
+            label: seasonDetail.serie.name,
+            to: `/${seasonDetail.serie.isAnime ? "animes" : "series"}/${seasonDetail.serie.id}`,
           },
-          { label: serieDetail.name },
+          { label: `Saison ${seasonDetail.number}` },
         ]}
       />
-      <SerieHeader serie={serieDetail} />
-      <SeasonList seasons={serieDetail.seasons} serieId={serieDetail.id} />
+      <SeasonHeader season={seasonDetail} />
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold md:text-2xl">Épisodes</h2>
+        <div className="overflow-hidden rounded-xl border border-white/15">
+          <EpisodeList episodes={seasonDetail.episodes} />
+        </div>
+      </section>
       <CastList
-        cast={serieDetail.cast}
-        castTotal={serieDetail.castTotal}
+        cast={seasonDetail.cast}
+        castTotal={seasonDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={serieDetail.id} />
+        <KnownFrom
+          personId={selectedPersonId}
+          mediaId={seasonDetail.serie.id}
+        />
       )}
     </div>
   );
 }
 
-export default SerieDetail;
+export default SeasonDetail;
