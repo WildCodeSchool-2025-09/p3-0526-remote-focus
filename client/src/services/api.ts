@@ -1,10 +1,4 @@
-import type {
-  Actor,
-  Episode,
-  FilmographyItem,
-  Media,
-  Serie,
-} from "../types/media";
+import type { Actor, Episode, Media, Serie } from "../types/media";
 import type { SearchResults } from "../types/search";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
