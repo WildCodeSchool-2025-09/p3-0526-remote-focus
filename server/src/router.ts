@@ -21,6 +21,9 @@ import hashPassword from "./middlewares/hashPassword";
 import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
+router.get("/api/medias", catalogActions.browse);
+router.get("/api/genres", catalogActions.browseGenres);
+
 router.get("/api/medias/home", homepageActions.browseHomepage);
 /*
 router.get("/api/items", itemActions.browse);
@@ -30,6 +33,7 @@ router.post("/api/items", itemActions.add);
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
+router.get("/api/actors/:id", actorActions.read);
 router.get("/api/series/:id", serieActions.read);
 router.get("/api/seasons/:id/episodes", seasonActions.readEpisodes);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
