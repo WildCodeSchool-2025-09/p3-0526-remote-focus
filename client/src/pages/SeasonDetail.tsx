@@ -65,15 +65,18 @@ function SeasonDetail() {
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
       <Breadcrumb
-        currentLabel={`Saison ${seasonDetail.number}`}
-        categoryLabel={seasonDetail.serie.isAnime ? "Animés" : "Séries"}
-        categoryPath={
+        items={[
+          { label: "Accueil", to: "/" },
+          { label: "Catalogue", to: "/catalog" },
           seasonDetail.serie.isAnime
-            ? "/catalog?type=anime"
-            : "/catalog?type=tv"
-        }
-        parentLabel={seasonDetail.serie.name}
-        parentPath={`/${seasonDetail.serie.isAnime ? "animes" : "series"}/${seasonDetail.serie.id}`}
+            ? { label: "Animés", to: "/catalog?type=anime" }
+            : { label: "Séries", to: "/catalog?type=tv" },
+          {
+            label: seasonDetail.serie.name,
+            to: `/${seasonDetail.serie.isAnime ? "animes" : "series"}/${seasonDetail.serie.id}`,
+          },
+          { label: `Saison ${seasonDetail.number}` },
+        ]}
       />
       <SeasonHeader season={seasonDetail} />
       <section className="flex flex-col gap-4">

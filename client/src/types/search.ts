@@ -1,6 +1,6 @@
 import type { Media } from "./Catalog";
 
-type Person = {
+type ActorSummary = {
   id: number;
   name: string;
   photo: string | null;
@@ -10,8 +10,8 @@ type SearchResults = {
   films: Media[];
   series: Media[];
   animes: Media[];
-  actors: Person[];
+  actors: ActorSummary[];
   hasMore: boolean;
 };
 
-export type { Media, Person, SearchResults };
+export type { ActorSummary, Media, SearchResults };

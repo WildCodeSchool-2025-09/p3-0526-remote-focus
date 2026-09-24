@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { fetchFilmography } from "../services/api";
 import type { FilmographyItem } from "../types/media";
 import FilmographyCard from "./FilmographyCard";
@@ -61,6 +62,15 @@ function KnownFrom({ personId, mediaId }: KnownFromProps) {
             <FilmographyCard key={item.id} item={item} />
           ))}
         </div>
+      )}
+
+      {!loading && error == null && (
+        <Link
+          to={`/actors/${personId}`}
+          className="text-sm font-medium text-[#F2B705] hover:underline"
+        >
+          Voir la fiche complète de l'acteur →
+        </Link>
       )}
     </div>
   );

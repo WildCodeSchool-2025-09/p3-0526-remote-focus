@@ -1,9 +1,9 @@
-import type { Person } from "../../types/search";
+import type { ActorSummary } from "../../types/search";
 import Carousel from "../Catalog/Carousel";
 import SearchActorCard from "./SearchActorCard";
 
 type ActorListProps = {
-  actors: Person[];
+  actors: ActorSummary[];
 };
 
 const ActorList = ({ actors }: ActorListProps) => {
@@ -15,7 +15,7 @@ const ActorList = ({ actors }: ActorListProps) => {
     <section className="space-y-3">
       <Carousel>
         {actors.map((actor) => (
-          <SearchActorCard key={actor.id} person={actor} />
+          <SearchActorCard key={actor.id} actor={actor} />
         ))}
       </Carousel>
     </section>

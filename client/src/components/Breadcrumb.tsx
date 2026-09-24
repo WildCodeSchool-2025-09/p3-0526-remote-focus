@@ -1,49 +1,41 @@
+import { Fragment } from "react";
 import { Link } from "react-router";
 
-type BreadcrumbProps = {
-  currentLabel: string;
-  categoryLabel?: string;
-  categoryPath?: string;
-  parentLabel?: string;
-  parentPath?: string;
+type BreadcrumbItem = {
+  label: string;
+  to?: string;
 };
 
-function Breadcrumb({
-  currentLabel,
-  categoryLabel = "Films",
-  categoryPath = "/catalog?type=movie",
-  parentLabel,
-  parentPath,
-}: BreadcrumbProps) {
-  const hasParent = parentLabel != null && parentPath != null;
+type BreadcrumbProps = {
+  items: BreadcrumbItem[];
+};
+
+function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav
       aria-label="Fil d'Ariane"
       className="flex flex-wrap items-center gap-2 text-sm text-[#9FB4BD]"
     >
-      <span className={hasParent ? "hidden md:contents" : "contents"}>
-        <Link to="/" className="hover:text-[#F5F5F0]">
-          Accueil
-        </Link>
-        <span className="text-[#5E7079]">›</span>
-        <Link to="/catalog" className="hover:text-[#F5F5F0]">
-          Catalogue
-        </Link>
-        <span className="text-[#5E7079]">›</span>
-      </span>
-      <Link to={categoryPath} className="hover:text-[#F5F5F0]">
-        {categoryLabel}
-      </Link>
-      {hasParent && (
-        <>
-          <span className="text-[#5E7079]">›</span>
-          <Link to={parentPath} className="hover:text-[#F5F5F0]">
-            {parentLabel}
-          </Link>
-        </>
-      )}
-      <span className="text-[#5E7079]">›</span>
-      <span className="font-medium text-[#F2B705]">{currentLabel}</span>
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+
+        return (
+          <Fragment key={item.label}>
+            {item.to != null && !isLast ? (
+              <Link to={item.to} className="hover:text-[#F5F5F0]">
+                {item.label}
+              </Link>
+            ) : (
+              <span
+                className={isLast ? "font-medium text-[#F2B705]" : undefined}
+              >
+                {item.label}
+              </span>
+            )}
+            {!isLast && <span className="text-[#5E7079]">›</span>}
+          </Fragment>
+        );
+      })}
     </nav>
   );
 }

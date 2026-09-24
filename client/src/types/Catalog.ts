@@ -21,6 +21,8 @@ export type EnrichedMedia = Media & {
   isNew: boolean;
 };
 
+export type MediaType = "movie" | "tv" | "anime";
+
 export type GenreSection = {
   id: number;
   name: string;
@@ -31,6 +33,18 @@ export type DiscoverResponse = {
   topRated: EnrichedMedia[];
   latest: EnrichedMedia[];
   genreSections: GenreSection[];
+};
+
+export type Pagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type PaginatedMediaResponse = {
+  medias: EnrichedMedia[];
+  pagination: Pagination;
 };
 
 export type LikedGenre = {
