@@ -67,7 +67,9 @@ describe("seasonActions.readEpisodes", () => {
   });
 
   test("renvoie 400 si l'id n'est pas un nombre", async () => {
-    const req = { params: { id: "abc" } } as unknown as Request;
+    const req = {
+      params: { id: "11", seasonId: "abc" },
+    } as unknown as Request;
     const res = createResponse();
 
     await seasonActions.readEpisodes(req, res, jest.fn());

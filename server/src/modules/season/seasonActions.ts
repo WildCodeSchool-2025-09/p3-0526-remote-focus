@@ -9,14 +9,22 @@ import seasonRepository from "./seasonRepository";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const seriesId = Number(req.params.id);
+    const seasonId = Number(req.params.seasonId);
 
-    if (Number.isNaN(id)) {
+    if (Number.isNaN(seriesId) || Number.isNaN(seasonId)) {
       res.sendStatus(400);
       return;
     }
 
-    const episodes = await seasonRepository.readEpisodes(id);
+    const season = await seasonRepository.read(seasonId);
+
+    if (season == null || season.ID_media !== seriesId) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const episodes = await seasonRepository.readEpisodes(seasonId);
 
     res.json(formatEpisodes(episodes));
   } catch (err) {
