@@ -87,7 +87,7 @@ function SeasonDetail() {
       </section>
       <CastList
         cast={seasonDetail.cast}
-        castTotal={seasonDetail.cast.length}
+        castTotal={seasonDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
       />
