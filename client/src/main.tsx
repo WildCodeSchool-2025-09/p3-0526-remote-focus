@@ -14,6 +14,7 @@ import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
 
 const router = createBrowserRouter([
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: "series/:id",
         element: <SerieDetail />,
+      },
+      {
+        path: "series/:id/seasons/:seasonId",
+        element: <SeasonDetail />,
       },
       {
         path: "animes/:id",

@@ -35,6 +35,7 @@ router.post("/api/items", itemActions.add);
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/actors/:id", actorActions.read);
 router.get("/api/series/:id", serieActions.read);
+router.get("/api/seasons/:id", seasonActions.read);
 router.get("/api/seasons/:id/episodes", seasonActions.readEpisodes);
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 router.get("/api/genres", genreActions.browse);

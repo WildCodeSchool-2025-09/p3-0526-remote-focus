@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import mediaRepository from "../src/modules/media/mediaRepository";
-import serieActions from "../src/modules/serie/serieActions";
+import mediaRepository from "../../src/modules/media/mediaRepository";
+import serieActions from "../../src/modules/serie/serieActions";
 
-jest.mock("../src/modules/media/mediaRepository");
+jest.mock("../../src/modules/media/mediaRepository");
 
 const mockedRepository = mediaRepository as jest.Mocked<typeof mediaRepository>;
 
