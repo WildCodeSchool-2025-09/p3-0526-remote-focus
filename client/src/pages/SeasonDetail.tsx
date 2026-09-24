@@ -3,10 +3,11 @@ import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
-import KnownFrom from "../components/KnownFrom";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import SeasonHeader from "../components/season/SeasonHeader";
 import { fetchSeason } from "../services/api";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
+import useSelectedActor from "../hooks/useSelectedActor";
 
 function SeasonDetail() {
   const { seasonId } = useParams();
@@ -16,7 +17,8 @@ function SeasonDetail() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   useEffect(() => {
     if (seasonId == null) {
@@ -49,10 +51,6 @@ function SeasonDetail() {
       active = false;
     };
   }, [seasonId]);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
@@ -92,9 +90,10 @@ function SeasonDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom
+        <ActorKnownForWidget
           personId={selectedPersonId}
           mediaId={seasonDetail.serie.id}
+          onClose={handleCloseActorWidget}
         />
       )}
     </div>
