@@ -1,67 +1,41 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
 import ActorKnownForWidget from "../components/ActorKnownForWidget";
-import SeasonHeader from "../components/season/SeasonHeader";
-import { fetchSeason } from "../services/api";
+// import { fetchSeason } from "../services/api";
+import SeasonHeader from "../components/Season/SeasonHeader";
+import useFetch from "../hooks/useFetch";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
 import useSelectedActor from "../hooks/useSelectedActor";
 
 function SeasonDetail() {
-  const { seasonId } = useParams();
+  const { seriesId, seasonId } = useParams();
 
-  const [seasonDetail, setSeasonDetail] = useState<SeasonDetailType | null>(
-    null,
+  const {
+    data: seasonDetail,
+    loading,
+    error,
+  } = useFetch<SeasonDetailType>(
+    seriesId != null && seasonId != null
+      ? `/api/series/${seriesId}/seasons/${seasonId}`
+      : null,
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
     useSelectedActor();
-
-  useEffect(() => {
-    if (seasonId == null) {
-      return;
-    }
-
-    let active = true;
-
-    setLoading(true);
-    setError(null);
-
-    fetchSeason(Number(seasonId))
-      .then((data) => {
-        if (active) {
-          setSeasonDetail(data);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setError("Cette saison est introuvable.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [seasonId]);
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
 
   if (error != null || seasonDetail == null) {
-    return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
+    return (
+      <p className="p-8 text-focus-muted">Cette saison est introuvable.</p>
+    );
   }
 
   return (
-    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
+    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
         items={[
           { label: "Accueil", to: "/" },

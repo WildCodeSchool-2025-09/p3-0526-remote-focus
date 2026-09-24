@@ -1,28 +1,32 @@
 import type { RequestHandler } from "express";
+import {
+  formatCast,
+  formatEpisodes,
+  formatPlatforms,
+} from "../../utils/formatters";
 import mediaRepository from "../media/mediaRepository";
 import seasonRepository from "./seasonRepository";
 
 const readEpisodes: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const seriesId = Number(req.params.id);
+    const seasonId = Number(req.params.seasonId);
 
-    if (Number.isNaN(id)) {
+    if (Number.isNaN(seriesId) || Number.isNaN(seasonId)) {
       res.sendStatus(400);
       return;
     }
 
-    const episodes = await seasonRepository.readEpisodes(id);
+    const season = await seasonRepository.read(seasonId);
 
-    res.json(
-      episodes.map((episode) => ({
-        id: episode.ID,
-        name: episode.name,
-        number: episode.number,
-        releasedAt: episode.released_at,
-        synopsis: episode.synopsis,
-        duration: episode.duration,
-      })),
-    );
+    if (season == null || season.ID_media !== seriesId) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const episodes = await seasonRepository.readEpisodes(seasonId);
+
+    res.json(formatEpisodes(episodes));
   } catch (err) {
     next(err);
   }
@@ -30,26 +34,27 @@ const readEpisodes: RequestHandler = async (req, res, next) => {
 
 const read: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const seriesId = Number(req.params.id);
+    const seasonId = Number(req.params.seasonId);
 
-    if (Number.isNaN(id)) {
+    if (Number.isNaN(seriesId) || Number.isNaN(seasonId)) {
       res.sendStatus(400);
       return;
     }
 
-    const season = await seasonRepository.read(id);
+    const season = await seasonRepository.read(seasonId);
 
-    if (season == null) {
+    if (season == null || season.ID_media !== seriesId) {
       res.sendStatus(404);
       return;
     }
 
     const [episodes, cast, duration, platforms, castTotal] = await Promise.all([
-      seasonRepository.readEpisodes(id),
-      seasonRepository.readCast(id),
-      seasonRepository.readDuration(id),
-      mediaRepository.readPlatforms(season.ID_media),
-      seasonRepository.countCast(id),
+      seasonRepository.readEpisodes(seasonId),
+      seasonRepository.readCast(seasonId),
+      seasonRepository.sumDuration(seasonId),
+      mediaRepository.readPlatforms(seriesId),
+      seasonRepository.countCast(seasonId),
     ]);
 
     res.json({
@@ -72,27 +77,9 @@ const read: RequestHandler = async (req, res, next) => {
         originalLanguage: season.original_language,
         isAnime: Boolean(season.is_anime),
       },
-      platforms: platforms.map((platform) => ({
-        id: platform.ID,
-        name: platform.name,
-        logo: platform.logo,
-        url: platform.url,
-      })),
-      episodes: episodes.map((episode) => ({
-        id: episode.ID,
-        name: episode.name,
-        number: episode.number,
-        releasedAt: episode.released_at,
-        synopsis: episode.synopsis,
-        duration: episode.duration,
-      })),
-      cast: cast.map((person) => ({
-        id: person.ID,
-        name: person.name,
-        photo: person.photo,
-        characterName: person.personnage_name,
-        role: person.role,
-      })),
+      platforms: formatPlatforms(platforms),
+      episodes: formatEpisodes(episodes),
+      cast: formatCast(cast),
       castTotal,
       userStatus: null,
       userRating: null,
