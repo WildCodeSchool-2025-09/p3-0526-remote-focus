@@ -53,20 +53,4 @@ export async function fetchEpisodes(seasonId: number): Promise<Episode[]> {
   return response.json();
 }
 
-export async function fetchFilmography(
-  personId: number,
-  excludeMediaId: number,
-  page = 1,
-): Promise<KnownForResponse> {
-  const response = await fetch(
-    `${API_URL}/api/actors/${personId}/known-for?exclude=${excludeMediaId}&page=${page}`,
-  );
-
-  if (!response.ok) {
-    throw new Error("Filmographie indisponible");
-  }
-
-  return response.json();
-}
-
 export { searchMedias };

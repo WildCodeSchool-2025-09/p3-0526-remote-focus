@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchFilmography } from "../services/api";
+import { fetchKnownFor } from "../services/knownForService";
 import FilmographyCard from "./FilmographyCard";
 import type { KnownForMedia } from "../types/media";
 import { Link } from "react-router";
@@ -27,7 +27,7 @@ function ActorKnownForWidget({ personId, mediaId, onClose }: KnownForProps) {
     setLoading(true);
     setError(null);
 
-    fetchFilmography(personId, mediaId, 1)
+    fetchKnownFor(personId, mediaId, 1)
       .then((data) => {
         if (active) {
           setItems(data.medias);
@@ -56,7 +56,7 @@ function ActorKnownForWidget({ personId, mediaId, onClose }: KnownForProps) {
 
     setLoading(true);
 
-    fetchFilmography(personId, mediaId, nextPage)
+    fetchKnownFor(personId, mediaId, nextPage)
       .then((data) => {
         setItems((currentItems) => [...currentItems, ...data.medias]);
         setPage(nextPage);
