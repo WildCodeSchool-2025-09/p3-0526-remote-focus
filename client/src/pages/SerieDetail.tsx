@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
