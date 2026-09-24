@@ -1,5 +1,9 @@
 import type { Genre } from "../types/Genre";
 
+interface GenreListResponse {
+  genreList: Genre[];
+}
+
 export async function fetchGenres(): Promise<Genre[]> {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/api/genres`);
 
@@ -7,5 +11,7 @@ export async function fetchGenres(): Promise<Genre[]> {
     throw new Error("Impossible de récupérer les genres.");
   }
 
-  return (await response.json()) as Genre[];
+  const data = (await response.json()) as GenreListResponse;
+
+  return data.genreList;
 }
