@@ -1,4 +1,4 @@
-import { Check, Heart, Plus, Star } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Serie } from "../../types/media";
 import ActionButton from "../ActionButton";
@@ -52,7 +52,7 @@ function SerieHeader({ serie }: SerieHeaderProps) {
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
             style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
           >
-            {isMetaOpen ? "⌃" : "⌄"}
+            {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div
