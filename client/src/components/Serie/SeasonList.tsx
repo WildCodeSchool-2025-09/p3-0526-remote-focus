@@ -58,7 +58,7 @@ function SeasonList({ seasons, serieId }: SeasonListProps) {
 
               {visitedSeasonIds.includes(season.id) && (
                 <div className={isOpen ? "" : "hidden"}>
-                  <SeasonEpisodes seasonId={season.id} />
+                  <SeasonEpisodes serieId={serieId} seasonId={season.id} />
                   <Link
                     to={`/series/${serieId}/seasons/${season.id}`}
                     className="block border-t border-white/10 px-4 py-3 text-sm text-[#F2B705] hover:underline md:px-6"

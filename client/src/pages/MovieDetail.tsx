@@ -1,51 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
-import MovieHeader from "../components/movie/MovieHeader";
-import { fetchMedia } from "../services/api";
+import MovieHeader from "../components/Movie/MovieHeader";
+import useFetch from "../hooks/useFetch";
 import type { Media } from "../types/media";
 
 function MovieDetail() {
   const { id } = useParams();
 
-  const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: mediaDetail,
+    loading,
+    error,
+  } = useFetch<Media>(id != null ? `/api/medias/${id}` : null);
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (id == null) {
-      return;
-    }
-
-    let active = true;
-
-    setLoading(true);
-    setError(null);
-
-    fetchMedia(Number(id))
-      .then((data) => {
-        if (active) {
-          setMediaDetail(data);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setError("Ce film est introuvable.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [id]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);
@@ -56,7 +26,7 @@ function MovieDetail() {
   }
 
   if (error != null || mediaDetail == null) {
-    return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
+    return <p className="p-8 text-focus-muted">Ce film est introuvable.</p>;
   }
 
   if (mediaDetail.type !== "movie") {
@@ -64,7 +34,7 @@ function MovieDetail() {
   }
 
   return (
-    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
+    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
         items={[
           { label: "Accueil", to: "/" },
