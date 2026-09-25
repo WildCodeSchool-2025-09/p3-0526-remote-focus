@@ -1,14 +1,17 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 import type { Season } from "../../types/media";
-import EpisodeList from "./EpisodeList";
+import SeasonEpisodes from "./SeasonEpisodes";
 
 type SeasonListProps = {
   seasons: Season[];
+  serieId: number;
 };
 
-function SeasonList({ seasons }: SeasonListProps) {
+function SeasonList({ seasons, serieId }: SeasonListProps) {
   const [openSeasonId, setOpenSeasonId] = useState<number | null>(null);
+  const [visitedSeasonIds, setVisitedSeasonIds] = useState<number[]>([]);
 
   if (seasons.length === 0) {
     return null;
@@ -16,6 +19,10 @@ function SeasonList({ seasons }: SeasonListProps) {
 
   const handleToggleSeason = (seasonId: number) => {
     setOpenSeasonId(openSeasonId === seasonId ? null : seasonId);
+
+    if (!visitedSeasonIds.includes(seasonId)) {
+      setVisitedSeasonIds([...visitedSeasonIds, seasonId]);
+    }
   };
 
   return (
@@ -49,7 +56,17 @@ function SeasonList({ seasons }: SeasonListProps) {
                 {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </button>
 
-              {isOpen && <EpisodeList seasonId={season.id} />}
+              {visitedSeasonIds.includes(season.id) && (
+                <div className={isOpen ? "" : "hidden"}>
+                  <SeasonEpisodes serieId={serieId} seasonId={season.id} />
+                  <Link
+                    to={`/series/${serieId}/seasons/${season.id}`}
+                    className="block border-t border-white/10 px-4 py-3 text-sm text-[#F2B705] hover:underline md:px-6"
+                  >
+                    Voir la saison →
+                  </Link>
+                </div>
+              )}
             </div>
           );
         })}

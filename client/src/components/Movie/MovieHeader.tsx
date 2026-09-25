@@ -1,9 +1,10 @@
-import { Check, Heart, Plus, Star } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import MovieInfo from "./MovieInfo";
 import ActionButton from "../ActionButton";
+import PlatformList from "../PlatformList";
+import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
   media: Media;
@@ -25,7 +26,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
   };
 
   return (
-    <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
+    <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
       {media.poster != null && (
         <img
           src={`https://image.tmdb.org/t/p/w500${media.poster}`}
@@ -53,7 +54,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
             style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
           >
-            {isMetaOpen ? "⌃" : "⌄"}
+            {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div
@@ -85,23 +86,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
           <ActionButton label="Vu" color="#17B890" icon={Check} />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
-
-          {media.platforms.length > 0 && (
-            <>
-              <div className="hidden h-12 w-px bg-white/15 md:block" />
-              <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
-                {media.platforms.map((platform) => (
-                  <img
-                    key={platform.id}
-                    src={`https://image.tmdb.org/t/p/w92${platform.logo}`}
-                    alt={platform.name}
-                    title={platform.name}
-                    className="h-8 w-8 rounded object-contain"
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          <PlatformList platforms={media.platforms} />
         </div>
       </div>
     </div>

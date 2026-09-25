@@ -1,52 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import KnownFrom from "../components/KnownFrom";
-import SeasonList from "../components/serie/SeasonList";
-import SerieHeader from "../components/serie/SerieHeader";
-import { fetchSerie } from "../services/api";
+import SeasonList from "../components/Serie/SeasonList";
+import SerieHeader from "../components/Serie/SerieHeader";
+import useFetch from "../hooks/useFetch";
 import type { Serie } from "../types/media";
 
 function SerieDetail() {
   const { id } = useParams();
 
-  const [serieDetail, setSerieDetail] = useState<Serie | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: serieDetail,
+    loading,
+    error,
+  } = useFetch<Serie>(id != null ? `/api/series/${id}` : null);
   const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (id == null) {
-      return;
-    }
-
-    let active = true;
-
-    setLoading(true);
-    setError(null);
-
-    fetchSerie(Number(id))
-      .then((data) => {
-        if (active) {
-          setSerieDetail(data);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setError("Cette série est introuvable.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [id]);
 
   const handleSelectPerson = (personId: number) => {
     setSelectedPersonId(personId);
@@ -57,11 +27,11 @@ function SerieDetail() {
   }
 
   if (error != null || serieDetail == null) {
-    return <p className="p-8 text-focus-muted">{error ?? "Erreur"}</p>;
+    return <p className="p-8 text-focus-muted">Cette série est introuvable.</p>;
   }
 
   return (
-    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 p-4 md:p-8">
+    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
         items={[
           { label: "Accueil", to: "/" },
@@ -76,7 +46,7 @@ function SerieDetail() {
         ]}
       />
       <SerieHeader serie={serieDetail} />
-      <SeasonList seasons={serieDetail.seasons} />
+      <SeasonList seasons={serieDetail.seasons} serieId={serieDetail.id} />
       <CastList
         cast={serieDetail.cast}
         castTotal={serieDetail.castTotal}
