@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 
 import type { RegisterUserInput } from "../../types/User/User.types";
-import UserRepository from "./userRepository";
+import userRepository from "./userRepository";
 
 const add: RequestHandler = async (req, res, next) => {
   try {
@@ -14,9 +14,9 @@ const add: RequestHandler = async (req, res, next) => {
       hashedPassword: req.body.hashedPassword,
     };
 
-    const insertId = await UserRepository.create(newUser);
+    const insertId = await userRepository.create(newUser);
 
-    await UserRepository.addLikedGenres(insertId, req.body.genreIds);
+    await userRepository.addLikedGenres(insertId, req.body.genreIds);
 
     res.status(201).json({
       insertId,
