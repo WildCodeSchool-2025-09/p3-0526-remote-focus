@@ -8,12 +8,8 @@ import type { RegisterFormErrors } from "../../types/Auth";
 import type { Genre } from "../../types/Genre";
 import { validateRegisterForm } from "../../utils/validateRegisterForm";
 import FieldError from "./FieldError";
+import FormField from "./FormField";
 import GenreSelector from "./GenreSelector";
-
-const inputClassName =
-  "mt-1 w-full rounded-md border border-focus-line/50 bg-base-200 md:bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
-
-const labelClassName = "block text-xs font-medium text-base-content/70";
 
 function RegisterForm() {
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -184,233 +180,142 @@ function RegisterForm() {
         Créer un compte
       </h1>
 
-      <div>
-        <label htmlFor="firstName" className={labelClassName}>
-          Prénom
-        </label>
+      <FormField
+        ref={firstNameRef}
+        id="firstName"
+        label="Prénom"
+        maxLength={100}
+        autoComplete="given-name"
+        required
+        error={errors.firstName}
+      />
 
-        <input
-          ref={firstNameRef}
-          id="firstName"
-          name="firstName"
-          type="text"
-          className={inputClassName}
-          maxLength={100}
-          autoComplete="given-name"
-          required
-          aria-invalid={errors.firstName !== undefined}
-          aria-describedby={
-            errors.firstName !== undefined ? "firstName-error" : undefined
+      <FormField
+        ref={lastNameRef}
+        id="lastName"
+        label="Nom"
+        maxLength={50}
+        autoComplete="family-name"
+      />
+
+      <FormField
+        ref={bornAtRef}
+        id="bornAt"
+        label="Date de naissance"
+        type="date"
+        className="[color-scheme:dark]"
+        autoComplete="bday"
+        required
+        error={errors.bornAt}
+      />
+
+      <FormField
+        ref={loginRef}
+        id="login"
+        label="Pseudo"
+        maxLength={50}
+        autoComplete="username"
+        required
+        error={errors.login}
+      />
+
+      <FormField
+        ref={emailRef}
+        id="email"
+        label="Adresse e-mail"
+        type="email"
+        maxLength={255}
+        autoComplete="email"
+        required
+        error={errors.email}
+      />
+
+      <FormField
+        ref={passwordRef}
+        id="password"
+        label="Mot de passe"
+        type={isPasswordVisible ? "text" : "password"}
+        className="pr-10"
+        minLength={8}
+        maxLength={255}
+        autoComplete="new-password"
+        required
+        onChange={handlePasswordChange}
+        error={errors.password}
+      >
+        <button
+          type="button"
+          onClick={handlePasswordVisibility}
+          aria-label={
+            isPasswordVisible
+              ? "Masquer le mot de passe"
+              : "Afficher le mot de passe"
           }
-        />
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
+        >
+          {isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </FormField>
 
-        <FieldError id="firstName-error" message={errors.firstName} />
-      </div>
-
-      <div>
-        <label htmlFor="lastName" className={labelClassName}>
-          Nom
-        </label>
-
-        <input
-          ref={lastNameRef}
-          id="lastName"
-          name="lastName"
-          type="text"
-          className={inputClassName}
-          maxLength={50}
-          autoComplete="family-name"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="bornAt" className={labelClassName}>
-          Date de naissance
-        </label>
-
-        <input
-          ref={bornAtRef}
-          id="bornAt"
-          name="bornAt"
-          type="date"
-          className={`${inputClassName} [color-scheme:dark]`}
-          autoComplete="bday"
-          required
-          aria-invalid={errors.bornAt !== undefined}
-          aria-describedby={
-            errors.bornAt !== undefined ? "bornAt-error" : undefined
-          }
-        />
-
-        <FieldError id="bornAt-error" message={errors.bornAt} />
-      </div>
-
-      <div>
-        <label htmlFor="login" className={labelClassName}>
-          Pseudo
-        </label>
-
-        <input
-          ref={loginRef}
-          id="login"
-          name="login"
-          type="text"
-          className={inputClassName}
-          maxLength={50}
-          autoComplete="username"
-          required
-          aria-invalid={errors.login !== undefined}
-          aria-describedby={
-            errors.login !== undefined ? "login-error" : undefined
-          }
-        />
-
-        <FieldError id="login-error" message={errors.login} />
-      </div>
-
-      <div>
-        <label htmlFor="email" className={labelClassName}>
-          Adresse e-mail
-        </label>
-
-        <input
-          ref={emailRef}
-          id="email"
-          name="email"
-          type="email"
-          className={inputClassName}
-          maxLength={255}
-          autoComplete="email"
-          required
-          aria-invalid={errors.email !== undefined}
-          aria-describedby={
-            errors.email !== undefined ? "email-error" : undefined
-          }
-        />
-
-        <FieldError id="email-error" message={errors.email} />
-      </div>
-
-      <div>
-        <label htmlFor="password" className={labelClassName}>
-          Mot de passe
-        </label>
-
-        <div className="relative">
-          <input
-            ref={passwordRef}
-            id="password"
-            name="password"
-            type={isPasswordVisible ? "text" : "password"}
-            className={`${inputClassName} pr-10`}
-            minLength={8}
-            maxLength={255}
-            autoComplete="new-password"
-            required
-            onChange={handlePasswordChange}
-            aria-invalid={errors.password !== undefined}
-            aria-describedby={
-              errors.password !== undefined ? "password-error" : undefined
-            }
-          />
-
-          <button
-            type="button"
-            onClick={handlePasswordVisibility}
-            aria-label={
-              isPasswordVisible
-                ? "Masquer le mot de passe"
-                : "Afficher le mot de passe"
-            }
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
+      <FormField
+        ref={passwordConfirmationRef}
+        id="passwordConfirmation"
+        label="Confirmer le mot de passe"
+        type={isPasswordConfirmationVisible ? "text" : "password"}
+        className="pr-16"
+        minLength={8}
+        maxLength={255}
+        autoComplete="new-password"
+        required
+        onChange={handlePasswordConfirmationChange}
+        error={errors.passwordConfirmation}
+        aria-invalid={
+          errors.passwordConfirmation !== undefined ||
+          (isPasswordConfirmationFilled && !isPasswordMatching)
+        }
+      >
+        {isPasswordConfirmationFilled && (
+          <span
+            className="absolute right-10 top-1/2 -translate-y-1/2"
+            aria-live="polite"
           >
-            {isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
+            {isPasswordMatching ? (
+              <>
+                <Check size={18} className="text-success" aria-hidden="true" />
 
-        <FieldError id="password-error" message={errors.password} />
-      </div>
-
-      <div>
-        <label htmlFor="passwordConfirmation" className={labelClassName}>
-          Confirmer le mot de passe
-        </label>
-
-        <div className="relative">
-          <input
-            ref={passwordConfirmationRef}
-            id="passwordConfirmation"
-            name="passwordConfirmation"
-            type={isPasswordConfirmationVisible ? "text" : "password"}
-            className={`${inputClassName} pr-16`}
-            minLength={8}
-            maxLength={255}
-            autoComplete="new-password"
-            required
-            onChange={handlePasswordConfirmationChange}
-            aria-invalid={
-              errors.passwordConfirmation !== undefined ||
-              (isPasswordConfirmationFilled && !isPasswordMatching)
-            }
-            aria-describedby={
-              errors.passwordConfirmation !== undefined
-                ? "passwordConfirmation-error"
-                : undefined
-            }
-          />
-
-          {isPasswordConfirmationFilled && (
-            <span
-              className="absolute right-10 top-1/2 -translate-y-1/2"
-              aria-live="polite"
-            >
-              {isPasswordMatching ? (
-                <>
-                  <Check
-                    size={18}
-                    className="text-success"
-                    aria-hidden="true"
-                  />
-
-                  <span className="sr-only">
-                    Les mots de passe correspondent.
-                  </span>
-                </>
-              ) : (
-                <>
-                  <X size={18} className="text-error" aria-hidden="true" />
-
-                  <span className="sr-only">
-                    Les mots de passe ne correspondent pas.
-                  </span>
-                </>
-              )}
-            </span>
-          )}
-
-          <button
-            type="button"
-            onClick={handlePasswordConfirmationVisibility}
-            aria-label={
-              isPasswordConfirmationVisible
-                ? "Masquer la confirmation du mot de passe"
-                : "Afficher la confirmation du mot de passe"
-            }
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
-          >
-            {isPasswordConfirmationVisible ? (
-              <EyeOff size={18} />
+                <span className="sr-only">
+                  Les mots de passe correspondent.
+                </span>
+              </>
             ) : (
-              <Eye size={18} />
-            )}
-          </button>
-        </div>
+              <>
+                <X size={18} className="text-error" aria-hidden="true" />
 
-        <FieldError
-          id="passwordConfirmation-error"
-          message={errors.passwordConfirmation}
-        />
-      </div>
+                <span className="sr-only">
+                  Les mots de passe ne correspondent pas.
+                </span>
+              </>
+            )}
+          </span>
+        )}
+
+        <button
+          type="button"
+          onClick={handlePasswordConfirmationVisibility}
+          aria-label={
+            isPasswordConfirmationVisible
+              ? "Masquer la confirmation du mot de passe"
+              : "Afficher la confirmation du mot de passe"
+          }
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
+        >
+          {isPasswordConfirmationVisible ? (
+            <EyeOff size={18} />
+          ) : (
+            <Eye size={18} />
+          )}
+        </button>
+      </FormField>
 
       <div>
         <GenreSelector

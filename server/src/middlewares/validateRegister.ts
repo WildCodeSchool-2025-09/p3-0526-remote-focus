@@ -93,7 +93,7 @@ const validateRegister: RequestHandler = (req, res, next) => {
     )
   ) {
     res.status(400).json({
-      error: "Sélectionnez au moins un genre valide.",
+      error: "Sélectionnez au moins un genre.",
     });
     return;
   }

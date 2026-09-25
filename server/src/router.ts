@@ -2,7 +2,6 @@ import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
-import genreActions from "./modules/genre/genreActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
@@ -41,7 +40,6 @@ router.get(
   seasonActions.readEpisodes,
 );
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
-router.get("/api/genres", genreActions.browse);
 
 router.post(
   "/api/users",
