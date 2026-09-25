@@ -18,15 +18,19 @@ export interface SearchResult {
 export async function browseResults(
   q: string,
   type: string | undefined,
+  genreIds: number[] | undefined,
   page: number,
   limit: number,
 ): Promise<SearchResult> {
   const offset = (page - 1) * limit;
+  const hasGenreFilter = genreIds !== undefined && genreIds.length > 0;
 
   const [mediaRows, personRows, totalMedia] = await Promise.all([
-    searchRepository.findMediaByTitle(q, type, limit, offset),
-    searchRepository.findPersonByName(q, limit, 0),
-    searchRepository.countMediaByTitle(q, type),
+    searchRepository.findMediaByTitle(q, type, genreIds, limit, offset),
+    hasGenreFilter
+      ? Promise.resolve([])
+      : searchRepository.findPersonByName(q, limit, 0),
+    searchRepository.countMediaByTitle(q, type, genreIds),
   ]);
 
   const films: Media[] = [];

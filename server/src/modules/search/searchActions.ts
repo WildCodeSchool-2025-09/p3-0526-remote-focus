@@ -19,6 +19,7 @@ export async function browse(
 ): Promise<void> {
   const q = (req.query.q as string)?.trim();
   const type = req.query.type as string | undefined;
+  const genreParam = req.query.genre?.toString();
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 20;
 
@@ -33,8 +34,14 @@ export async function browse(
     return;
   }
 
+  const genreIds = genreParam ? genreParam.split(",").map(Number) : undefined;
+  if (genreIds?.some((genreId) => !Number.isInteger(genreId) || genreId <= 0)) {
+    res.status(400).json({ error: "genre invalide" });
+    return;
+  }
+
   try {
-    const data = await browseResults(q, type, page, limit);
+    const data = await browseResults(q, type, genreIds, page, limit);
     res.status(200).json(data);
   } catch (err) {
     next(err);

@@ -7,10 +7,24 @@ export interface PersonSearchRow extends Rows {
   photo: string | null;
 }
 
+const buildGenreClause = (genreIds: number[] | undefined) => {
+  if (!genreIds || genreIds.length === 0) {
+    return { clause: "", params: [] };
+  }
+
+  const placeholders = genreIds.map(() => "?").join(", ");
+
+  return {
+    clause: `AND EXISTS (SELECT 1 FROM classify_as ca WHERE ca.ID_media = m.ID AND ca.ID_genre IN (${placeholders}))`,
+    params: genreIds,
+  };
+};
+
 class SearchRepository {
   async findMediaByTitle(
     q: string,
     type: string | undefined,
+    genreIds: number[] | undefined,
     limit: number,
     offset: number,
   ): Promise<Media[]> {
@@ -24,7 +38,8 @@ class SearchRepository {
       params.push(type);
     }
 
-    params.push(`${q}%`, limit, offset);
+    const genre = buildGenreClause(genreIds);
+    params.push(...genre.params, `${q}%`, limit, offset);
 
     const [rows] = await databaseClient.query<Media[]>(
       `SELECT
@@ -46,7 +61,7 @@ class SearchRepository {
           JOIN genre ON genre.ID = classify_as.ID_genre
           WHERE classify_as.ID_media = m.ID LIMIT 1) AS genreName
       FROM media m
-      WHERE m.name LIKE ? ${typeClause}
+      WHERE m.name LIKE ? ${typeClause} ${genre.clause}
       ORDER BY
         CASE WHEN m.name LIKE ? THEN 0 ELSE 1 END,
         m.name ASC
@@ -79,6 +94,7 @@ class SearchRepository {
   async countMediaByTitle(
     q: string,
     type: string | undefined,
+    genreIds: number[] | undefined,
   ): Promise<number> {
     const params: unknown[] = [`%${q}%`];
     let typeClause = "";
@@ -90,8 +106,11 @@ class SearchRepository {
       params.push(type);
     }
 
+    const genre = buildGenreClause(genreIds);
+    params.push(...genre.params);
+
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT COUNT(*) as total FROM media m WHERE m.name LIKE ? ${typeClause}`,
+      `SELECT COUNT(*) as total FROM media m WHERE m.name LIKE ? ${typeClause} ${genre.clause}`,
       params,
     );
 
