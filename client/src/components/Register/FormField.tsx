@@ -34,6 +34,7 @@ function FormField({
 
       <div className="relative">
         <input
+          {...inputProps}
           id={id}
           name={id}
           type={type}
@@ -42,7 +43,6 @@ function FormField({
           }
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}
-          {...inputProps}
         />
 
         {children}
