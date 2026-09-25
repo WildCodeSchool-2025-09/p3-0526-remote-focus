@@ -1,12 +1,12 @@
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import SeasonList from "../components/Serie/SeasonList";
 import SerieHeader from "../components/Serie/SerieHeader";
 import useFetch from "../hooks/useFetch";
-import type { Serie } from "../types/media";
 import useSelectedActor from "../hooks/useSelectedActor";
+import type { Serie } from "../types/media";
 
 function SerieDetail() {
   const { id } = useParams();

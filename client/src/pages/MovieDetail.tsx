@@ -1,11 +1,11 @@
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import MovieHeader from "../components/Movie/MovieHeader";
-import type { Media } from "../types/media";
-import useSelectedActor from "../hooks/useSelectedActor";
 import useFetch from "../hooks/useFetch";
+import useSelectedActor from "../hooks/useSelectedActor";
+import type { Media } from "../types/media";
 
 function MovieDetail() {
   const { id } = useParams();

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { fetchKnownFor } from "../services/knownForService";
-import FilmographyCard from "./FilmographyCard";
-import type { KnownForMedia } from "../types/media";
-import { Link } from "react-router";
 import { ChevronRight, MoveRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { fetchKnownFor } from "../services/knownForService";
+import type { KnownForMedia } from "../types/media";
+import FilmographyCard from "./FilmographyCard";
 
 type KnownForProps = {
   personId: number;

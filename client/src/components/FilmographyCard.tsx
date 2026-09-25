@@ -1,6 +1,6 @@
+import { Clapperboard, Sparkles, TvMinimalPlay } from "lucide-react";
 import { Link } from "react-router";
 import type { KnownForMedia } from "../types/media";
-import { Clapperboard, Sparkles, TvMinimalPlay } from "lucide-react";
 
 type FilmographyCardProps = {
   item: KnownForMedia;
