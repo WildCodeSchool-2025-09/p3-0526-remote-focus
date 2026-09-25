@@ -3,7 +3,7 @@ import { fetchKnownFor } from "../services/knownForService";
 import FilmographyCard from "./FilmographyCard";
 import type { KnownForMedia } from "../types/media";
 import { Link } from "react-router";
-import { MoveRight } from "lucide-react";
+import { ChevronRight, MoveRight } from "lucide-react";
 
 type KnownForProps = {
   personId: number;
@@ -95,11 +95,11 @@ function ActorKnownForWidget({ personId, mediaId, onClose }: KnownForProps) {
           ))}
           {mode === "seen" && page < totalPages && !loading && (
             <button
-              className="w-[120px] shrink-0 flex-col gap-2 md:w-[170px] self-center text-sm font-semibold text-focus-cream hover:underline underline-offset-8 hover:text-focus-yellow"
+              className="btn-cta-pill btn-cta-pill:hover self-center flex gap-1 ml-5"
               type="button"
               onClick={handleLoadMore}
             >
-              Voir plus ...
+              Voir plus <ChevronRight size={16} />
             </button>
           )}
         </div>
