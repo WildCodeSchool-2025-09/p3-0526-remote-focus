@@ -100,7 +100,9 @@ const SearchResults = () => {
   return (
     <div className="space-y-6">
       <TypeFilter />
-      <GenreFilter resetLabel="Réinitialiser les genres" />
+      <div className={activeGenre ? "pb-4" : undefined}>
+        <GenreFilter resetLabel="Réinitialiser les genres" />
+      </div>
 
       {loading && <span className="loading loading-spinner text-primary" />}
 
