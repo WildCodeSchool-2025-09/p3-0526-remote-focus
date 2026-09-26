@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import KnownFrom from "../components/KnownFrom";
 import MovieHeader from "../components/Movie/MovieHeader";
 import useFetch from "../hooks/useFetch";
+import useSelectedActor from "../hooks/useSelectedActor";
 import type { Media } from "../types/media";
 
 function MovieDetail() {
@@ -15,11 +15,8 @@ function MovieDetail() {
     loading,
     error,
   } = useFetch<Media>(id != null ? `/api/medias/${id}` : null);
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
@@ -51,7 +48,11 @@ function MovieDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={mediaDetail.id} />
+        <ActorKnownForWidget
+          personId={selectedPersonId}
+          mediaId={mediaDetail.id}
+          onClose={handleCloseActorWidget}
+        />
       )}
     </div>
   );

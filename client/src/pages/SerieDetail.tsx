@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
-import KnownFrom from "../components/KnownFrom";
 import SeasonList from "../components/Serie/SeasonList";
 import SerieHeader from "../components/Serie/SerieHeader";
 import useFetch from "../hooks/useFetch";
+import useSelectedActor from "../hooks/useSelectedActor";
 import type { Serie } from "../types/media";
 
 function SerieDetail() {
@@ -16,11 +16,8 @@ function SerieDetail() {
     loading,
     error,
   } = useFetch<Serie>(id != null ? `/api/series/${id}` : null);
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
@@ -54,7 +51,11 @@ function SerieDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom personId={selectedPersonId} mediaId={serieDetail.id} />
+        <ActorKnownForWidget
+          personId={selectedPersonId}
+          mediaId={serieDetail.id}
+          onClose={handleCloseActorWidget}
+        />
       )}
     </div>
   );

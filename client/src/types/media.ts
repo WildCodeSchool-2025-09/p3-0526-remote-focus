@@ -99,6 +99,29 @@ export type Serie = {
   userRating: number | null;
 };
 
+export type KnownForMedia = {
+  id: number;
+  name: string;
+  poster: string | null;
+  type: string;
+  isAnime: boolean;
+  releasedAt: string;
+  characterNames: string[];
+};
+
+export type KnownForPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type KnownForResponse = {
+  mode: "top-rated" | "seen";
+  medias: KnownForMedia[];
+  pagination: KnownForPagination | null;
+};
+
 export type SeasonDetail = {
   id: number;
   name: string | null;
