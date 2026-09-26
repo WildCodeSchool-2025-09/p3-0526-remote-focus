@@ -3,9 +3,10 @@ import MediaCard from "../Catalog/MediaCard";
 
 type MediaListProps = {
   medias: Media[];
+  showGenre?: boolean;
 };
 
-const MediaList = ({ medias }: MediaListProps) => {
+const MediaList = ({ medias, showGenre = true }: MediaListProps) => {
   if (medias.length === 0) {
     return null;
   }
@@ -18,6 +19,7 @@ const MediaList = ({ medias }: MediaListProps) => {
             key={media.id}
             media={{ ...media, topRank: null, isNew: false }}
             className="card"
+            showGenre={showGenre}
           />
         ))}
       </div>

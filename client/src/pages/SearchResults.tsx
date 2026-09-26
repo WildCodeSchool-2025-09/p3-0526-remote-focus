@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
+import GenreFilter from "../components/Catalog/GenreFilter";
 import TypeFilter from "../components/Catalog/TypeFilter";
 import ActorList from "../components/Search/ActorList";
 import MediaList from "../components/Search/MediaList";
@@ -19,9 +20,10 @@ const SearchResults = () => {
   const debouncedQuery = useDebounce(searchQuery, DEBOUNCE_DELAY_MS);
   const trimmedQuery = debouncedQuery.trim();
   const activeType = searchParams.get("type") ?? undefined;
+  const activeGenre = searchParams.get("genre") || undefined;
 
   const { results, loading, loadingMore, error, hasMore, loadMore } =
-    useMediaSearch(trimmedQuery, activeType);
+    useMediaSearch(trimmedQuery, activeType, activeGenre);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate le contexte depuis l'URL une seule fois au montage, pas à chaque frappe
   useEffect(() => {
@@ -98,6 +100,7 @@ const SearchResults = () => {
   return (
     <div className="space-y-6">
       <TypeFilter />
+      <GenreFilter resetLabel="Réinitialiser les genres" />
 
       {loading && <span className="loading loading-spinner text-primary" />}
 
@@ -131,7 +134,7 @@ const SearchResults = () => {
       {!loading && !error && hasResults && (
         <div className="space-y-8">
           <ActorList actors={results.actors} />
-          <MediaList medias={allMedias} />
+          <MediaList medias={allMedias} showGenre={activeGenre === undefined} />
 
           {hasMore && (
             <div className="flex justify-center">
