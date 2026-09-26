@@ -5,13 +5,17 @@ import { fetchKnownFor } from "../services/knownForService";
 import type { KnownForMedia } from "../types/media";
 import FilmographyCard from "./FilmographyCard";
 
-type KnownForProps = {
+type ActorKnownForWidgetProps = {
   personId: number;
   mediaId: number;
   onClose: () => void;
 };
 
-function ActorKnownForWidget({ personId, mediaId, onClose }: KnownForProps) {
+function ActorKnownForWidget({
+  personId,
+  mediaId,
+  onClose,
+}: ActorKnownForWidgetProps) {
   const [items, setItems] = useState<KnownForMedia[]>([]);
   const [mode, setMode] = useState<"top-rated" | "seen">("top-rated");
   const [page, setPage] = useState(1);

@@ -1,6 +1,5 @@
 import type { KnownForResponse } from "../types/media";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
+import { API_URL } from "./api";
 
 export async function fetchKnownFor(
   personId: number,

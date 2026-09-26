@@ -102,7 +102,7 @@ export type Serie = {
 export type KnownForMedia = {
   id: number;
   name: string;
-  poster: string;
+  poster: string | null;
   type: string;
   isAnime: boolean;
   releasedAt: string;
