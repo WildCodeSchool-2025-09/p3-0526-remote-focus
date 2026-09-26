@@ -13,12 +13,12 @@ const MediaList = ({ medias, showGenre = true }: MediaListProps) => {
 
   return (
     <section className="space-y-3">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6">
+      <div className="flex flex-wrap justify-center gap-4">
         {medias.map((media) => (
           <MediaCard
             key={media.id}
             media={{ ...media, topRank: null, isNew: false }}
-            className="card"
+            className="catalog-carousel-item w-48 lg:w-60"
             showGenre={showGenre}
           />
         ))}
