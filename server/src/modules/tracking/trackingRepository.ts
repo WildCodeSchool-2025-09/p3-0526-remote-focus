@@ -19,6 +19,12 @@ class TrackingRepository {
     return rows;
   }
 
+  async markSeriesAsWatched(userId: number, seriesId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT
+        `,
+    );
+  }
 
   async isMediaWatched(userId: number, mediaId: number) {
     const [rows] = await databaseClient.query<Rows>(
