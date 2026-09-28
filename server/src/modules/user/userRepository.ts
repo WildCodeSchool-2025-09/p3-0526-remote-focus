@@ -74,6 +74,15 @@ class UserRepository {
     return rows.length > 0;
   }
 
+  async readByEmail(email: string): Promise<RowDataPacket | null> {
+    const [rows] = await databaseClient.query<RowDataPacket[]>(
+      "SELECT ID, firstname, lastname, email, login, avatar, role, hashed_password FROM user_ WHERE email = ? LIMIT 1",
+      [email],
+    );
+
+    return rows[0] ?? null;
+  }
+
   async findByLogin(login: string): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
       "SELECT ID FROM user_ WHERE login = ? LIMIT 1",

@@ -9,6 +9,7 @@ import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
+import authActions from "./modules/auth/authActions";
 
 const router = express.Router();
 
@@ -50,5 +51,6 @@ router.post(
   hashPassword,
   userActions.add,
 );
+router.post("/api/auth/login", authActions.login);
 
 export default router;

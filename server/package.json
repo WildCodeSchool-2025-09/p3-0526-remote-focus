@@ -12,6 +12,7 @@
     "tmdb:seed": "tsx ./bin/tmdbSeed.ts"
   },
   "dependencies": {
+    "argon2": "^0.45.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
