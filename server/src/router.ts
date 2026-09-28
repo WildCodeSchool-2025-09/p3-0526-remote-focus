@@ -2,6 +2,7 @@ import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
+import authActions from "./modules/auth/authActions";
 import genreActions from "./modules/genre/genreActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
@@ -9,7 +10,6 @@ import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
-import authActions from "./modules/auth/authActions";
 
 const router = express.Router();
 
