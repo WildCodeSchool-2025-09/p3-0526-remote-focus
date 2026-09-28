@@ -1,5 +1,6 @@
 import express from "express";
 import actorActions from "./modules/actor/actorActions";
+import episodeActions from "./modules/episode/episodeActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
@@ -36,6 +37,10 @@ router.get("/api/series/:id/seasons/:seasonId", seasonActions.read);
 router.get(
   "/api/series/:id/seasons/:seasonId/episodes",
   seasonActions.readEpisodes,
+);
+router.get(
+  "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
+  episodeActions.read,
 );
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
