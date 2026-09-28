@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
 // Import necessary modules from React and React Router
 import SearchResults from "./pages/SearchResults";
@@ -90,9 +91,11 @@ if (rootElement == null) {
 
 // Render the app inside the root element
 createRoot(rootElement).render(
-  <SearchProvider>
-    <RouterProvider router={router} />
-  </SearchProvider>,
+  <AuthProvider>
+    <SearchProvider>
+      <RouterProvider router={router} />
+    </SearchProvider>
+  </AuthProvider>,
 );
 
 /**

@@ -19,3 +19,34 @@ export interface RegisterFormErrors {
   genres?: string;
   form?: string;
 }
+
+export interface AuthUser {
+  id: number;
+  firstName: string;
+  lastName: string | null;
+  email: string;
+  login: string;
+  avatar: string | null;
+  role: "user" | "admin";
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  user: AuthUser;
+  token: string;
+}
+
+export interface LoginFormValues {
+  email: string;
+  password: string;
+}
+
+export interface LoginFormErrors {
+  email?: string;
+  password?: string;
+  form?: string;
+}
