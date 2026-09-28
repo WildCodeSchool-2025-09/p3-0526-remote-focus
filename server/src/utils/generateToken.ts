@@ -9,7 +9,7 @@ type TokenPayload = {
 export function generateToken(payload: TokenPayload): string {
   const secret = process.env.JWT_SECRET;
 
-  if (secret == null) {
+  if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
 
