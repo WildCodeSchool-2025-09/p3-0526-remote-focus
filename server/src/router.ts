@@ -14,7 +14,8 @@ const router = express.Router();
 router.get("/api/medias/search", searchActions.browse);
 
 import catalogActions from "./modules/catalog/catalogActions";
-import trackingActions from "./modules/tracking/trackingActions";
+import trackingActions from "./modules/watching/watchingActions";
+import watchingActions from "./modules/watching/watchingActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 router.get("/api/medias", catalogActions.browse);
@@ -35,9 +36,15 @@ router.get("/api/actors/:id/filmography", actorActions.readFilmography);
 
 /* Connected user, add authentication when ready*/
 
-router.patch("/api/me/medias/:id/watched", trackingActions.toggleMediaWatched);
-router.patch("/api/me/series/:id/watched");
-router.patch("/api/me/seasons/:id/watched");
-router.patch("/api/me/episodes/:id/watched");
+router.patch("/api/me/medias/:id/watched", watchingActions.toggleMediaWatched);
+router.patch("/api/me/series/:id/watched", watchingActions.toggleSeriesWatched);
+router.patch(
+  "/api/me/seasons/:id/watched",
+  watchingActions.toggleSeasonWatched,
+);
+router.patch(
+  "/api/me/episodes/:id/watched",
+  watchingActions.toggleEpisodeWatched,
+);
 
 export default router;
