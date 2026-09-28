@@ -8,6 +8,7 @@ import App from "./App";
 import ActorDetail from "./pages/ActorDetail";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
+import EpisodeDetail from "./pages/EpisodeDetail";
 import Homepage from "./pages/Homepage";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: "series/:seriesId/seasons/:seasonId",
         element: <SeasonDetail />,
+      },
+      {
+        path: "series/:seriesId/seasons/:seasonId/episodes/:episodeId",
+        element: <EpisodeDetail />,
       },
       {
         path: "animes/:id",
