@@ -1,5 +1,6 @@
 import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
+import optionalAuth from "./middlewares/optionalAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
@@ -11,6 +12,8 @@ import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
 
 const router = express.Router();
+
+router.use(optionalAuth);
 
 /* ************************************************************************* */
 // Define Your API Routes Here
