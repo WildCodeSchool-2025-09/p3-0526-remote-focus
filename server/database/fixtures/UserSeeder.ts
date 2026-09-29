@@ -1,10 +1,8 @@
-import bcrypt from "bcryptjs";
+import argon2 from "argon2";
 
 import AbstractSeeder from "./AbstractSeeder";
 
-const SALT_ROUNDS = 10;
-
-// Mot de passe commun à tous les comptes de dev (jamais en prod !)
+// Mot de passe commun aux comptes de développement uniquement.
 const DEV_PASSWORD = "Focus2026!";
 
 class UserSeeder extends AbstractSeeder {
@@ -13,7 +11,7 @@ class UserSeeder extends AbstractSeeder {
   }
 
   async run() {
-    const hashedPassword = await bcrypt.hash(DEV_PASSWORD, SALT_ROUNDS);
+    const hashedPassword = await argon2.hash(DEV_PASSWORD);
 
     const users = [
       {
@@ -56,7 +54,7 @@ class UserSeeder extends AbstractSeeder {
         email: user.email,
         born_at: user.born_at,
         login: user.login,
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         dark_theme: true,
         is_pegi16: user.is_pegi16,
         role: user.role,
