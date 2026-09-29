@@ -1,11 +1,11 @@
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeHeader from "../components/Episode/EpisodeHeader";
-import KnownFrom from "../components/KnownFrom";
 import useFetch from "../hooks/useFetch";
+import useSelectedActor from "../hooks/useSelectedActor";
 import type { EpisodeDetail as EpisodeDetailType } from "../types/media";
 
 function EpisodeDetail() {
@@ -21,11 +21,8 @@ function EpisodeDetail() {
       ? `/api/series/${seriesId}/seasons/${seasonId}/episodes/${episodeId}`
       : null,
   );
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   const handleGoBack = () => {
     navigate(-1);
@@ -82,9 +79,10 @@ function EpisodeDetail() {
       />
 
       {selectedPersonId != null && (
-        <KnownFrom
+        <ActorKnownForWidget
           personId={selectedPersonId}
           mediaId={episodeDetail.serie.id}
+          onClose={handleCloseActorWidget}
         />
       )}
     </div>
