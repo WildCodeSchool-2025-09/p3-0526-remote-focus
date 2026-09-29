@@ -6,12 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { loginUser } from "../../services/authApi";
 import type { LoginFormErrors } from "../../types/Auth";
 import { validateLoginForm } from "../../utils/validateLoginForm";
-import FieldError from "../Register/FieldError";
-
-const inputClassName =
-  "mt-1 w-full rounded-md border border-focus-line/50 bg-base-200 md:bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
-
-const labelClassName = "block text-xs font-medium text-base-content/70";
+import FormField from "../Register/FormField";
 
 interface LoginLocationState {
   from?: string;
@@ -87,66 +82,41 @@ function LoginForm() {
     >
       <h1 className="mb-6 text-2xl font-bold text-base-content">Connexion</h1>
 
-      <div>
-        <label htmlFor="email" className={labelClassName}>
-          Email
-        </label>
+      <FormField
+        ref={emailRef}
+        id="email"
+        label="Email"
+        type="email"
+        maxLength={255}
+        autoComplete="email"
+        required
+        error={errors.email}
+      />
 
-        <input
-          ref={emailRef}
-          id="email"
-          name="email"
-          type="email"
-          className={inputClassName}
-          maxLength={255}
-          autoComplete="email"
-          required
-          aria-invalid={errors.email !== undefined}
-          aria-describedby={
-            errors.email !== undefined ? "email-error" : undefined
+      <FormField
+        ref={passwordRef}
+        id="password"
+        label="Mot de passe"
+        type={isPasswordVisible ? "text" : "password"}
+        className="pr-10"
+        maxLength={255}
+        autoComplete="current-password"
+        required
+        error={errors.password}
+      >
+        <button
+          type="button"
+          onClick={handlePasswordVisibility}
+          aria-label={
+            isPasswordVisible
+              ? "Masquer le mot de passe"
+              : "Afficher le mot de passe"
           }
-        />
-
-        <FieldError id="email-error" message={errors.email} />
-      </div>
-
-      <div>
-        <label htmlFor="password" className={labelClassName}>
-          Mot de passe
-        </label>
-
-        <div className="relative">
-          <input
-            ref={passwordRef}
-            id="password"
-            name="password"
-            type={isPasswordVisible ? "text" : "password"}
-            className={`${inputClassName} pr-10`}
-            maxLength={255}
-            autoComplete="current-password"
-            required
-            aria-invalid={errors.password !== undefined}
-            aria-describedby={
-              errors.password !== undefined ? "password-error" : undefined
-            }
-          />
-
-          <button
-            type="button"
-            onClick={handlePasswordVisibility}
-            aria-label={
-              isPasswordVisible
-                ? "Masquer le mot de passe"
-                : "Afficher le mot de passe"
-            }
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
-          >
-            {isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
-
-        <FieldError id="password-error" message={errors.password} />
-      </div>
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 transition hover:text-base-content"
+        >
+          {isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </FormField>
 
       {errors.form !== undefined && (
         <p
