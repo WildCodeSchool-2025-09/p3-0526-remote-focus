@@ -5,7 +5,13 @@ import type { Genre } from "../../types/media";
 import Carousel from "./Carousel";
 import MediaCardLoading from "./MediaCardLoading";
 
-function GenreFilter() {
+interface GenreFilterProps {
+  resetLabel?: string;
+}
+
+function GenreFilter({
+  resetLabel = "Réinitialiser les genres et revenir au catalogue général",
+}: GenreFilterProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +106,7 @@ function GenreFilter() {
           onClick={handleClearGenre}
           className="absolute inset-x-0 top-full mt-1 text-center text-sm hover:underline hover:text-focus-cream text-focus-muted-dark"
         >
-          Réinitialiser les genres et revenir au catalogue général
+          {resetLabel}
         </button>
       ) : null}
     </div>

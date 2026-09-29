@@ -7,11 +7,16 @@ const searchMedias = async (
   query: string,
   page = 1,
   type?: string,
+  genre?: string,
 ): Promise<SearchResults> => {
   const params = new URLSearchParams({ q: query, page: String(page) });
 
   if (type) {
     params.set("type", type);
+  }
+
+  if (genre) {
+    params.set("genre", genre);
   }
 
   const response = await fetch(`${API_URL}/api/medias/search?${params}`);

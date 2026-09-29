@@ -24,6 +24,7 @@ interface UseMediaSearchResult {
 const useMediaSearch = (
   query: string,
   type: string | undefined,
+  genre: string | undefined,
 ): UseMediaSearchResult => {
   const [results, setResults] = useState<SearchResultsType>(emptyResults);
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ const useMediaSearch = (
     setLoading(true);
     setError(false);
 
-    searchMedias(query, 1, type)
+    searchMedias(query, 1, type, genre)
       .then((data) => {
         if (!cancelled) {
           setResults(data);
@@ -67,14 +68,14 @@ const useMediaSearch = (
     return () => {
       cancelled = true;
     };
-  }, [query, type]);
+  }, [query, type, genre]);
 
   const loadMore = () => {
     const nextPage = page + 1;
     const generationAtStart = searchGeneration.current;
     setLoadingMore(true);
 
-    searchMedias(query, nextPage, type)
+    searchMedias(query, nextPage, type, genre)
       .then((data) => {
         if (searchGeneration.current !== generationAtStart) {
           return;
