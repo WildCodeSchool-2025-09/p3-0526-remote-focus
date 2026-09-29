@@ -3,7 +3,6 @@ import checkAvailability from "./middlewares/checkAvailability";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
-import genreActions from "./modules/genre/genreActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
@@ -26,11 +25,6 @@ router.get("/api/medias", catalogActions.browse);
 router.get("/api/genres", catalogActions.browseGenres);
 
 router.get("/api/medias/home", homepageActions.browseHomepage);
-/*
-router.get("/api/items", itemActions.browse);
-router.get("/api/items/:id", itemActions.read);
-router.post("/api/items", itemActions.add); 
-*/
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
@@ -42,7 +36,7 @@ router.get(
   seasonActions.readEpisodes,
 );
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
-router.get("/api/genres", genreActions.browse);
+router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 router.post(
   "/api/users",
