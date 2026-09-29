@@ -8,6 +8,8 @@ import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
+import fakeAuth from "./middlewares/fakeAuth";
+import trackActions from "./modules/track/trackActions";
 
 const router = express.Router();
 
@@ -48,5 +50,13 @@ router.post(
   hashPassword,
   userActions.add,
 );
+
+router.use("/api/me", fakeAuth);
+
+router.get("/api/me/tracks", trackActions.browse);
+
+router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
+
+router.patch("/api/me/medias/:id/watchlist", trackActions.toggleWatchlist);
 
 export default router;
