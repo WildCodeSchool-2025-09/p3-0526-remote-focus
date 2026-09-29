@@ -96,4 +96,15 @@ describe("POST /api/auth/login", () => {
     expect(response.status).toBe(400);
     expect(readByEmailSpy).not.toHaveBeenCalled();
   });
+
+  it("returns 400 when the email or the password is empty", async () => {
+    const readByEmailSpy = jest.spyOn(userRepository, "readByEmail");
+
+    const response = await supertest(app)
+      .post("/api/auth/login")
+      .send({ email: "", password: "" });
+
+    expect(response.status).toBe(400);
+    expect(readByEmailSpy).not.toHaveBeenCalled();
+  });
 });

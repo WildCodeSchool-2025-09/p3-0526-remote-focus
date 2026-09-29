@@ -7,7 +7,12 @@ const login: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (typeof email !== "string" || typeof password !== "string") {
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      email.trim() === "" ||
+      password === ""
+    ) {
       res.sendStatus(400);
       return;
     }
