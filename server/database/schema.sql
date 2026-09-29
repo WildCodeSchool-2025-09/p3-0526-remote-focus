@@ -5,7 +5,7 @@ CREATE TABLE user_(
    email VARCHAR(255) NOT NULL,
    born_at DATE NOT NULL,
    login VARCHAR(50) NOT NULL,
-   password VARCHAR(255) NOT NULL,
+   hashed_password VARCHAR(255) NOT NULL,
    dark_theme BOOLEAN NOT NULL DEFAULT TRUE,
    is_pegi16 BOOLEAN NOT NULL DEFAULT FALSE,
    role ENUM('user', 'admin') NOT NULL DEFAULT 'user',

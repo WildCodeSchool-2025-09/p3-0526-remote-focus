@@ -1,4 +1,6 @@
 import express from "express";
+import checkAvailability from "./middlewares/checkAvailability";
+import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
 import episodeActions from "./modules/episode/episodeActions";
 import homepageActions from "./modules/homepage/homepageActions";
@@ -6,6 +8,7 @@ import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
+import userActions from "./modules/user/userActions";
 
 const router = express.Router();
 
@@ -14,8 +17,7 @@ const router = express.Router();
 /* ************************************************************************* */
 router.get("/api/medias/search", searchActions.browse);
 
-// Define item-related routes
-/* import itemActions from "./modules/item/itemActions.old";*/
+import hashPassword from "./middlewares/hashPassword";
 import catalogActions from "./modules/catalog/catalogActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
@@ -23,11 +25,6 @@ router.get("/api/medias", catalogActions.browse);
 router.get("/api/genres", catalogActions.browseGenres);
 
 router.get("/api/medias/home", homepageActions.browseHomepage);
-/*
-router.get("/api/items", itemActions.browse);
-router.get("/api/items/:id", itemActions.read);
-router.post("/api/items", itemActions.add); 
-*/
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
@@ -43,5 +40,14 @@ router.get(
   episodeActions.read,
 );
 router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
+
+router.post(
+  "/api/users",
+  validateRegister,
+  checkAvailability,
+  hashPassword,
+  userActions.add,
+);
 
 export default router;

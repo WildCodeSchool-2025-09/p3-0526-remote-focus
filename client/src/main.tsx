@@ -10,9 +10,11 @@ import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import EpisodeDetail from "./pages/EpisodeDetail";
 import Homepage from "./pages/Homepage";
+import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import Register from "./pages/Register";
 import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
 
@@ -48,6 +50,14 @@ const router = createBrowserRouter([
       {
         path: "movies/:id",
         element: <MovieDetail />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "login",
+        element: <Login />,
       },
       {
         path: "series/:id",
