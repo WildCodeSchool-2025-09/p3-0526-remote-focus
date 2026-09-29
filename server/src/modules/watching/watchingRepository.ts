@@ -1,7 +1,7 @@
 import databaseClient from "../../../database/client";
 import type { Result, Rows } from "../../../database/client";
 
-class TrackingRepository {
+class WatchingRepository {
   async markMediaAsWatched(userId: number, mediaId: number) {
     const [result] = await databaseClient.query<Result>(
       `INSERT INTO media_user (ID_user, ID_media, viewed_at)
@@ -146,6 +146,25 @@ class TrackingRepository {
     );
     return rows;
   }
+
+  async isWatched(
+    userId: number,
+    mediaId: number,
+    type: "movie" | "tv" | "anime" | undefined,
+  ) {
+    if (type === "movie") {
+      const movieWatched = await this.isMediaWatched(userId, mediaId);
+      if (movieWatched.length > 0) {
+        return true;
+      }
+      return false;
+    }
+
+    if (type === "tv" || type === "anime") {
+      return await this.isFullyWatched(userId, mediaId);
+    }
+    return false;
+  }
 }
 
-export default new TrackingRepository();
+export default new WatchingRepository();
