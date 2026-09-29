@@ -18,7 +18,6 @@ router.get("/api/medias/search", searchActions.browse);
 
 import hashPassword from "./middlewares/hashPassword";
 import catalogActions from "./modules/catalog/catalogActions";
-import trackingActions from "./modules/watching/watchingActions";
 import watchingActions from "./modules/watching/watchingActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);

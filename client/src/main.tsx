@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
+import { WatchingProvider } from "./contexts/WatchingContext";
 
 const router = createBrowserRouter([
   {
@@ -91,7 +92,9 @@ if (rootElement == null) {
 // Render the app inside the root element
 createRoot(rootElement).render(
   <SearchProvider>
-    <RouterProvider router={router} />
+    <WatchingProvider>
+      <RouterProvider router={router} />
+    </WatchingProvider>
   </SearchProvider>,
 );
 
