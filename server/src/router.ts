@@ -59,5 +59,5 @@ router.patch(
   "/api/me/episodes/:id/watched",
   watchingActions.toggleEpisodeWatched,
 );
-
+router.get("/api/me/medias/watched", watchingActions.readMediaWatched);
 export default router;

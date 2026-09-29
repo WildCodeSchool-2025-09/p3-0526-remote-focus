@@ -1,9 +1,10 @@
 import type { RequestHandler } from "express";
 import trackingRepository from "./watchingRepository";
+import watchingRepository from "./watchingRepository";
 
 const toggleMediaWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 33;
+    const userId = req.user?.id || 1;
 
     const mediaId = Number(req.params.id);
 
@@ -28,7 +29,7 @@ const toggleMediaWatched: RequestHandler = async (req, res, next) => {
 
 const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 33;
+    const userId = req.user?.id || 1;
 
     const episodeId = Number(req.params.id);
 
@@ -53,7 +54,7 @@ const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
 
 const toggleSeasonWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 33;
+    const userId = req.user?.id || 1;
 
     const seasonId = Number(req.params.id);
 
@@ -78,7 +79,7 @@ const toggleSeasonWatched: RequestHandler = async (req, res, next) => {
 
 const toggleSeriesWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 33;
+    const userId = req.user?.id || 1;
 
     const seriesId = Number(req.params.id);
 
@@ -101,9 +102,22 @@ const toggleSeriesWatched: RequestHandler = async (req, res, next) => {
   }
 };
 
+const readMediaWatched: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id || 1;
+
+    const mediaIds = await watchingRepository.readMediaWatched(userId);
+
+    res.json(mediaIds);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   toggleMediaWatched,
   toggleSeriesWatched,
   toggleEpisodeWatched,
   toggleSeasonWatched,
+  readMediaWatched,
 };

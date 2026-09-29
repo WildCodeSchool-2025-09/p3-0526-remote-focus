@@ -147,23 +147,27 @@ class WatchingRepository {
     return rows;
   }
 
-  async isWatched(
-    userId: number,
-    mediaId: number,
-    type: "movie" | "tv" | "anime" | undefined,
-  ) {
-    if (type === "movie") {
-      const movieWatched = await this.isMediaWatched(userId, mediaId);
-      if (movieWatched.length > 0) {
-        return true;
-      }
-      return false;
-    }
+  async readMediaWatched(userId: number): Promise<number[]> {
+    const [rows] = await databaseClient.query<Rows>(
+      `(SELECT ID_media FROM media_user 
+    WHERE ID_user=?)
+    UNION
+    (SELECT s.ID_media
+    FROM episode AS e
+    JOIN season AS s ON e.ID_season = s.ID
+    LEFT JOIN episode_user AS eu ON (
+      e.ID = eu.ID_episode 
+      AND eu.ID_user = ?
+    )
+    GROUP BY s.ID_media
+    HAVING (
+      COUNT(e.ID) = COUNT(eu.ID_EPISODE) 
+      AND COUNT(e.ID) > 0
+    ))`,
+      [userId, userId],
+    );
 
-    if (type === "tv" || type === "anime") {
-      return await this.isFullyWatched(userId, mediaId);
-    }
-    return false;
+    return rows.map((row) => Number(row.ID_media));
   }
 }
 
