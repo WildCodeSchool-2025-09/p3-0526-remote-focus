@@ -39,7 +39,7 @@ router.get(
   "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
   episodeActions.read,
 );
-router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 router.post(
