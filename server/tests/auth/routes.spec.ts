@@ -8,17 +8,17 @@ import {
 } from "@jest/globals";
 import argon2 from "argon2";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import type { RowDataPacket } from "mysql2";
 import supertest from "supertest";
 
 import app from "../../src/app";
 import userRepository from "../../src/modules/user/userRepository";
+import type { UserAuthRow } from "../../src/types/User/User.types";
 
 const JWT_SECRET = "test-secret";
 const PASSWORD = "Focus2026!";
 const GENERIC_ERROR = "Email ou mot de passe incorrect";
 
-let storedUser: RowDataPacket;
+let storedUser: UserAuthRow;
 
 beforeAll(async () => {
   process.env.JWT_SECRET = JWT_SECRET;
@@ -32,7 +32,7 @@ beforeAll(async () => {
     avatar: null,
     role: "user",
     hashed_password: await argon2.hash(PASSWORD),
-  } as unknown as RowDataPacket;
+  } as unknown as UserAuthRow;
 });
 
 afterEach(() => {
