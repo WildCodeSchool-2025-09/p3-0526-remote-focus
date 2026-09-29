@@ -1,3 +1,5 @@
+import type { Genre } from "./Genre";
+
 export type Media = {
   id: number;
   tmdbId: number;
@@ -35,6 +37,7 @@ export type DiscoverResponse = {
   genreSections: GenreSection[];
 };
 
+export type LikedGenre = Genre;
 export type Pagination = {
   total: number;
   page: number;
@@ -45,9 +48,4 @@ export type Pagination = {
 export type PaginatedMediaResponse = {
   medias: EnrichedMedia[];
   pagination: Pagination;
-};
-
-export type LikedGenre = {
-  id: number;
-  name: string;
 };
