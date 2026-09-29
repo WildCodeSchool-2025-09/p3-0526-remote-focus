@@ -5,9 +5,9 @@ import type { Genre } from "../../types/media";
 import Carousel from "./Carousel";
 import MediaCardLoading from "./MediaCardLoading";
 
-interface GenreFilterProps {
+type GenreFilterProps = {
   resetLabel?: string;
-}
+};
 
 function GenreFilter({
   resetLabel = "Réinitialiser les genres et revenir au catalogue général",
