@@ -65,6 +65,15 @@ class UserRepository {
     return result.insertId;
   }
 
+  async readProfile(userId: number) {
+    const [rows] = await databaseClient.query<RowDataPacket[]>(
+      "SELECT firstname, avatar, created_at FROM user_ WHERE ID = ?",
+      [userId],
+    );
+
+    return (rows[0] as RowDataPacket | undefined) ?? null;
+  }
+
   async findByEmail(email: string): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
       "SELECT ID FROM user_ WHERE email = ? LIMIT 1",
