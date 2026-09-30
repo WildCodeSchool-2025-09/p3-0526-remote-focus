@@ -1,4 +1,4 @@
-import type { Actor } from "../types/media";
+import type { Actor, FilmographyPage } from "../types/media";
 import type { SearchResults } from "../types/search";
 
 export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
@@ -28,6 +28,32 @@ export async function fetchActor(id: number): Promise<Actor> {
 
   if (!response.ok) {
     throw new Error(`Comédien ${id} introuvable`);
+  }
+
+  return response.json();
+}
+
+type FetchFilmographyOptions = {
+  page?: number;
+  excludeMediaId?: number;
+};
+
+export async function fetchFilmography(
+  personId: number,
+  { page = 1, excludeMediaId }: FetchFilmographyOptions = {},
+): Promise<FilmographyPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  if (excludeMediaId != null) {
+    params.set("exclude", String(excludeMediaId));
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/actors/${personId}/filmography?${params}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Filmographie indisponible");
   }
 
   return response.json();
