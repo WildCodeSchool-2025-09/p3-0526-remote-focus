@@ -15,6 +15,7 @@ function ActorFilmography({ personId }: ActorFilmographyProps) {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
   const generation = useRef(0);
 
   useEffect(() => {
@@ -27,6 +28,7 @@ function ActorFilmography({ personId }: ActorFilmographyProps) {
     setHasMore(false);
     setLoading(true);
     setError(false);
+    setLoadMoreError(false);
 
     fetchFilmography(personId)
       .then((data) => {
@@ -56,7 +58,7 @@ function ActorFilmography({ personId }: ActorFilmographyProps) {
     const generationAtStart = generation.current;
 
     setLoadingMore(true);
-    setError(false);
+    setLoadMoreError(false);
 
     fetchFilmography(personId, { page: nextPage })
       .then((data) => {
@@ -69,7 +71,7 @@ function ActorFilmography({ personId }: ActorFilmographyProps) {
       })
       .catch(() => {
         if (generation.current === generationAtStart) {
-          setError(true);
+          setLoadMoreError(true);
         }
       })
       .finally(() => setLoadingMore(false));
@@ -105,7 +107,12 @@ function ActorFilmography({ personId }: ActorFilmographyProps) {
       )}
 
       {hasMore && (
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-2">
+          {loadMoreError && (
+            <p className="text-sm text-focus-muted">
+              Impossible de charger la suite. Réessaie.
+            </p>
+          )}
           <button
             type="button"
             onClick={handleLoadMore}
