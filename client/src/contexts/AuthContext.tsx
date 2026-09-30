@@ -8,9 +8,7 @@ import {
 } from "react";
 
 import type { AuthUser, LoginResponse } from "../types/Auth";
-
-const TOKEN_STORAGE_KEY = "focus.token";
-const USER_STORAGE_KEY = "focus.user";
+import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from "../utils/authStorage";
 
 interface AuthContextValue {
   user: AuthUser | null;
