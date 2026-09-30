@@ -1,11 +1,6 @@
 import type { RowDataPacket } from "mysql2";
 import databaseClient, { type Rows } from "../../../database/client";
-import type { Media } from "../../types/Media/Media.types";
 import type { PersonRow } from "../../types/Person/Person.types";
-
-export interface FilmographyRow extends Media {
-  characterName: string | null;
-}
 
 class ActorRepository {
   async read(id: number) {
@@ -24,26 +19,15 @@ class ActorRepository {
     limit: number,
     offset: number,
   ) {
-    const [rows] = await databaseClient.query<FilmographyRow[]>(
+    const [rows] = await databaseClient.query<Rows>(
       `SELECT
-         m.ID AS id,
-         m.tmdb_id AS tmdbId,
-         m.name,
-         m.type,
-         m.released_at AS releasedAt,
-         m.duration,
-         m.poster,
-         m.synopsis,
-         m.overall_rating AS overallRating,
-         m.status,
-         m.original_name AS originalName,
-         m.original_language AS originalLanguage,
-         m.pegi,
-         m.is_anime AS isAnime,
+         m.ID, m.tmdb_id, m.name, m.type, m.released_at, m.duration,
+         m.poster, m.synopsis, m.overall_rating, m.status,
+         m.original_name, m.original_language, m.pegi, m.is_anime,
          (SELECT genre.name FROM classify_as
            JOIN genre ON genre.ID = classify_as.ID_genre
-           WHERE classify_as.ID_media = m.ID LIMIT 1) AS genreName,
-         mp.personnage_name AS characterName
+           WHERE classify_as.ID_media = m.ID LIMIT 1) AS genre_name,
+         mp.personnage_name
        FROM media AS m
        JOIN media_person AS mp ON mp.ID_media = m.ID
        WHERE mp.ID_person = ?

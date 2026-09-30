@@ -75,9 +75,9 @@ describe("GET /api/actors/:id", () => {
 
 const buildFilmographyRows = (count: number) =>
   Array.from({ length: count }, (_, index) => ({
-    id: index + 1,
+    ID: index + 1,
     name: `Film ${index + 1}`,
-    characterName: "Le Frère",
+    personnage_name: "Le Frère",
   })) as Rows;
 
 const mockFilmographyQueries = (items: Rows, total: number) =>

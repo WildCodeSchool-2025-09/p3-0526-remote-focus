@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import { formatFilmography } from "../../utils/formatters";
 import actorRepository from "./actorRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -56,7 +57,7 @@ const browseFilmography: RequestHandler = async (req, res, next) => {
     ]);
 
     res.json({
-      items,
+      items: formatFilmography(items),
       hasMore: offset + items.length < total,
     });
   } catch (err) {
