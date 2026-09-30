@@ -110,3 +110,85 @@ describe("GET api/medias/search", () => {
     expect(response.body.series).toHaveLength(0);
   });
 });
+
+const mockMediaAndCountQueries = (mediaRows: Rows, total: number) =>
+  jest
+    .spyOn(databaseClient, "query")
+    .mockImplementationOnce(async () => [mediaRows, []])
+    .mockImplementationOnce(async () => [[{ total }] as Rows, []]);
+
+describe("GET api/medias/search with a genre filter", () => {
+  it.each(["abc", "0", "-2", "1.5", "1,,2"])(
+    "should return error : 400 on invalid genre %s",
+    async (genre) => {
+      const response = await supertest(app).get(
+        `/api/medias/search?q=test&genre=${genre}`,
+      );
+      expect(response.status).toBe(400);
+    },
+  );
+
+  it("should apply the genres to the media query and to the count query", async () => {
+    const querySpy = mockMediaAndCountQueries([] as Rows, 0);
+
+    const response = await supertest(app).get(
+      "/api/medias/search?q=test&genre=1,4",
+    );
+
+    expect(response.status).toBe(200);
+    expect(String(querySpy.mock.calls[0][0])).toContain("classify_as");
+    expect(querySpy.mock.calls[0][1]).toEqual(["%test%", 1, 4, "test%", 20, 0]);
+    expect(querySpy.mock.calls[1][1]).toEqual(["%test%", 1, 4]);
+  });
+
+  it("should keep the SQL parameters in order when type and genre are combined", async () => {
+    const querySpy = mockMediaAndCountQueries([] as Rows, 0);
+
+    const response = await supertest(app).get(
+      "/api/medias/search?q=test&type=movie&genre=2",
+    );
+
+    expect(response.status).toBe(200);
+    expect(querySpy.mock.calls[0][1]).toEqual([
+      "%test%",
+      "movie",
+      2,
+      "test%",
+      20,
+      0,
+    ]);
+    expect(querySpy.mock.calls[1][1]).toEqual(["%test%", "movie", 2]);
+  });
+
+  it("should not search actors when a genre is active", async () => {
+    const querySpy = mockMediaAndCountQueries([] as Rows, 0);
+
+    const response = await supertest(app).get(
+      "/api/medias/search?q=test&genre=1",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.actors).toEqual([]);
+    expect(querySpy).toHaveBeenCalledTimes(2);
+  });
+
+  it("should ignore an empty genre parameter and still search actors", async () => {
+    const querySpy = jest
+      .spyOn(databaseClient, "query")
+      .mockImplementationOnce(async () => [[] as Rows, []])
+      .mockImplementationOnce(async () => [
+        [{ id: 1, name: "Test Actor", photo: null }] as Rows,
+        [],
+      ])
+      .mockImplementationOnce(async () => [[{ total: 0 }] as Rows, []]);
+
+    const response = await supertest(app).get(
+      "/api/medias/search?q=test&genre=",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.actors).toHaveLength(1);
+    expect(querySpy).toHaveBeenCalledTimes(3);
+    expect(String(querySpy.mock.calls[0][0])).not.toContain("classify_as ca");
+  });
+});
