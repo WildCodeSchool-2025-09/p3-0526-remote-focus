@@ -13,20 +13,43 @@ class ActorRepository {
     return rows[0] ?? null;
   }
 
-  async readFilmography(personId: number, excludeMediaId: number) {
+  async readFilmography(
+    personId: number,
+    excludeMediaId: number,
+    limit: number,
+    offset: number,
+  ) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT m.ID, m.name, m.poster, m.type, m.released_at,
-              mp.personnage_name
+      `SELECT
+         m.ID, m.tmdb_id, m.name, m.type, m.released_at, m.duration,
+         m.poster, m.synopsis, m.overall_rating, m.status,
+         m.original_name, m.original_language, m.pegi, m.is_anime,
+         (SELECT genre.name FROM classify_as
+           JOIN genre ON genre.ID = classify_as.ID_genre
+           WHERE classify_as.ID_media = m.ID LIMIT 1) AS genre_name,
+         mp.personnage_name
        FROM media AS m
        JOIN media_person AS mp ON mp.ID_media = m.ID
        WHERE mp.ID_person = ?
          AND mp.role = 'actor'
          AND m.ID <> ?
-       ORDER BY m.released_at DESC
-       LIMIT 6`,
-      [personId, excludeMediaId],
+       ORDER BY m.released_at IS NULL, m.released_at DESC, m.ID DESC
+       LIMIT ? OFFSET ?`,
+      [personId, excludeMediaId, limit, offset],
     );
     return rows;
+  }
+
+  async countFilmography(personId: number, excludeMediaId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(*) AS total
+       FROM media_person
+       WHERE ID_person = ?
+         AND role = 'actor'
+         AND ID_media <> ?`,
+      [personId, excludeMediaId],
+    );
+    return Number(rows[0].total);
   }
 
   async readTopRatedByActor(personId: number, excludeMediaId: number) {

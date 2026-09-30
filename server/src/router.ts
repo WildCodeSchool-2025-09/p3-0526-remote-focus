@@ -4,6 +4,7 @@ import optionalAuth from "./middlewares/optionalAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
+import episodeActions from "./modules/episode/episodeActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
@@ -38,7 +39,11 @@ router.get(
   "/api/series/:id/seasons/:seasonId/episodes",
   seasonActions.readEpisodes,
 );
-router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get(
+  "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
+  episodeActions.read,
+);
+router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 router.post(
