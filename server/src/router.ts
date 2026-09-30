@@ -10,6 +10,8 @@ import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
 import fakeAuth from "./middlewares/fakeAuth";
 import trackActions from "./modules/track/trackActions";
+import hashPassword from "./middlewares/hashPassword";
+import catalogActions from "./modules/catalog/catalogActions";
 
 const router = express.Router();
 
@@ -17,10 +19,6 @@ const router = express.Router();
 // Define Your API Routes Here
 /* ************************************************************************* */
 router.get("/api/medias/search", searchActions.browse);
-
-import hashPassword from "./middlewares/hashPassword";
-import catalogActions from "./modules/catalog/catalogActions";
-
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 router.get("/api/medias", catalogActions.browse);
 router.get("/api/genres", catalogActions.browseGenres);
