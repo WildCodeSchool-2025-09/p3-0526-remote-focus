@@ -45,6 +45,7 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
             type="button"
             onClick={handleToggleMeta}
             aria-expanded={isMetaOpen}
+            aria-controls="episode-meta-panel"
             aria-label="Afficher plus d'informations"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
             style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
@@ -53,6 +54,7 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
           </button>
 
           <div
+            id="episode-meta-panel"
             className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
           >
             {episode.originalLanguage != null && (
