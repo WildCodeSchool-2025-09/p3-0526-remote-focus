@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { SearchProvider } from "./contexts/SearchContext";
-// Import necessary modules from React and React Router
+import { WatchingProvider } from "./contexts/WatchingContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
@@ -17,7 +17,6 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
-import { WatchingProvider } from "./contexts/WatchingContext";
 
 const router = createBrowserRouter([
   {
