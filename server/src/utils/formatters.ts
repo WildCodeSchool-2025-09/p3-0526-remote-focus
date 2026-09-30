@@ -26,6 +26,27 @@ export function formatCast(rows: Rows) {
   }));
 }
 
+export function formatFilmography(rows: Rows) {
+  return rows.map((media) => ({
+    id: media.ID,
+    tmdbId: media.tmdb_id,
+    name: media.name,
+    type: media.type,
+    releasedAt: media.released_at,
+    duration: media.duration,
+    poster: media.poster,
+    synopsis: media.synopsis,
+    overallRating: media.overall_rating,
+    status: media.status,
+    originalName: media.original_name,
+    originalLanguage: media.original_language,
+    pegi: media.pegi,
+    isAnime: media.is_anime,
+    genreName: media.genre_name,
+    characterName: media.personnage_name,
+  }));
+}
+
 export function formatEpisodes(rows: Rows) {
   return rows.map((episode) => ({
     id: episode.ID,
