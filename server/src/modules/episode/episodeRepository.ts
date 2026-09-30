@@ -20,7 +20,7 @@ class EpisodeRepository {
 
   async readCast(id: number, limit = 10) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT pe.ID, pe.name, pe.photo, ep.personnage_name, ep.role
+      `SELECT DISTINCT pe.ID, pe.name, pe.photo, ep.personnage_name, ep.role
        FROM person AS pe
        JOIN episode_person AS ep ON ep.ID_person = pe.ID
        WHERE ep.ID_episode = ? AND ep.role = 'actor'
@@ -33,7 +33,7 @@ class EpisodeRepository {
 
   async countCast(id: number) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT COUNT(*) AS total
+      `SELECT COUNT(DISTINCT ID_person) AS total
        FROM episode_person
        WHERE ID_episode = ? AND role = 'actor'`,
       [id],
