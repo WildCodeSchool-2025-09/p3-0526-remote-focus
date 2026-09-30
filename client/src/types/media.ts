@@ -149,3 +149,29 @@ export type SeasonDetail = {
   userStatus: string | null;
   userRating: number | null;
 };
+
+export type EpisodeDetail = {
+  id: number;
+  name: string | null;
+  number: number | null;
+  releasedAt: string | null;
+  synopsis: string | null;
+  duration: number | null;
+  poster: string | null;
+  originalLanguage: string | null;
+  overallRating: string | null;
+  season: {
+    id: number;
+    number: number | null;
+  };
+  serie: {
+    id: number;
+    name: string;
+    poster: string | null;
+    isAnime: boolean;
+  };
+  platforms: Platform[];
+  cast: CastMember[];
+  castTotal: number;
+  userStatus: string | null;
+};
