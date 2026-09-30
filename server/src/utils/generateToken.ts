@@ -6,6 +6,9 @@ type TokenPayload = {
   role: string;
 };
 
+// Durée de vie courte : un token volé devient inutilisable plus vite.
+const TOKEN_LIFETIME = "24h";
+
 export function generateToken(payload: TokenPayload): string {
   const secret = process.env.JWT_SECRET;
 
@@ -13,5 +16,5 @@ export function generateToken(payload: TokenPayload): string {
     throw new Error("JWT_SECRET is not defined");
   }
 
-  return jwt.sign(payload, secret, { expiresIn: "7d" });
+  return jwt.sign(payload, secret, { expiresIn: TOKEN_LIFETIME });
 }
