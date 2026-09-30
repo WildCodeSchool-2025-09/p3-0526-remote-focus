@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { SearchProvider } from "./contexts/SearchContext";
+import { TrackProvider } from "./contexts/TrackContext";
 // Import necessary modules from React and React Router
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
@@ -89,9 +90,12 @@ if (rootElement == null) {
 }
 
 // Render the app inside the root element
+
 createRoot(rootElement).render(
   <SearchProvider>
-    <RouterProvider router={router} />
+    <TrackProvider>
+      <RouterProvider router={router} />
+    </TrackProvider>
   </SearchProvider>,
 );
 
