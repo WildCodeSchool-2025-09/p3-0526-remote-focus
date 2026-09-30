@@ -6,6 +6,7 @@ import { SearchProvider } from "./contexts/SearchContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
+import PrivateRoute from "./components/PrivateRoute";
 import ActorDetail from "./pages/ActorDetail";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
@@ -42,7 +43,11 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "*",
