@@ -1,4 +1,5 @@
 import type { RegisterFormErrors, RegisterFormValues } from "../types/Auth";
+import { isValidEmail } from "./isValidEmail";
 
 export function validateRegisterForm(
   values: RegisterFormValues,
@@ -35,9 +36,7 @@ export function validateRegisterForm(
   if (values.email === "") {
     errors.email = "L'adresse e-mail est obligatoire.";
   } else {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailPattern.test(values.email)) {
+    if (!isValidEmail(values.email)) {
       errors.email = "Le format de l'adresse e-mail est invalide.";
     } else if (values.email.length > 255) {
       errors.email = "L'adresse e-mail est limitée à 255 caractères.";
