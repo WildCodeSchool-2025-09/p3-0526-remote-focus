@@ -126,11 +126,7 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
             }
             isPressed={isFavorite}
             fillIcon={isFavorite}
-            buttonClassName={
-              isFavorite
-                ? "border-focus-coral bg-focus-coral text-focus-cream"
-                : "border-focus-coral text-focus-coral"
-            }
+            buttonClassName="border-focus-coral text-focus-coral"
             onClick={handleFavoriteClick}
           />
 
