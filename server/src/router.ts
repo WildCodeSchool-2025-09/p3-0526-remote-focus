@@ -11,10 +11,11 @@ import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
-import fakeAuth from "./middlewares/fakeAuth";
+import fakeAuth from "./middlewares/requireAuth";
 import trackActions from "./modules/track/trackActions";
 import hashPassword from "./middlewares/hashPassword";
 import catalogActions from "./modules/catalog/catalogActions";
+import requireAuth from "./middlewares/requireAuth";
 
 const router = express.Router();
 
@@ -55,7 +56,7 @@ router.post(
 );
 router.post("/api/auth/login", authActions.login);
 
-router.use("/api/me", fakeAuth);
+router.use("/api/me", requireAuth);
 
 router.get("/api/me/tracks", trackActions.browse);
 
