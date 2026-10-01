@@ -1,4 +1,4 @@
-import { Check, Heart, Plus } from "lucide-react";
+import { Check, Heart, Minus, Plus } from "lucide-react";
 import type { Media } from "../../types/Catalog";
 import { useTracks } from "../../contexts/TrackContext";
 
@@ -10,17 +10,25 @@ const buttonsClass =
   "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/70 shadow-badge";
 
 function MediaActions({ media }: MediaActionsProps) {
-  const { tracks, toggleFavorite } = useTracks();
+  const { tracks, toggleFavorite, toggleWatchlist } = useTracks();
 
   const currentTrack = tracks.find((track) => track.mediaId === media.id);
 
   const isFavorite = currentTrack?.isFavorite ?? false;
+  const isInWatchlist = currentTrack?.isInWatchlist ?? false;
 
   async function handleFavoriteClick() {
     try {
       await toggleFavorite(media.id);
     } catch (error) {
       console.error("Impossible de modifier le favori :", error);
+    }
+  }
+  async function handleWtachlistClick() {
+    try {
+      await toggleWatchlist(media.id);
+    } catch (error) {
+      console.error("Impossible de modifier la Watchlist :", error);
     }
   }
 
@@ -41,10 +49,20 @@ function MediaActions({ media }: MediaActionsProps) {
       </button>
       <button
         type="button"
-        aria-label={`Ajouter ${media.name} à la watchlist`}
-        className={`${buttonsClass}`}
+        aria-label={
+          isFavorite
+            ? `Retirer ${media.name} de la Watchlist`
+            : `Ajouter ${media.name} à la Watchlist`
+        }
+        aria-pressed={isInWatchlist}
+        className={`${buttonsClass} ${
+          isInWatchlist
+            ? "!border-focus-cream !bg-focus-cream !text-focus-void"
+            : ""
+        }`}
+        onClick={handleWtachlistClick}
       >
-        <Plus size={14} />
+        {isInWatchlist ? <Minus size={14} /> : <Plus size={14} />}
       </button>
       <button
         type="button"
