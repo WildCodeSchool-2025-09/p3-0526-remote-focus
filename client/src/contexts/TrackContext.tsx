@@ -5,11 +5,19 @@ import {
   useEffect,
   useState,
 } from "react";
-import { fetchTracks, type TrackState } from "../services/trackApi";
+import {
+  fetchTracks,
+  toggleFavorite as toggleFavoriteApi,
+  toggleWatchlist as toggleWatchlistApi,
+  type TrackState,
+} from "../services/trackApi";
 
 type TrackContextValue = {
   tracks: TrackState[];
+  toggleFavorite: (mediaId: number) => Promise<void>;
+  toggleWatchlist: (mediaId: number) => Promise<void>;
 };
+
 type TrackProviderProps = {
   children: ReactNode;
 };
@@ -29,8 +37,27 @@ export function TrackProvider({ children }: TrackProviderProps) {
       });
   }, []);
 
+  async function toggleFavorite(mediaId: number) {
+    const updatedTrack = await toggleFavoriteApi(mediaId);
+
+    setTracks((currentTracks) => [
+      ...currentTracks.filter((track) => track.mediaId !== mediaId),
+      updatedTrack,
+    ]);
+  }
+  async function toggleWatchlist(mediaId: number) {
+    const updatedTrack = await toggleWatchlistApi(mediaId);
+
+    setTracks((currentTracks) => [
+      ...currentTracks.filter((track) => track.mediaId !== mediaId),
+      updatedTrack,
+    ]);
+  }
+
   return (
-    <TrackContext.Provider value={{ tracks }}>{children}</TrackContext.Provider>
+    <TrackContext.Provider value={{ tracks, toggleFavorite }}>
+      {children}
+    </TrackContext.Provider>
   );
 }
 
