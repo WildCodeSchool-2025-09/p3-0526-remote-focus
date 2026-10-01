@@ -1,5 +1,7 @@
 import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useTracks } from "../../contexts/TrackContext";
 import type { EpisodeDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
@@ -9,18 +11,45 @@ type EpisodeHeaderProps = {
   episode: EpisodeDetail;
 };
 
-const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
+const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
 
 function EpisodeHeader({ episode }: EpisodeHeaderProps) {
+  const { isAuthenticated } = useAuth();
+  const { tracks, toggleFavorite } = useTracks();
+
+  const [isMetaOpen, setIsMetaOpen] = useState(false);
+
+  const currentTrack = tracks.find(
+    (track) => track.mediaId === episode.serie.id,
+  );
+
+  const isFavorite = currentTrack?.isFavorite ?? false;
+
   const releasedAt = episode.releasedAt
     ? new Date(episode.releasedAt).toLocaleDateString("fr-FR")
     : null;
 
-  const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const handleToggleMeta = () => {
+  function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  };
+  }
+
+  async function handleFavoriteClick() {
+    if (!isAuthenticated) {
+      window.alert("Vous devez être connecté pour réaliser cette action.");
+      return;
+    }
+
+    try {
+      await toggleFavorite(episode.serie.id);
+    } catch (error) {
+      console.error(
+        isFavorite
+          ? "Impossible de retirer la série des favoris :"
+          : "Impossible d'ajouter la série aux favoris :",
+        error,
+      );
+    }
+  }
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -47,21 +76,25 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
             aria-expanded={isMetaOpen}
             aria-controls="episode-meta-panel"
             aria-label="Afficher plus d'informations"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
-            style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-focus-cream/30 text-sm md:hidden ${
+              isMetaOpen ? "text-focus-yellow" : "text-focus-cream"
+            }`}
           >
             {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div
             id="episode-meta-panel"
-            className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
+            className={`${
+              isMetaOpen ? "flex" : "hidden"
+            } w-full flex-wrap gap-2 rounded-lg border border-focus-cream/15 bg-focus-surface p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
           >
             {episode.originalLanguage != null && (
               <span className={PILL}>
                 VO : {episode.originalLanguage.toUpperCase()}
               </span>
             )}
+
             {episode.duration != null && (
               <span className={PILL}>{formatDuration(episode.duration)}</span>
             )}
@@ -71,14 +104,37 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
 
       <div className="col-span-2 row-start-2 flex flex-col gap-4 md:col-span-1 md:col-start-2">
         {episode.synopsis != null && (
-          <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
+          <p className="max-w-[660px] text-base leading-relaxed text-focus-cream/80">
             {episode.synopsis}
           </p>
         )}
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Favoris"
+            icon={Heart}
+            ariaLabel={
+              isFavorite
+                ? `Retirer ${episode.serie.name} des favoris`
+                : `Ajouter ${episode.serie.name} aux favoris`
+            }
+            isPressed={isFavorite}
+            fillIcon={isFavorite}
+            buttonClassName={
+              isFavorite
+                ? "border-focus-coral bg-focus-coral text-focus-cream"
+                : "border-focus-coral text-focus-coral"
+            }
+            onClick={handleFavoriteClick}
+          />
+
+          <ActionButton
+            label="Vu"
+            icon={Check}
+            buttonClassName="border-focus-teal text-focus-teal"
+            disabled
+          />
+
           <PlatformList platforms={episode.platforms} />
         </div>
       </div>
