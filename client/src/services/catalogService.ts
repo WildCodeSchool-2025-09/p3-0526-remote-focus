@@ -3,6 +3,7 @@ import type {
   PaginatedMediaResponse,
 } from "../types/Catalog";
 import type { Genre } from "../types/media";
+import { getAuthHeaders } from "../utils/authStorage";
 
 function fetchDiscover(
   type?: "movie" | "tv" | "anime",
@@ -11,12 +12,14 @@ function fetchDiscover(
     ? `${import.meta.env.VITE_API_URL}/api/medias/discover?type=${type}`
     : `${import.meta.env.VITE_API_URL}/api/medias/discover`;
 
-  return fetch(urlRequestedType).then((response) => {
-    if (!response.ok) {
-      throw new Error(`${response.status}`);
-    }
-    return response.json();
-  });
+  return fetch(urlRequestedType, { headers: getAuthHeaders() }).then(
+    (response) => {
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+      return response.json();
+    },
+  );
 }
 
 async function fetchGenres(): Promise<Genre[]> {

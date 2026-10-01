@@ -1,9 +1,11 @@
 import type { RowDataPacket } from "mysql2";
 import databaseClient from "../../../database/client";
-
 import type { Result } from "../../../database/client";
 import type { LikedGenre } from "../../types/Genre/Genre.types";
-import type { RegisterUserInput } from "../../types/User/User.types";
+import type {
+  RegisterUserInput,
+  UserAuthRow,
+} from "../../types/User/User.types";
 
 class UserRepository {
   async readRandomGenres(
@@ -81,6 +83,15 @@ class UserRepository {
     );
 
     return rows.length > 0;
+  }
+
+  async readByEmail(email: string): Promise<UserAuthRow | null> {
+    const [rows] = await databaseClient.query<UserAuthRow[]>(
+      "SELECT ID, firstname, lastname, email, login, avatar, role, hashed_password FROM user_ WHERE email = ? LIMIT 1",
+      [email],
+    );
+
+    return rows[0] ?? null;
   }
 
   async findByLogin(login: string): Promise<boolean> {
