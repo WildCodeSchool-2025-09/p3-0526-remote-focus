@@ -3,15 +3,19 @@ import type { LucideIcon } from "lucide-react";
 type ActionButtonProps = {
   label: string;
   color: string;
+  bgColor?: string;
   icon: LucideIcon;
   align?: "center" | "start";
+  onClick?: () => void;
 };
 
 function ActionButton({
   label,
   color,
+  bgColor,
   icon: Icon,
   align = "center",
+  onClick,
 }: ActionButtonProps) {
   return (
     <div
@@ -19,9 +23,9 @@ function ActionButton({
     >
       <button
         type="button"
-        disabled
         className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12"
-        style={{ borderColor: color, color }}
+        style={{ borderColor: color, backgroundColor: bgColor, color }}
+        onClick={onClick}
       >
         <Icon size={22} strokeWidth={1.8} />
       </button>

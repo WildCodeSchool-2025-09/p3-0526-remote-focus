@@ -7,6 +7,7 @@ import SeasonHeader from "../components/Season/SeasonHeader";
 import useFetch from "../hooks/useFetch";
 import useSelectedActor from "../hooks/useSelectedActor";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
+import { useWatch } from "../contexts/WatchingContext";
 
 function SeasonDetail() {
   const { seriesId, seasonId } = useParams();
@@ -33,6 +34,11 @@ function SeasonDetail() {
     );
   }
 
+  const { isEpisodeWatched } = useWatch();
+  const isSeasonComplete = seasonDetail.episodes.every((episode) =>
+    isEpisodeWatched(episode.id),
+  );
+
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
       <Breadcrumb
@@ -49,7 +55,7 @@ function SeasonDetail() {
           { label: `Saison ${seasonDetail.number}` },
         ]}
       />
-      <SeasonHeader season={seasonDetail} />
+      <SeasonHeader season={seasonDetail} isSeasonComplete={isSeasonComplete} />
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-bold md:text-2xl">Épisodes</h2>
         <div className="overflow-hidden rounded-xl border border-white/15">

@@ -8,9 +8,21 @@ import {
 import useFetch from "../hooks/useFetch";
 import { API_URL } from "../services/api";
 
+interface WatchResponse {
+  watched: boolean;
+}
+
 interface WatchingContextType {
   watchedMediaIds: number[];
   isWatched: (mediaId: number) => boolean;
+  isEpisodeWatched: (episodeId: number) => boolean;
+  toggleWatchedMovie: (mediaId: number) => Promise<void>;
+  toggleWatchedSeries: (seriesId: number) => Promise<void>;
+  toggleWatchedSeason: (
+    seasonId: number,
+    episodeIds: number[],
+  ) => Promise<WatchResponse>;
+  toggleWatchedEpisode: (episodeId: number) => Promise<void>;
 }
 
 const WatchingContext = createContext<WatchingContextType | undefined>(
@@ -19,13 +31,18 @@ const WatchingContext = createContext<WatchingContextType | undefined>(
 
 function WatchingProvider({ children }: { children: ReactNode }) {
   const [watchedMediaIds, setWatchedMediaIds] = useState<number[]>([]);
+  const [watchedEpisodeIds, setWatchedEpisodeIds] = useState<number[]>([]);
 
   function isWatched(mediaId: number): boolean {
     return watchedMediaIds.includes(mediaId);
   }
 
-  function toggleWatchedMedia(mediaId: number) {
-    fetch(`${API_URL}/api/me/medias/${mediaId}/watched`, {
+  function isEpisodeWatched(episodeId: number): boolean {
+    return watchedEpisodeIds.includes(episodeId);
+  }
+
+  function toggleWatchedMovie(mediaId: number) {
+    return fetch(`${API_URL}/api/me/medias/${mediaId}/watched`, {
       method: "PATCH",
     })
       .then((response) => {
@@ -49,16 +66,115 @@ function WatchingProvider({ children }: { children: ReactNode }) {
       });
   }
 
-  const { data, loading, error } = useFetch<number[]>("/api/me/medias/watched");
+  function toggleWatchedSeries(seriesId: number) {
+    return fetch(`${API_URL}/api/me/series/${seriesId}/watched`, {
+      method: "PATCH",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erreur ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.watched === true) {
+          setWatchedMediaIds((ids) => {
+            if (!ids.includes(seriesId)) {
+              return [...ids, seriesId];
+            }
+
+            return ids;
+          });
+        } else {
+          setWatchedMediaIds((ids) => ids.filter((id) => id !== seriesId));
+        }
+      });
+  }
+
+  function toggleWatchedSeason(seasonId: number, episodeIds: number[]) {
+    return fetch(`${API_URL}/api/me/seasons/${seasonId}/watched`, {
+      method: "PATCH",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erreur ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.watched === true) {
+          setWatchedEpisodeIds((ids) => {
+            return [...new Set([...ids, ...episodeIds])];
+          });
+        } else {
+          setWatchedEpisodeIds((ids) =>
+            ids.filter((id) => !episodeIds.includes(id)),
+          );
+        }
+        return data;
+      });
+  }
+
+  function toggleWatchedEpisode(episodeId: number) {
+    const wasWatched = isEpisodeWatched(episodeId);
+    !wasWatched
+      ? setWatchedEpisodeIds((ids) => {
+          return [...ids, episodeId];
+        })
+      : setWatchedEpisodeIds((ids) => ids.filter((id) => id !== episodeId));
+    return fetch(`${API_URL}/api/me/episodes/${episodeId}/watched`, {
+      method: "PATCH",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erreur ${response.status}`);
+        }
+        return response.json();
+      })
+      .catch(() => {
+        if (wasWatched) {
+          setWatchedEpisodeIds((ids) => {
+            return [...ids, episodeId];
+          });
+        } else {
+          setWatchedEpisodeIds((ids) => ids.filter((id) => id !== episodeId));
+        }
+      });
+  }
+
+  const {
+    data: watchedMediaIdsData,
+    // loading: mediaLoading,
+    // error: mediaError,
+  } = useFetch<number[]>("/api/me/medias/watched");
+
+  const {
+    data: watchedEpisodeIdsData,
+    // loading: episodeLoading,
+    // error: episodeError,
+  } = useFetch<number[]>("/api/me/episodes/watched");
 
   useEffect(() => {
-    if (data) {
-      setWatchedMediaIds(data);
+    if (watchedMediaIdsData) {
+      setWatchedMediaIds(watchedMediaIdsData);
     }
-  }, [data]);
+    if (watchedEpisodeIdsData) {
+      setWatchedEpisodeIds(watchedEpisodeIdsData);
+    }
+  }, [watchedMediaIdsData, watchedEpisodeIdsData]);
 
   return (
-    <WatchingContext.Provider value={{ watchedMediaIds, isWatched }}>
+    <WatchingContext.Provider
+      value={{
+        watchedMediaIds,
+        isWatched,
+        isEpisodeWatched,
+        toggleWatchedMovie,
+        toggleWatchedSeries,
+        toggleWatchedSeason,
+        toggleWatchedEpisode,
+      }}
+    >
       {children}
     </WatchingContext.Provider>
   );

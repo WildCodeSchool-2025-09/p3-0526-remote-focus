@@ -169,6 +169,16 @@ class WatchingRepository {
 
     return rows.map((row) => Number(row.ID_media));
   }
+
+  async readEpisodeWatched(userId: number): Promise<number[]> {
+    const [rows] = await databaseClient.query<Rows>(
+      `(SELECT ID_episode FROM episode_user 
+    WHERE ID_user=?)`,
+      [userId],
+    );
+
+    return rows.map((row) => Number(row.ID_episode));
+  }
 }
 
 export default new WatchingRepository();

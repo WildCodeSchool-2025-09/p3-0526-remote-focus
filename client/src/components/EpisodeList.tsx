@@ -1,7 +1,7 @@
-import { Check } from "lucide-react";
 import { Link } from "react-router";
 import type { Episode } from "../types/media";
 import { formatDuration } from "../utils/formatDuration";
+import EpisodeWatchToggle from "./Episode/EpisodeWatchToggle";
 
 type EpisodeListProps = {
   episodes: Episode[];
@@ -36,15 +36,7 @@ function EpisodeList({ episodes, seriesId, seasonId }: EpisodeListProps) {
               )}
             </div>
           </Link>
-
-          <button
-            type="button"
-            disabled
-            aria-label="Marquer comme vu"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#17B890] text-[#17B890]"
-          >
-            <Check size={16} strokeWidth={2} />
-          </button>
+          <EpisodeWatchToggle episodeId={episode.id} />
         </li>
       ))}
     </ul>

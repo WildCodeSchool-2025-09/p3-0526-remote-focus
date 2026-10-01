@@ -1,5 +1,4 @@
 import type { RequestHandler } from "express";
-import trackingRepository from "./watchingRepository";
 import watchingRepository from "./watchingRepository";
 
 const toggleMediaWatched: RequestHandler = async (req, res, next) => {
@@ -8,15 +7,15 @@ const toggleMediaWatched: RequestHandler = async (req, res, next) => {
 
     const mediaId = Number(req.params.id);
 
-    const isMediaWatched = await trackingRepository.isMediaWatched(
+    const isMediaWatched = await watchingRepository.isMediaWatched(
       userId,
       mediaId,
     );
 
     if (isMediaWatched.length === 0) {
-      await trackingRepository.markMediaAsWatched(userId, mediaId);
+      await watchingRepository.markMediaAsWatched(userId, mediaId);
     } else {
-      await trackingRepository.unmarkMediaAsWatched(userId, mediaId);
+      await watchingRepository.unmarkMediaAsWatched(userId, mediaId);
     }
 
     res.json({
@@ -33,15 +32,15 @@ const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
 
     const episodeId = Number(req.params.id);
 
-    const isEpisodeWatched = await trackingRepository.isEpisodeWatched(
+    const isEpisodeWatched = await watchingRepository.isEpisodeWatched(
       userId,
       episodeId,
     );
 
     if (isEpisodeWatched.length === 0) {
-      await trackingRepository.markEpisodeAsWatched(userId, episodeId);
+      await watchingRepository.markEpisodeAsWatched(userId, episodeId);
     } else {
-      await trackingRepository.unmarkEpisodeAsWatched(userId, episodeId);
+      await watchingRepository.unmarkEpisodeAsWatched(userId, episodeId);
     }
 
     res.json({
@@ -58,15 +57,15 @@ const toggleSeasonWatched: RequestHandler = async (req, res, next) => {
 
     const seasonId = Number(req.params.id);
 
-    const isSeasonWatched = await trackingRepository.isSeasonWatched(
+    const isSeasonWatched = await watchingRepository.isSeasonWatched(
       userId,
       seasonId,
     );
 
     if (isSeasonWatched === false) {
-      await trackingRepository.markSeasonAsWatched(userId, seasonId);
+      await watchingRepository.markSeasonAsWatched(userId, seasonId);
     } else {
-      await trackingRepository.unmarkSeasonAsWatched(userId, seasonId);
+      await watchingRepository.unmarkSeasonAsWatched(userId, seasonId);
     }
 
     res.json({
@@ -83,15 +82,15 @@ const toggleSeriesWatched: RequestHandler = async (req, res, next) => {
 
     const seriesId = Number(req.params.id);
 
-    const isFullyWatched = await trackingRepository.isFullyWatched(
+    const isFullyWatched = await watchingRepository.isFullyWatched(
       userId,
       seriesId,
     );
 
     if (isFullyWatched === false) {
-      await trackingRepository.markSeriesAsWatched(userId, seriesId);
+      await watchingRepository.markSeriesAsWatched(userId, seriesId);
     } else {
-      await trackingRepository.unmarkSeriesAsWatched(userId, seriesId);
+      await watchingRepository.unmarkSeriesAsWatched(userId, seriesId);
     }
 
     res.json({
@@ -114,10 +113,23 @@ const readMediaWatched: RequestHandler = async (req, res, next) => {
   }
 };
 
+const readEpisodeWatched: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id || 1;
+
+    const episodeIds = await watchingRepository.readEpisodeWatched(userId);
+
+    res.json(episodeIds);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   toggleMediaWatched,
   toggleSeriesWatched,
   toggleEpisodeWatched,
   toggleSeasonWatched,
   readMediaWatched,
+  readEpisodeWatched,
 };
