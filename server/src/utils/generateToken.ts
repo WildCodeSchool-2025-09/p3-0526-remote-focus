@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 
+import type { UserRole } from "../types/User/User.types";
+
 type TokenPayload = {
   id: number;
   login: string;
-  role: string;
+  role: UserRole;
 };
 
 export function generateToken(payload: TokenPayload): string {
