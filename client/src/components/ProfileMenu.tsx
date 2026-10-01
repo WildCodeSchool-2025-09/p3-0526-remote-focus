@@ -1,14 +1,16 @@
 import { ChevronDown, Power } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { useAuth } from "../contexts/AuthContext";
 
 function ProfileMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,6 +42,15 @@ function ProfileMenu() {
     };
   }, [isOpen]);
 
+  // La session n'est fermée qu'une fois l'accueil affiché : si l'utilisateur
+  // était sur une page protégée, PrivateRoute ne doit pas rediriger vers /login.
+  useEffect(() => {
+    if (isLoggingOut && location.pathname === "/") {
+      logout();
+      setIsLoggingOut(false);
+    }
+  }, [isLoggingOut, location.pathname, logout]);
+
   if (user === null) {
     return null;
   }
@@ -50,7 +61,7 @@ function ProfileMenu() {
 
   const handleLogout = () => {
     setIsOpen(false);
-    logout();
+    setIsLoggingOut(true);
     navigate("/", { replace: true });
   };
 
@@ -61,11 +72,11 @@ function ProfileMenu() {
       <button
         type="button"
         onClick={handleToggle}
-        aria-haspopup="menu"
+        disabled={isLoggingOut}
         aria-expanded={isOpen}
         aria-controls="profile-menu"
         aria-label={`Menu du profil de ${user.firstName}`}
-        className="flex items-center gap-2 rounded-full border border-focus-line/30 bg-base-200 p-1 transition hover:border-focus-line/60 lg:pr-3"
+        className="flex items-center gap-2 rounded-full border border-focus-line/30 bg-base-200 p-1 transition hover:border-focus-line/60 disabled:opacity-50 lg:pr-3"
       >
         <span
           aria-hidden="true"
@@ -90,7 +101,6 @@ function ProfileMenu() {
       {isOpen && (
         <div
           id="profile-menu"
-          role="menu"
           className="absolute right-0 top-full z-40 mt-2 w-56 rounded-box border border-focus-line/30 bg-base-200 p-2 shadow-xl"
         >
           <p className="truncate px-3 py-2 text-xs text-base-content/60">
@@ -99,7 +109,6 @@ function ProfileMenu() {
 
           <button
             type="button"
-            role="menuitem"
             onClick={handleLogout}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-error transition hover:bg-error/10"
           >
