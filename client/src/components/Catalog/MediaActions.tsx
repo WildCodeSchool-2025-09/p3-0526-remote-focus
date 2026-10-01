@@ -1,6 +1,8 @@
 import { Check, Heart, Minus, Plus } from "lucide-react";
-import type { Media } from "../../types/Catalog";
+import type { MouseEvent } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useTracks } from "../../contexts/TrackContext";
+import type { Media } from "../../types/Catalog";
 
 interface MediaActionsProps {
   media: Media;
@@ -10,6 +12,7 @@ const buttonsClass =
   "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/70 shadow-badge";
 
 function MediaActions({ media }: MediaActionsProps) {
+  const { isAuthenticated } = useAuth();
   const { tracks, toggleFavorite, toggleWatchlist } = useTracks();
 
   const currentTrack = tracks.find((track) => track.mediaId === media.id);
@@ -17,18 +20,45 @@ function MediaActions({ media }: MediaActionsProps) {
   const isFavorite = currentTrack?.isFavorite ?? false;
   const isInWatchlist = currentTrack?.isInWatchlist ?? false;
 
-  async function handleFavoriteClick() {
+  async function handleFavoriteClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      window.alert("Vous devez être connecté pour réaliser cette action.");
+      return;
+    }
+
     try {
       await toggleFavorite(media.id);
     } catch (error) {
-      console.error("Impossible de modifier le favori :", error);
+      console.error(
+        isFavorite
+          ? "Impossible de retirer le média des favoris :"
+          : "Impossible d'ajouter le média aux favoris :",
+        error,
+      );
     }
   }
-  async function handleWtachlistClick() {
+
+  async function handleWatchlistClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      window.alert("Vous devez être connecté pour réaliser cette action.");
+      return;
+    }
+
     try {
       await toggleWatchlist(media.id);
     } catch (error) {
-      console.error("Impossible de modifier la Watchlist :", error);
+      console.error(
+        isInWatchlist
+          ? "Impossible de retirer le média de la watchlist :"
+          : "Impossible d'ajouter le média à la watchlist :",
+        error,
+      );
     }
   }
 
@@ -47,12 +77,13 @@ function MediaActions({ media }: MediaActionsProps) {
       >
         <Heart size={14} fill={isFavorite ? "currentColor" : "none"} />
       </button>
+
       <button
         type="button"
         aria-label={
-          isFavorite
-            ? `Retirer ${media.name} de la Watchlist`
-            : `Ajouter ${media.name} à la Watchlist`
+          isInWatchlist
+            ? `Retirer ${media.name} de la watchlist`
+            : `Ajouter ${media.name} à la watchlist`
         }
         aria-pressed={isInWatchlist}
         className={`${buttonsClass} ${
@@ -60,10 +91,11 @@ function MediaActions({ media }: MediaActionsProps) {
             ? "!border-focus-cream !bg-focus-cream !text-focus-void"
             : ""
         }`}
-        onClick={handleWtachlistClick}
+        onClick={handleWatchlistClick}
       >
         {isInWatchlist ? <Minus size={14} /> : <Plus size={14} />}
       </button>
+
       <button
         type="button"
         aria-label={`Ajouter ${media.name} aux médias vus`}
@@ -74,4 +106,5 @@ function MediaActions({ media }: MediaActionsProps) {
     </div>
   );
 }
+
 export default MediaActions;
