@@ -1,21 +1,21 @@
 import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
+import hashPassword from "./middlewares/hashPassword";
 import optionalAuth from "./middlewares/optionalAuth";
+import fakeAuth from "./middlewares/requireAuth";
+import requireAuth from "./middlewares/requireAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
+import catalogActions from "./modules/catalog/catalogActions";
 import episodeActions from "./modules/episode/episodeActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
-import userActions from "./modules/user/userActions";
-import fakeAuth from "./middlewares/requireAuth";
 import trackActions from "./modules/track/trackActions";
-import hashPassword from "./middlewares/hashPassword";
-import catalogActions from "./modules/catalog/catalogActions";
-import requireAuth from "./middlewares/requireAuth";
+import userActions from "./modules/user/userActions";
 
 const router = express.Router();
 

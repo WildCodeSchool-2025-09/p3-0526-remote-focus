@@ -1,15 +1,15 @@
 import {
-  createContext,
   type ReactNode,
+  createContext,
   useContext,
   useEffect,
   useState,
 } from "react";
 import {
+  type TrackState,
   fetchTracks,
   toggleFavorite as toggleFavoriteApi,
   toggleWatchlist as toggleWatchlistApi,
-  type TrackState,
 } from "../services/trackApi";
 import { useAuth } from "./AuthContext";
 
