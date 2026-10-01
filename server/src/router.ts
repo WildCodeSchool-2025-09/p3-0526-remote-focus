@@ -1,7 +1,10 @@
 import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
+import optionalAuth from "./middlewares/optionalAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
+import authActions from "./modules/auth/authActions";
+import episodeActions from "./modules/episode/episodeActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
@@ -15,6 +18,8 @@ import catalogActions from "./modules/catalog/catalogActions";
 
 const router = express.Router();
 
+router.use(optionalAuth);
+
 /* ************************************************************************* */
 // Define Your API Routes Here
 /* ************************************************************************* */
@@ -24,11 +29,6 @@ router.get("/api/medias", catalogActions.browse);
 router.get("/api/genres", catalogActions.browseGenres);
 
 router.get("/api/medias/home", homepageActions.browseHomepage);
-/*
-router.get("/api/items", itemActions.browse);
-router.get("/api/items/:id", itemActions.read);
-router.post("/api/items", itemActions.add); 
-*/
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
@@ -39,7 +39,12 @@ router.get(
   "/api/series/:id/seasons/:seasonId/episodes",
   seasonActions.readEpisodes,
 );
-router.get("/api/actors/:id/filmography", actorActions.readFilmography);
+router.get(
+  "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
+  episodeActions.read,
+);
+router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
+router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 router.post(
   "/api/users",
@@ -48,6 +53,7 @@ router.post(
   hashPassword,
   userActions.add,
 );
+router.post("/api/auth/login", authActions.login);
 
 router.use("/api/me", fakeAuth);
 

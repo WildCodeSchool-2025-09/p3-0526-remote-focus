@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
-import KnownFrom from "../components/KnownFrom";
 import SeasonHeader from "../components/Season/SeasonHeader";
 import useFetch from "../hooks/useFetch";
+import useSelectedActor from "../hooks/useSelectedActor";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
 
 function SeasonDetail() {
@@ -20,11 +20,8 @@ function SeasonDetail() {
       ? `/api/series/${seriesId}/seasons/${seasonId}`
       : null,
   );
-  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
-
-  const handleSelectPerson = (personId: number) => {
-    setSelectedPersonId(personId);
-  };
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
@@ -56,7 +53,11 @@ function SeasonDetail() {
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-bold md:text-2xl">Épisodes</h2>
         <div className="overflow-hidden rounded-xl border border-white/15">
-          <EpisodeList episodes={seasonDetail.episodes} />
+          <EpisodeList
+            episodes={seasonDetail.episodes}
+            seriesId={seasonDetail.serie.id}
+            seasonId={seasonDetail.id}
+          />
         </div>
       </section>
       <CastList
@@ -66,9 +67,10 @@ function SeasonDetail() {
         onSelectPerson={handleSelectPerson}
       />
       {selectedPersonId != null && (
-        <KnownFrom
+        <ActorKnownForWidget
           personId={selectedPersonId}
           mediaId={seasonDetail.serie.id}
+          onClose={handleCloseActorWidget}
         />
       )}
     </div>

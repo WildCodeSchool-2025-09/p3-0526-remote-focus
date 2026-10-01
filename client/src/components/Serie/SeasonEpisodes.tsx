@@ -34,7 +34,9 @@ function SeasonEpisodes({ serieId, seasonId }: SeasonEpisodesProps) {
     );
   }
 
-  return <EpisodeList episodes={episodes} />;
+  return (
+    <EpisodeList episodes={episodes} seriesId={serieId} seasonId={seasonId} />
+  );
 }
 
 export default SeasonEpisodes;

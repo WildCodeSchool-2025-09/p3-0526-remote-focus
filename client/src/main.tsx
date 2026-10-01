@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
 import { TrackProvider } from "./contexts/TrackContext";
 // Import necessary modules from React and React Router
@@ -9,6 +10,7 @@ import App from "./App";
 import ActorDetail from "./pages/ActorDetail";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
+import EpisodeDetail from "./pages/EpisodeDetail";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
@@ -68,6 +70,10 @@ const router = createBrowserRouter([
         element: <SeasonDetail />,
       },
       {
+        path: "series/:seriesId/seasons/:seasonId/episodes/:episodeId",
+        element: <EpisodeDetail />,
+      },
+      {
         path: "animes/:id",
         element: <SerieDetail />,
       },
@@ -92,11 +98,14 @@ if (rootElement == null) {
 // Render the app inside the root element
 
 createRoot(rootElement).render(
-  <SearchProvider>
-    <TrackProvider>
-      <RouterProvider router={router} />
-    </TrackProvider>
-  </SearchProvider>,
+  <AuthProvider>
+    <SearchProvider>
+      <TrackProvider>
+        <RouterProvider router={router} />
+      </TrackProvider>
+    </SearchProvider>
+    ,
+  </AuthProvider>,
 );
 
 /**

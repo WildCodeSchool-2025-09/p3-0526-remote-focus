@@ -1,3 +1,5 @@
+import type { LoginPayload, LoginResponse } from "../types/Auth";
+
 export interface RegisterPayload {
   firstName: string;
   lastName: string | null;
@@ -34,4 +36,30 @@ export async function registerUser(
   }
 
   return (await response.json()) as RegisterResponse;
+}
+
+export async function loginUser(payload: LoginPayload): Promise<LoginResponse> {
+  let response: Response;
+
+  try {
+    response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error("Impossible de joindre le serveur. Réessayez plus tard.");
+  }
+
+  if (response.status === 401) {
+    throw new Error("Email ou mot de passe incorrect.");
+  }
+
+  if (!response.ok) {
+    throw new Error("La connexion a échoué. Réessayez plus tard.");
+  }
+
+  return (await response.json()) as LoginResponse;
 }

@@ -3,21 +3,23 @@ import MediaCard from "../Catalog/MediaCard";
 
 type MediaListProps = {
   medias: Media[];
+  showGenre?: boolean;
 };
 
-const MediaList = ({ medias }: MediaListProps) => {
+const MediaList = ({ medias, showGenre = true }: MediaListProps) => {
   if (medias.length === 0) {
     return null;
   }
 
   return (
     <section className="space-y-3">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      <div className="flex flex-wrap justify-center gap-4">
         {medias.map((media) => (
           <MediaCard
             key={media.id}
             media={{ ...media, topRank: null, isNew: false }}
-            className="card"
+            className="catalog-carousel-item w-48 lg:w-60"
+            showGenre={showGenre}
           />
         ))}
       </div>
