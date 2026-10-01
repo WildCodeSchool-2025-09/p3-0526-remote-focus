@@ -55,7 +55,7 @@ export function TrackProvider({ children }: TrackProviderProps) {
   }
 
   return (
-    <TrackContext.Provider value={{ tracks, toggleFavorite }}>
+    <TrackContext.Provider value={{ tracks, toggleFavorite, toggleWatchlist }}>
       {children}
     </TrackContext.Provider>
   );
