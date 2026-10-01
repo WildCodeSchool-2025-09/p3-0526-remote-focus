@@ -1,4 +1,10 @@
-import { createContext, type ReactNode, useEffect, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { fetchTracks, type TrackState } from "../services/trackApi";
 
 type TrackContextValue = {
@@ -26,4 +32,15 @@ export function TrackProvider({ children }: TrackProviderProps) {
   return (
     <TrackContext.Provider value={{ tracks }}>{children}</TrackContext.Provider>
   );
+}
+
+export function useTracks() {
+  const context = useContext(TrackContext);
+
+  if (context === null) {
+    throw new Error(
+      "useTracks doit être utilisé à l'intérieur du TrackProvider",
+    );
+  }
+  return context;
 }
