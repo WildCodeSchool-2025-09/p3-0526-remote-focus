@@ -2,30 +2,49 @@ import type { LucideIcon } from "lucide-react";
 
 type ActionButtonProps = {
   label: string;
-  color: string;
   icon: LucideIcon;
+  buttonClassName: string;
   align?: "center" | "start";
+  ariaLabel?: string;
+  isPressed?: boolean;
+  fillIcon?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
 };
 
 function ActionButton({
   label,
-  color,
   icon: Icon,
+  buttonClassName,
   align = "center",
+  ariaLabel,
+  isPressed,
+  fillIcon = false,
+  onClick,
+  disabled = false,
 }: ActionButtonProps) {
   return (
     <div
-      className={`flex flex-col gap-2 ${align === "start" ? "items-start" : "items-center"}`}
+      className={`flex flex-col gap-2 ${
+        align === "start" ? "items-start" : "items-center"
+      }`}
     >
       <button
         type="button"
-        disabled
-        className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12"
-        style={{ borderColor: color, color }}
+        aria-label={ariaLabel ?? label}
+        aria-pressed={isPressed}
+        disabled={disabled}
+        onClick={onClick}
+        className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12 ${buttonClassName}`}
       >
-        <Icon size={22} strokeWidth={1.8} />
+        <Icon
+          size={22}
+          strokeWidth={1.8}
+          fill={fillIcon ? "currentColor" : "none"}
+        />
       </button>
-      <span className="text-sm text-white/60">{label}</span>
+
+      <span className="text-sm text-focus-muted">{label}</span>
     </div>
   );
 }
