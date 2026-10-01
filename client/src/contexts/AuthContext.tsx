@@ -13,6 +13,9 @@ import {
   TOKEN_STORAGE_KEY,
   USER_STORAGE_KEY,
   getTokenExpiration,
+  safeGetItem,
+  safeRemoveItem,
+  safeSetItem,
 } from "../utils/authStorage";
 
 // Délai maximal accepté par setTimeout (environ 24,8 jours).
@@ -33,12 +36,12 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 function clearStoredSession() {
-  localStorage.removeItem(TOKEN_STORAGE_KEY);
-  localStorage.removeItem(USER_STORAGE_KEY);
+  safeRemoveItem(TOKEN_STORAGE_KEY);
+  safeRemoveItem(USER_STORAGE_KEY);
 }
 
 function readStoredToken(): string | null {
-  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+  const token = safeGetItem(TOKEN_STORAGE_KEY);
 
   if (token === null) {
     return null;
@@ -55,7 +58,7 @@ function readStoredToken(): string | null {
 }
 
 function readStoredUser(): AuthUser | null {
-  const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+  const storedUser = safeGetItem(USER_STORAGE_KEY);
 
   if (storedUser === null) {
     return null;
@@ -64,7 +67,7 @@ function readStoredUser(): AuthUser | null {
   try {
     return JSON.parse(storedUser) as AuthUser;
   } catch {
-    localStorage.removeItem(USER_STORAGE_KEY);
+    safeRemoveItem(USER_STORAGE_KEY);
     return null;
   }
 }
@@ -74,8 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(readStoredUser);
 
   const login = useCallback((data: LoginResponse) => {
-    localStorage.setItem(TOKEN_STORAGE_KEY, data.token);
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+    safeSetItem(TOKEN_STORAGE_KEY, data.token);
+    safeSetItem(USER_STORAGE_KEY, JSON.stringify(data.user));
 
     setToken(data.token);
     setUser(data.user);
