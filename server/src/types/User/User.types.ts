@@ -1,5 +1,7 @@
 import type { RowDataPacket } from "mysql2";
 
+export type UserRole = "user" | "admin";
+
 export interface RegisterUserInput {
   firstName: string;
   lastName: string | null;
@@ -16,6 +18,6 @@ export interface UserAuthRow extends RowDataPacket {
   email: string;
   login: string;
   avatar: string | null;
-  role: "user" | "admin";
+  role: UserRole;
   hashed_password: string;
 }
