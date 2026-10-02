@@ -10,11 +10,13 @@ import {
 import { Link } from "react-router";
 import DashboardCard from "../components/profile/DashboardCard";
 import ProfileHeader from "../components/profile/ProfileHeader";
+import { useAuth } from "../contexts/AuthContext";
 import useFetch from "../hooks/useFetch";
 import type { DashboardData } from "../types/Dashboard";
 
 function Profile() {
   const { data, loading, error } = useFetch<DashboardData>("/api/me/dashboard");
+  const { logout } = useAuth();
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
@@ -85,8 +87,8 @@ function Profile() {
 
         <button
           type="button"
-          disabled
-          className="flex items-center gap-2 rounded-lg px-4 py-3 text-left font-semibold text-[#E83658] disabled:opacity-60"
+          onClick={logout}
+          className="flex items-center gap-2 rounded-lg px-4 py-3 text-left font-semibold text-[#E83658]"
         >
           <LogOut size={16} />
           Déconnexion
