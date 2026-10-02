@@ -86,14 +86,14 @@ const toggleSeriesWatched: RequestHandler = async (req, res, next) => {
       userId,
       seriesId,
     );
-    let episodeIds: number[] = [];
 
     if (isFullyWatched === false) {
       await watchingRepository.markSeriesAsWatched(userId, seriesId);
-      episodeIds = await watchingRepository.readSeriesEpisodeIds(seriesId);
     } else {
       await watchingRepository.unmarkSeriesAsWatched(userId, seriesId);
     }
+
+    const episodeIds = await watchingRepository.readSeriesEpisodeIds(seriesId);
 
     res.json({
       watched: !isFullyWatched,
