@@ -1,7 +1,9 @@
 import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
+import optionalAuth from "./middlewares/optionalAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
+import authActions from "./modules/auth/authActions";
 import episodeActions from "./modules/episode/episodeActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
@@ -11,6 +13,8 @@ import serieActions from "./modules/serie/serieActions";
 import userActions from "./modules/user/userActions";
 
 const router = express.Router();
+
+router.use(optionalAuth);
 
 /* ************************************************************************* */
 // Define Your API Routes Here
@@ -50,6 +54,7 @@ router.post(
   hashPassword,
   userActions.add,
 );
+router.post("/api/auth/login", authActions.login);
 
 /* Connected user, add authentication when ready*/
 

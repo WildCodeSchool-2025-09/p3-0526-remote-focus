@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 import FieldError from "./FieldError";
 
 const inputClassName =
-  "mt-1 w-full rounded-md border border-focus-line/50 bg-base-200 md:bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning";
+  "mt-1 w-full rounded-md border border-focus-line/50 bg-base-200 md:bg-base-100 px-3 py-2 text-sm text-base-content outline-none transition placeholder:text-base-content/30 focus:border-warning focus:ring-1 focus:ring-warning autofill:shadow-[inset_0_0_0_1000px_theme(colors.focus.surface)] md:autofill:shadow-[inset_0_0_0_1000px_theme(colors.focus.void)] autofill:[-webkit-text-fill-color:theme(colors.focus.cream)]";
 
 const labelClassName = "block text-xs font-medium text-base-content/70";
 

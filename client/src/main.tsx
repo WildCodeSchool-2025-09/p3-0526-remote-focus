@@ -1,10 +1,12 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
 import { WatchingProvider } from "./contexts/WatchingContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
+import PrivateRoute from "./components/PrivateRoute";
 import ActorDetail from "./pages/ActorDetail";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
@@ -41,7 +43,11 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "*",
@@ -95,11 +101,13 @@ if (rootElement == null) {
 
 // Render the app inside the root element
 createRoot(rootElement).render(
-  <SearchProvider>
+  <AuthProvider>
     <WatchingProvider>
-      <RouterProvider router={router} />
+      <SearchProvider>
+        <RouterProvider router={router} />
+      </SearchProvider>
     </WatchingProvider>
-  </SearchProvider>,
+  </AuthProvider>,
 );
 
 /**
