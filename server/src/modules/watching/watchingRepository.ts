@@ -76,6 +76,17 @@ class WatchingRepository {
     return true;
   }
 
+  async readSeriesEpisodeIds(seriesId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT e.ID
+      FROM episode e
+      JOIN season s ON e.ID_season = s.ID
+      WHERE s.ID_media = ? `,
+      [seriesId],
+    );
+    return rows.map((row) => Number(row.ID));
+  }
+
   async markSeasonAsWatched(userId: number, seasonId: number) {
     const [result] = await databaseClient.query<Result>(
       `INSERT INTO episode_user (ID_user, ID_episode, viewed_at)
