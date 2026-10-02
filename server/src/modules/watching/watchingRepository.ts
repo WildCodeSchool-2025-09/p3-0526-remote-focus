@@ -190,6 +190,22 @@ class WatchingRepository {
 
     return rows.map((row) => Number(row.ID_episode));
   }
+
+  async readSeriesIdFromEpisode(episodeId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT s.ID_media
+      FROM episode AS e
+      JOIN season AS s ON e.ID_season = s.ID
+      WHERE e.ID = ?`,
+      [episodeId],
+    );
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return Number(rows[0].ID_media);
+  }
 }
 
 export default new WatchingRepository();

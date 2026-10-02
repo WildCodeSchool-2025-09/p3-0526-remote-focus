@@ -10,6 +10,11 @@ import { API_URL } from "../services/api";
 
 interface WatchResponse {
   watched: boolean;
+  episodeIds: number[];
+}
+
+interface SimpleWatchResponse {
+  watched: boolean;
 }
 
 interface WatchingContextType {
@@ -17,11 +22,11 @@ interface WatchingContextType {
   isWatched: (mediaId: number) => boolean;
   isEpisodeWatched: (episodeId: number) => boolean;
   toggleWatchedMovie: (mediaId: number) => Promise<void>;
-  toggleWatchedSeries: (seriesId: number) => Promise<void>;
+  toggleWatchedSeries: (seriesId: number) => Promise<WatchResponse>;
   toggleWatchedSeason: (
     seasonId: number,
     episodeIds: number[],
-  ) => Promise<WatchResponse>;
+  ) => Promise<void>;
   toggleWatchedEpisode: (episodeId: number) => Promise<void>;
 }
 
@@ -49,7 +54,7 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
-        return response.json();
+        return response.json() as Promise<SimpleWatchResponse>;
       })
       .then((data) => {
         if (data.watched === true) {
@@ -74,7 +79,7 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
-        return response.json();
+        return response.json() as Promise<WatchResponse>;
       })
       .then((data) => {
         if (data.watched === true) {
@@ -82,12 +87,18 @@ function WatchingProvider({ children }: { children: ReactNode }) {
             if (!ids.includes(seriesId)) {
               return [...ids, seriesId];
             }
-
             return ids;
+          });
+          setWatchedEpisodeIds((ids) => {
+            return [...new Set([...ids, ...data.episodeIds])];
           });
         } else {
           setWatchedMediaIds((ids) => ids.filter((id) => id !== seriesId));
+          setWatchedEpisodeIds((ids) =>
+            ids.filter((id) => !data.episodeIds.includes(id)),
+          );
         }
+        return data;
       });
   }
 
@@ -99,7 +110,7 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
-        return response.json();
+        return response.json() as Promise<SimpleWatchResponse>;
       })
       .then((data) => {
         if (data.watched === true) {
@@ -111,7 +122,6 @@ function WatchingProvider({ children }: { children: ReactNode }) {
             ids.filter((id) => !episodeIds.includes(id)),
           );
         }
-        return data;
       });
   }
 
@@ -129,7 +139,6 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
-        return response.json();
       })
       .catch(() => {
         if (wasWatched) {

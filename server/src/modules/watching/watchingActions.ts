@@ -43,8 +43,21 @@ const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
       await watchingRepository.unmarkEpisodeAsWatched(userId, episodeId);
     }
 
+    const mediaId = await watchingRepository.readSeriesIdFromEpisode(episodeId);
+
+    if (mediaId === null) {
+      throw new Error("Série introuvable pour cet épisode");
+    }
+
+    const seriesFullyWatched = await watchingRepository.isFullyWatched(
+      userId,
+      mediaId,
+    );
+
     res.json({
       watched: isEpisodeWatched.length === 0,
+      mediaId,
+      seriesFullyWatched,
     });
   } catch (err) {
     next(err);
