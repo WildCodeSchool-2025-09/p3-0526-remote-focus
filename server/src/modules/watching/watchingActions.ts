@@ -3,7 +3,12 @@ import watchingRepository from "./watchingRepository";
 
 const toggleMediaWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 1;
+    const userId = req.user?.id;
+
+    if (userId === undefined) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const mediaId = Number(req.params.id);
 
@@ -28,8 +33,11 @@ const toggleMediaWatched: RequestHandler = async (req, res, next) => {
 
 const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 1;
-
+    const userId = req.user?.id;
+    if (userId === undefined) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     const episodeId = Number(req.params.id);
 
     const isEpisodeWatched = await watchingRepository.isEpisodeWatched(
@@ -66,7 +74,11 @@ const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
 
 const toggleSeasonWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 1;
+    const userId = req.user?.id;
+    if (userId === undefined) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const seasonId = Number(req.params.id);
 
@@ -91,7 +103,11 @@ const toggleSeasonWatched: RequestHandler = async (req, res, next) => {
 
 const toggleSeriesWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 1;
+    const userId = req.user?.id;
+    if (userId === undefined) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const seriesId = Number(req.params.id);
 
@@ -119,7 +135,11 @@ const toggleSeriesWatched: RequestHandler = async (req, res, next) => {
 
 const readMediaWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 1;
+    const userId = req.user?.id;
+    if (userId === undefined) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const mediaIds = await watchingRepository.readMediaWatched(userId);
 
@@ -131,7 +151,11 @@ const readMediaWatched: RequestHandler = async (req, res, next) => {
 
 const readEpisodeWatched: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id || 1;
+    const userId = req.user?.id;
+    if (userId === undefined) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
 
     const episodeIds = await watchingRepository.readEpisodeWatched(userId);
 
