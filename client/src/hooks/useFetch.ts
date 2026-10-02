@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../services/api";
+import { getAuthHeaders } from "../utils/authStorage";
 
 function useFetch<T>(path: string | null) {
   const [data, setData] = useState<T | null>(null);
@@ -16,7 +17,7 @@ function useFetch<T>(path: string | null) {
     setLoading(true);
     setError(null);
 
-    fetch(`${API_URL}${path}`)
+    fetch(`${API_URL}${path}`, { headers: getAuthHeaders() })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
