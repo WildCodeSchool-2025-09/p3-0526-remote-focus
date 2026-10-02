@@ -4,7 +4,7 @@ import { NavLink, useLocation, useNavigate } from "react-router";
 import logoFocus from "../assets/images/logoFocus.png";
 import { useAuth } from "../contexts/AuthContext";
 import { useSearch } from "../contexts/SearchContext";
-import AccountMenu from "./AccountMenu";
+import ProfileMenu from "./ProfileMenu";
 import SearchBar from "./SearchBar";
 
 const Header = () => {
@@ -56,7 +56,7 @@ const Header = () => {
 
         <div className="col-start-3 row-start-1 flex items-center justify-end">
           {isAuthenticated ? (
-            <AccountMenu />
+            <ProfileMenu />
           ) : (
             <>
               <NavLink

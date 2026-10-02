@@ -9,7 +9,8 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+
 import { useAuth } from "../contexts/AuthContext";
 import { API_URL } from "../services/api";
 
@@ -24,9 +25,13 @@ const LINKS = [
   { to: "/profile/settings", label: "Réglages", icon: Settings },
 ];
 
-function AccountMenu() {
+function ProfileMenu() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,33 +41,61 @@ function AccountMenu() {
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        menuRef.current != null &&
+        menuRef.current !== null &&
         !menuRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
     };
 
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, [isOpen]);
 
-  if (user == null) {
+  // La session n'est fermée qu'une fois l'accueil affiché : si l'utilisateur
+  // était sur une page protégée, PrivateRoute ne doit pas rediriger vers /login.
+  useEffect(() => {
+    if (isLoggingOut && location.pathname === "/") {
+      logout();
+      setIsLoggingOut(false);
+    }
+  }, [isLoggingOut, location.pathname, logout]);
+
+  if (user === null) {
     return null;
   }
 
+  const handleToggle = () => {
+    setIsOpen((currentValue) => !currentValue);
+  };
+
   const handleLogout = () => {
     setIsOpen(false);
-    logout();
+    setIsLoggingOut(true);
+    navigate("/", { replace: true });
   };
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div ref={menuRef} className="relative">
       <button
         type="button"
-        onClick={() => setIsOpen((previous) => !previous)}
+        onClick={handleToggle}
+        disabled={isLoggingOut}
         aria-expanded={isOpen}
-        className="flex items-center gap-2 rounded-full border border-base-content/40 py-1 pr-3 pl-1 text-sm font-semibold text-base-content transition hover:bg-base-200"
+        aria-controls="profile-menu"
+        aria-label={`Menu du profil de ${user.firstName}`}
+        className="flex items-center gap-2 rounded-full border border-base-content/40 py-1 pr-3 pl-1 text-sm font-semibold text-base-content transition hover:bg-base-200 disabled:opacity-50"
       >
         <img
           src={`${API_URL}${user.avatar ?? DEFAULT_AVATAR}`}
@@ -72,12 +105,16 @@ function AccountMenu() {
         <span className="hidden sm:inline">{user.firstName}</span>
         <ChevronDown
           size={14}
+          aria-hidden="true"
           className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-48 overflow-hidden rounded-lg border border-focus-line/20 bg-base-100 shadow-lg">
+        <div
+          id="profile-menu"
+          className="absolute right-0 top-full z-40 mt-2 w-48 overflow-hidden rounded-lg border border-focus-line/20 bg-base-100 shadow-lg"
+        >
           {LINKS.map((link) => (
             <Link
               key={link.to}
@@ -104,4 +141,4 @@ function AccountMenu() {
   );
 }
 
-export default AccountMenu;
+export default ProfileMenu;

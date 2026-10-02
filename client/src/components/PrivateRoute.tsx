@@ -1,20 +1,21 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router";
+
 import { useAuth } from "../contexts/AuthContext";
 
-type RequireAuthProps = {
+interface PrivateRouteProps {
   children: ReactNode;
-};
+}
 
-function RequireAuth({ children }: RequireAuthProps) {
+function PrivateRoute({ children }: PrivateRouteProps) {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  return children;
+  return <>{children}</>;
 }
 
-export default RequireAuth;
+export default PrivateRoute;
