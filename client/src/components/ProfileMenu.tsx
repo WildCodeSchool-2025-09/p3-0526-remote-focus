@@ -94,15 +94,15 @@ function ProfileMenu() {
         disabled={isLoggingOut}
         aria-expanded={isOpen}
         aria-controls="profile-menu"
-        aria-label={`Menu du profil de ${user.firstName}`}
+        aria-label={`Menu du profil de ${user.login}`}
         className="flex items-center gap-2 rounded-full border border-base-content/40 py-1 pr-3 pl-1 text-sm font-semibold text-base-content transition hover:bg-base-200 disabled:opacity-50"
       >
         <img
           src={`${API_URL}${user.avatar ?? DEFAULT_AVATAR}`}
-          alt={user.firstName}
+          alt={user.login}
           className="h-7 w-7 rounded-full object-cover"
         />
-        <span className="hidden sm:inline">{user.firstName}</span>
+        <span className="hidden sm:inline">{user.login}</span>
         <ChevronDown
           size={14}
           aria-hidden="true"
