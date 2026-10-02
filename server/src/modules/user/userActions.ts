@@ -52,7 +52,7 @@ const readDashboard: RequestHandler = async (req, res, next) => {
 
     res.json({
       profile: {
-        name: profile.firstname,
+        name: profile.login,
         avatar: profile.avatar,
         createdAt: profile.created_at,
       },

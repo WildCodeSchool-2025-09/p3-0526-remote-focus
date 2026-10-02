@@ -69,7 +69,7 @@ class UserRepository {
 
   async readProfile(userId: number) {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
-      "SELECT firstname, avatar, created_at FROM user_ WHERE ID = ?",
+      "SELECT login, avatar, created_at FROM user_ WHERE ID = ?",
       [userId],
     );
 

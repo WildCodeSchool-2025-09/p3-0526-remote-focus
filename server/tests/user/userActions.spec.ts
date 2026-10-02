@@ -56,7 +56,7 @@ describe("userActions.readDashboard", () => {
     const res = createResponse();
 
     mockedUserRepository.readProfile.mockResolvedValue({
-      firstname: "Camille",
+      login: "camille98",
       avatar: "/avatar.jpg",
       created_at: "2025-03-01T00:00:00.000Z",
     } as never);
@@ -73,7 +73,7 @@ describe("userActions.readDashboard", () => {
     );
     expect(res.json).toHaveBeenCalledWith({
       profile: {
-        name: "Camille",
+        name: "camille98",
         avatar: "/avatar.jpg",
         createdAt: "2025-03-01T00:00:00.000Z",
       },
@@ -86,7 +86,7 @@ describe("userActions.readDashboard", () => {
     const res = createResponse();
 
     mockedUserRepository.readProfile.mockResolvedValue({
-      firstname: "Tester",
+      login: "tester",
       avatar: "/avatar.jpg",
       created_at: "2025-01-01T00:00:00.000Z",
     } as never);
@@ -98,7 +98,7 @@ describe("userActions.readDashboard", () => {
 
     expect(res.json).toHaveBeenCalledWith({
       profile: {
-        name: "Tester",
+        name: "tester",
         avatar: "/avatar.jpg",
         createdAt: "2025-01-01T00:00:00.000Z",
       },
