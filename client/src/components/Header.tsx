@@ -2,11 +2,14 @@ import { Power } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 
 import logoFocus from "../assets/images/logoFocus.png";
+import { useAuth } from "../contexts/AuthContext";
 import { useSearch } from "../contexts/SearchContext";
+import ProfileMenu from "./ProfileMenu";
 import SearchBar from "./SearchBar";
 
 const Header = () => {
   const { searchQuery, setSearchQuery, hasNoResults } = useSearch();
+  const { isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,30 +50,36 @@ const Header = () => {
         </div>
 
         <div className="col-start-3 row-start-1 flex items-center justify-end">
-          <NavLink
-            to="/login"
-            aria-label="Se connecter"
-            className="flex size-10 items-center justify-center text-base-content transition hover:text-warning lg:hidden"
-          >
-            <Power size={22} />
-          </NavLink>
+          {isAuthenticated ? (
+            <ProfileMenu />
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                aria-label="Se connecter"
+                className="flex size-10 items-center justify-center text-base-content transition hover:text-warning lg:hidden"
+              >
+                <Power size={22} />
+              </NavLink>
 
-          <div className="hidden items-center gap-3 lg:flex">
-            <NavLink
-              to="/login"
-              className="flex items-center gap-2 rounded-md border border-base-content/40 px-4 py-2 text-sm font-semibold text-base-content transition hover:bg-base-200"
-            >
-              <Power size={17} />
-              Connexion
-            </NavLink>
+              <div className="hidden items-center gap-3 lg:flex">
+                <NavLink
+                  to="/login"
+                  className="flex items-center gap-2 rounded-md border border-base-content/40 px-4 py-2 text-sm font-semibold text-base-content transition hover:bg-base-200"
+                >
+                  <Power size={17} />
+                  Connexion
+                </NavLink>
 
-            <NavLink
-              to="/register"
-              className="rounded-md bg-warning px-4 py-2 text-sm font-semibold text-warning-content transition hover:brightness-95"
-            >
-              Inscription
-            </NavLink>
-          </div>
+                <NavLink
+                  to="/register"
+                  className="rounded-md bg-warning px-4 py-2 text-sm font-semibold text-warning-content transition hover:brightness-95"
+                >
+                  Inscription
+                </NavLink>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>
