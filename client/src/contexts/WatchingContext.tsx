@@ -17,6 +17,12 @@ interface SimpleWatchResponse {
   watched: boolean;
 }
 
+interface EpisodeWatchResponse {
+  watched: boolean;
+  mediaId: number;
+  seriesFullyWatched: boolean;
+}
+
 interface WatchingContextType {
   watchedMediaIds: number[];
   isWatched: (mediaId: number) => boolean;
@@ -138,6 +144,20 @@ function WatchingProvider({ children }: { children: ReactNode }) {
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
+        }
+        return response.json() as Promise<EpisodeWatchResponse>;
+      })
+      .then((data) => {
+        const mediaId = data.mediaId;
+        if (data.seriesFullyWatched === true) {
+          setWatchedMediaIds((ids) => {
+            if (!ids.includes(mediaId)) {
+              return [...ids, mediaId];
+            }
+            return ids;
+          });
+        } else {
+          setWatchedMediaIds((ids) => ids.filter((id) => id !== mediaId));
         }
       })
       .catch(() => {
