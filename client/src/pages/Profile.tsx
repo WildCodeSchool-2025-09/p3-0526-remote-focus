@@ -36,7 +36,7 @@ function Profile() {
         <Link
           to="/profile/settings"
           aria-label="Paramètres"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-[#F2B705] hover:text-[#F2B705]"
+          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-[#F2B705] hover:text-[#F2B705] lg:flex"
         >
           <Settings size={18} />
         </Link>
