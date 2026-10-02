@@ -9,9 +9,10 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { useAuth } from "../contexts/AuthContext";
+import useLogout from "../hooks/useLogout";
 import { API_URL } from "../services/api";
 
 const DEFAULT_AVATAR = "/assets/images/default-avatar.svg";
@@ -26,12 +27,10 @@ const LINKS = [
 ];
 
 function ProfileMenu() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user } = useAuth();
+  const { handleLogout: triggerLogout, isLoggingOut } = useLogout();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,15 +62,6 @@ function ProfileMenu() {
     };
   }, [isOpen]);
 
-  // La session n'est fermée qu'une fois l'accueil affiché : si l'utilisateur
-  // était sur une page protégée, PrivateRoute ne doit pas rediriger vers /login.
-  useEffect(() => {
-    if (isLoggingOut && location.pathname === "/") {
-      logout();
-      setIsLoggingOut(false);
-    }
-  }, [isLoggingOut, location.pathname, logout]);
-
   if (user === null) {
     return null;
   }
@@ -82,8 +72,7 @@ function ProfileMenu() {
 
   const handleLogout = () => {
     setIsOpen(false);
-    setIsLoggingOut(true);
-    navigate("/", { replace: true });
+    triggerLogout();
   };
 
   return (
