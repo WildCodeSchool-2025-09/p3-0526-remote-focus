@@ -11,7 +11,6 @@ import DashboardCard from "../components/profile/DashboardCard";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import useFetch from "../hooks/useFetch";
 import type { DashboardData } from "../types/Dashboard";
-import NotFound from "./NotFound";
 
 function Profile() {
   const { data, loading, error } = useFetch<DashboardData>("/api/me/dashboard");
@@ -21,7 +20,12 @@ function Profile() {
   }
 
   if (error != null || data == null) {
-    return <NotFound />;
+    return (
+      <p className="p-8 text-focus-muted">
+        Une erreur est survenue lors du chargement du profil. Merci d'actualiser
+        la page.
+      </p>
+    );
   }
 
   return (
