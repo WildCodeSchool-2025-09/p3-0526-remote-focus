@@ -4,7 +4,7 @@ import {
   ChevronRight,
   Heart,
   Settings,
-  User,
+  Users,
 } from "lucide-react";
 import { Link } from "react-router";
 import DashboardCard from "../components/profile/DashboardCard";
@@ -59,7 +59,7 @@ function Profile() {
         />
         <DashboardCard
           to="/profile/actors"
-          icon={User}
+          icon={Users}
           iconColor="#17B890"
           title="Mes Acteurs"
           subtitle={`${data.counts.actors} suivis`}
