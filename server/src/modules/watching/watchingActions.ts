@@ -93,8 +93,20 @@ const toggleSeasonWatched: RequestHandler = async (req, res, next) => {
       await watchingRepository.unmarkSeasonAsWatched(userId, seasonId);
     }
 
+    const mediaId = await watchingRepository.readSeriesIdFromSeason(seasonId);
+    if (mediaId === null) {
+      throw new Error("Série introuvable pour cette saison");
+    }
+
+    const seriesFullyWatched = await watchingRepository.isFullyWatched(
+      userId,
+      mediaId,
+    );
+
     res.json({
       watched: !isSeasonWatched,
+      mediaId,
+      seriesFullyWatched,
     });
   } catch (err) {
     next(err);

@@ -206,6 +206,21 @@ class WatchingRepository {
 
     return Number(rows[0].ID_media);
   }
+
+  async readSeriesIdFromSeason(seasonId: number) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT s.ID_media
+      FROM season AS s 
+      WHERE s.ID = ?`,
+      [seasonId],
+    );
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return Number(rows[0].ID_media);
+  }
 }
 
 export default new WatchingRepository();

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../services/api";
 
-function useFetch<T>(path: string | null) {
+function useFetch<T>(path: string | null, token: string | null) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(path != null);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +16,15 @@ function useFetch<T>(path: string | null) {
     setLoading(true);
     setError(null);
 
-    fetch(`${API_URL}${path}`)
+    const headers: HeadersInit = {};
+
+    if (token !== null) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    fetch(`${API_URL}${path}`, {
+      headers,
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
@@ -42,7 +50,7 @@ function useFetch<T>(path: string | null) {
     return () => {
       active = false;
     };
-  }, [path]);
+  }, [path, token]);
 
   return { data, loading, error };
 }

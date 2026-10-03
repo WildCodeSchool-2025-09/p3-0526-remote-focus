@@ -7,6 +7,7 @@ import {
 } from "react";
 import useFetch from "../hooks/useFetch";
 import { API_URL } from "../services/api";
+import { useAuth } from "./AuthContext";
 
 interface WatchResponse {
   watched: boolean;
@@ -17,7 +18,7 @@ interface SimpleWatchResponse {
   watched: boolean;
 }
 
-interface EpisodeWatchResponse {
+interface EnrichedWatchResponse {
   watched: boolean;
   mediaId: number;
   seriesFullyWatched: boolean;
@@ -41,6 +42,12 @@ const WatchingContext = createContext<WatchingContextType | undefined>(
 );
 
 function WatchingProvider({ children }: { children: ReactNode }) {
+  const { token } = useAuth();
+  const headers: HeadersInit = {};
+
+  if (token !== null) {
+    headers.Authorization = `Bearer ${token}`;
+  }
   const [watchedMediaIds, setWatchedMediaIds] = useState<number[]>([]);
   const [watchedEpisodeIds, setWatchedEpisodeIds] = useState<number[]>([]);
 
@@ -55,6 +62,7 @@ function WatchingProvider({ children }: { children: ReactNode }) {
   function toggleWatchedMovie(mediaId: number) {
     return fetch(`${API_URL}/api/me/medias/${mediaId}/watched`, {
       method: "PATCH",
+      headers,
     })
       .then((response) => {
         if (!response.ok) {
@@ -80,6 +88,7 @@ function WatchingProvider({ children }: { children: ReactNode }) {
   function toggleWatchedSeries(seriesId: number) {
     return fetch(`${API_URL}/api/me/series/${seriesId}/watched`, {
       method: "PATCH",
+      headers,
     })
       .then((response) => {
         if (!response.ok) {
@@ -111,14 +120,16 @@ function WatchingProvider({ children }: { children: ReactNode }) {
   function toggleWatchedSeason(seasonId: number, episodeIds: number[]) {
     return fetch(`${API_URL}/api/me/seasons/${seasonId}/watched`, {
       method: "PATCH",
+      headers,
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
-        return response.json() as Promise<SimpleWatchResponse>;
+        return response.json() as Promise<EnrichedWatchResponse>;
       })
       .then((data) => {
+        const mediaId = data.mediaId;
         if (data.watched === true) {
           setWatchedEpisodeIds((ids) => {
             return [...new Set([...ids, ...episodeIds])];
@@ -127,6 +138,16 @@ function WatchingProvider({ children }: { children: ReactNode }) {
           setWatchedEpisodeIds((ids) =>
             ids.filter((id) => !episodeIds.includes(id)),
           );
+        }
+        if (data.seriesFullyWatched === true) {
+          setWatchedMediaIds((ids) => {
+            if (!ids.includes(mediaId)) {
+              return [...ids, mediaId];
+            }
+            return ids;
+          });
+        } else {
+          setWatchedMediaIds((ids) => ids.filter((id) => id !== mediaId));
         }
       });
   }
@@ -140,12 +161,13 @@ function WatchingProvider({ children }: { children: ReactNode }) {
       : setWatchedEpisodeIds((ids) => ids.filter((id) => id !== episodeId));
     return fetch(`${API_URL}/api/me/episodes/${episodeId}/watched`, {
       method: "PATCH",
+      headers,
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
-        return response.json() as Promise<EpisodeWatchResponse>;
+        return response.json() as Promise<EnrichedWatchResponse>;
       })
       .then((data) => {
         const mediaId = data.mediaId;
@@ -175,13 +197,13 @@ function WatchingProvider({ children }: { children: ReactNode }) {
     data: watchedMediaIdsData,
     // loading: mediaLoading,
     // error: mediaError,
-  } = useFetch<number[]>("/api/me/medias/watched");
+  } = useFetch<number[]>("/api/me/medias/watched", token);
 
   const {
     data: watchedEpisodeIdsData,
     // loading: episodeLoading,
     // error: episodeError,
-  } = useFetch<number[]>("/api/me/episodes/watched");
+  } = useFetch<number[]>("/api/me/episodes/watched", token);
 
   useEffect(() => {
     if (watchedMediaIdsData) {
