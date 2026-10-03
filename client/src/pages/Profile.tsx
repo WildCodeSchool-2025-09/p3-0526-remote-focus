@@ -3,7 +3,6 @@ import {
   Bookmark,
   ChevronRight,
   Heart,
-  LogOut,
   Settings,
   User,
 } from "lucide-react";
@@ -11,21 +10,18 @@ import { Link } from "react-router";
 import DashboardCard from "../components/profile/DashboardCard";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import useFetch from "../hooks/useFetch";
-import useLogout from "../hooks/useLogout";
 import type { DashboardData } from "../types/Dashboard";
+import NotFound from "./NotFound";
 
 function Profile() {
   const { data, loading, error } = useFetch<DashboardData>("/api/me/dashboard");
-  const { handleLogout } = useLogout();
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
 
   if (error != null || data == null) {
-    return (
-      <p className="p-8 text-focus-muted">Impossible de charger le profil.</p>
-    );
+    return <NotFound />;
   }
 
   return (
@@ -73,7 +69,7 @@ function Profile() {
         />
       </div>
 
-      <div className="flex flex-col gap-2 lg:hidden">
+      <div className="lg:hidden">
         <Link
           to="/profile/settings"
           className="flex items-center justify-between rounded-lg border border-white/10 bg-base-200 px-4 py-3"
@@ -84,15 +80,6 @@ function Profile() {
           </span>
           <ChevronRight size={16} />
         </Link>
-
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg px-4 py-3 text-left font-semibold text-[#E83658]"
-        >
-          <LogOut size={16} />
-          Déconnexion
-        </button>
       </div>
     </div>
   );
