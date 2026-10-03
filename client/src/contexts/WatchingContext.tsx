@@ -197,13 +197,13 @@ function WatchingProvider({ children }: { children: ReactNode }) {
     data: watchedMediaIdsData,
     // loading: mediaLoading,
     // error: mediaError,
-  } = useFetch<number[]>("/api/me/medias/watched", token);
+  } = useFetch<number[]>("/api/me/medias/watched");
 
   const {
     data: watchedEpisodeIdsData,
     // loading: episodeLoading,
     // error: episodeError,
-  } = useFetch<number[]>("/api/me/episodes/watched", token);
+  } = useFetch<number[]>("/api/me/episodes/watched");
 
   useEffect(() => {
     if (watchedMediaIdsData) {
