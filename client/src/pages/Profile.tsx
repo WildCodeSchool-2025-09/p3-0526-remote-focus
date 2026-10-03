@@ -54,7 +54,7 @@ function Profile() {
         <DashboardCard
           to="/profile/watchlist"
           icon={Bookmark}
-          iconColor="#F2B705"
+          iconColor="#F5F5F0"
           title="Watchlist"
           subtitle={`${data.counts.watchlist} titres`}
         />
@@ -68,7 +68,7 @@ function Profile() {
         <DashboardCard
           to="/profile/statistics"
           icon={BarChart3}
-          iconColor="#2E6373"
+          iconColor="#F2B705"
           title="Statistiques"
           subtitle="voir mon activité"
         />
