@@ -15,6 +15,7 @@ const Header = () => {
   const location = useLocation();
 
   const isTyping = searchQuery.length > 0;
+  const isProfilePage = location.pathname === "/profile";
 
   const handleChange = (value: string) => {
     setSearchQuery(value);
@@ -25,7 +26,11 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-focus-line/20 bg-base-100/95 p-4 backdrop-blur">
+    <header
+      className={`sticky top-0 z-30 border-b border-focus-line/20 bg-base-100/95 p-4 backdrop-blur ${
+        isProfilePage ? "hidden lg:block" : "block"
+      }`}
+    >
       <div className="relative grid grid-cols-3 items-center gap-3">
         <NavLink
           to="/"

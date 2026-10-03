@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import { API_URL } from "../services/api";
+import { getAuthHeaders } from "../utils/authStorage";
 
-function useFetch<T>(path: string | null, token: string | null) {
+function useFetch<T>(path: string | null) {
+  const { logout } = useAuth();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(path != null);
   const [error, setError] = useState<string | null>(null);
@@ -16,16 +19,11 @@ function useFetch<T>(path: string | null, token: string | null) {
     setLoading(true);
     setError(null);
 
-    const headers: HeadersInit = {};
-
-    if (token !== null) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    fetch(`${API_URL}${path}`, {
-      headers,
-    })
+    fetch(`${API_URL}${path}`, { headers: getAuthHeaders() })
       .then((response) => {
+        if (response.status === 401) {
+          logout();
+        }
         if (!response.ok) {
           throw new Error(`Erreur ${response.status}`);
         }
@@ -50,8 +48,7 @@ function useFetch<T>(path: string | null, token: string | null) {
     return () => {
       active = false;
     };
-  }, [path, token]);
-
+  }, [path, logout]);
   return { data, loading, error };
 }
 
