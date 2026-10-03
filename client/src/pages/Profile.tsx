@@ -47,6 +47,7 @@ function Profile() {
           to="/profile/favorites"
           icon={Heart}
           iconColor="#E83658"
+          iconFilled
           title="Favoris"
           subtitle={`${data.counts.favorites} titres`}
         />
