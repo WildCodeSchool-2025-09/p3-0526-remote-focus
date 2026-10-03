@@ -1,25 +1,30 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { API_URL } from "../services/api";
-import { getAuthHeaders } from "../utils/authStorage";
 
 function useFetch<T>(path: string | null) {
-  const { logout } = useAuth();
+  const { token, logout } = useAuth();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(path != null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const headers: HeadersInit = {};
+
+    if (token !== null) {
+      headers.Authorization = `Bearer ${token}`;
+    }
     if (path == null) {
       return;
     }
 
     let active = true;
 
+    setData(null);
     setLoading(true);
     setError(null);
 
-    fetch(`${API_URL}${path}`, { headers: getAuthHeaders() })
+    fetch(`${API_URL}${path}`, { headers })
       .then((response) => {
         if (response.status === 401) {
           logout();
@@ -48,7 +53,7 @@ function useFetch<T>(path: string | null) {
     return () => {
       active = false;
     };
-  }, [path, logout]);
+  }, [path, token, logout]);
   return { data, loading, error };
 }
 

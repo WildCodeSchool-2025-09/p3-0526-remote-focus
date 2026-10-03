@@ -4,6 +4,7 @@ import type { EpisodeDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import { useWatch } from "../../contexts/WatchingContext";
 
 type EpisodeHeaderProps = {
   episode: EpisodeDetail;
@@ -12,6 +13,9 @@ type EpisodeHeaderProps = {
 const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
 
 function EpisodeHeader({ episode }: EpisodeHeaderProps) {
+  const { isEpisodeWatched, toggleWatchedEpisode } = useWatch();
+  const isThisEpisodeWatched = isEpisodeWatched(episode.id);
+
   const releasedAt = episode.releasedAt
     ? new Date(episode.releasedAt).toLocaleDateString("fr-FR")
     : null;
@@ -78,7 +82,13 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
 
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color={isThisEpisodeWatched ? "#0D1117" : "#17B890"}
+            bgColor={isThisEpisodeWatched ? "#17B890" : "#0D1117"}
+            icon={Check}
+            onClick={() => toggleWatchedEpisode(episode.id)}
+          />{" "}
           <PlatformList platforms={episode.platforms} />
         </div>
       </div>

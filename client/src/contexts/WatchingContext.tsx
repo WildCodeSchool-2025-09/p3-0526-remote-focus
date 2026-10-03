@@ -206,14 +206,20 @@ function WatchingProvider({ children }: { children: ReactNode }) {
   } = useFetch<number[]>("/api/me/episodes/watched");
 
   useEffect(() => {
+    if (token === null) {
+      setWatchedMediaIds([]);
+      setWatchedEpisodeIds([]);
+      return;
+    }
+
     if (watchedMediaIdsData) {
       setWatchedMediaIds(watchedMediaIdsData);
     }
+
     if (watchedEpisodeIdsData) {
       setWatchedEpisodeIds(watchedEpisodeIdsData);
     }
-  }, [watchedMediaIdsData, watchedEpisodeIdsData]);
-
+  }, [watchedMediaIdsData, watchedEpisodeIdsData, token]);
   return (
     <WatchingContext.Provider
       value={{
