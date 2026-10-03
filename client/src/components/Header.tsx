@@ -26,20 +26,16 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-30 border-b border-focus-line/20 bg-base-100/95 p-4 backdrop-blur">
-      <div className="relative grid grid-cols-3 items-center gap-3">
-        <NavLink
-          to="/"
-          end
-          className="row-start-1 justify-self-start lg:hidden"
-        >
+      <div className="relative grid grid-cols-[auto_1fr_auto] items-center gap-3">
+        <NavLink to="/" end className="lg:hidden">
           <img src={logoFocus} alt="Focus" width={100} />
         </NavLink>
 
         <div
           className={
             isTyping
-              ? "absolute inset-0 z-10 flex items-center bg-base-100 lg:static lg:col-start-2 lg:row-start-1 lg:z-auto lg:justify-center"
-              : "col-start-3 row-start-1 mr-10 flex items-center justify-end lg:col-start-2 lg:mr-0 lg:justify-center"
+              ? "absolute inset-0 z-10 flex items-center bg-base-100 lg:static lg:z-auto lg:justify-center"
+              : "flex items-center justify-end lg:justify-center"
           }
         >
           <SearchBar
@@ -49,7 +45,7 @@ const Header = () => {
           />
         </div>
 
-        <div className="col-start-3 row-start-1 flex items-center justify-end">
+        <div className="flex items-center justify-end">
           {isAuthenticated ? (
             <ProfileMenu />
           ) : (
