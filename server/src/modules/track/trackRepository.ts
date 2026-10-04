@@ -1,6 +1,4 @@
-import databaseClient from "../../../database/client";
-
-import type { Rows } from "../../../database/client";
+import databaseClient, { type Rows } from "../../../database/client";
 
 export type TrackState = {
   mediaId: number;
@@ -98,6 +96,30 @@ class TrackRepository {
     }
 
     return track;
+  }
+
+  async countFavoriteMedias(userId: number): Promise<number> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(*) AS total
+      FROM track
+      WHERE ID_user = ?
+        AND favorite_media = TRUE`,
+      [userId],
+    );
+
+    return Number(rows[0].total);
+  }
+
+  async countWatchlist(userId: number): Promise<number> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(*) AS total
+      FROM track
+      WHERE ID_user = ?
+        AND watchlist = TRUE`,
+      [userId],
+    );
+
+    return Number(rows[0].total);
   }
 }
 
