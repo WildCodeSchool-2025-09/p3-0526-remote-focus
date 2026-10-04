@@ -1,8 +1,8 @@
 import { Check, Heart, Minus, Plus } from "lucide-react";
 import type { MouseEvent } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { useTracks } from "../../contexts/TrackContext";
+import { useTrackActions } from "../../hooks/useTrackActions";
 import type { Media } from "../../types/Catalog";
+import AuthRequiredModal from "../AuthRequiredModal";
 
 interface MediaActionsProps {
   media: Media;
@@ -12,54 +12,27 @@ const buttonsClass =
   "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/70 shadow-badge";
 
 function MediaActions({ media }: MediaActionsProps) {
-  const { isAuthenticated } = useAuth();
-  const { tracks, toggleFavorite, toggleWatchlist } = useTracks();
+  const {
+    isFavorite,
+    isInWatchlist,
+    handleFavorite,
+    handleWatchlist,
+    isAuthModalOpen,
+    closeAuthModal,
+  } = useTrackActions(media.id);
 
-  const currentTrack = tracks.find((track) => track.mediaId === media.id);
-
-  const isFavorite = currentTrack?.isFavorite ?? false;
-  const isInWatchlist = currentTrack?.isInWatchlist ?? false;
-
-  async function handleFavoriteClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleFavoriteClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleFavorite(media.id);
-    } catch (error) {
-      console.error(
-        isFavorite
-          ? "Impossible de retirer le média des favoris :"
-          : "Impossible d'ajouter le média aux favoris :",
-        error,
-      );
-    }
+    handleFavorite();
   }
 
-  async function handleWatchlistClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleWatchlistClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleWatchlist(media.id);
-    } catch (error) {
-      console.error(
-        isInWatchlist
-          ? "Impossible de retirer le média de la watchlist :"
-          : "Impossible d'ajouter le média à la watchlist :",
-        error,
-      );
-    }
+    handleWatchlist();
   }
 
   return (
@@ -103,6 +76,8 @@ function MediaActions({ media }: MediaActionsProps) {
       >
         <Check size={14} />
       </button>
+
+      <AuthRequiredModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
     </div>
   );
 }
