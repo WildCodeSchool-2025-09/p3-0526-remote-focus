@@ -1,18 +1,8 @@
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Heart,
-  Minus,
-  Plus,
-  Star,
-} from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { useTracks } from "../../contexts/TrackContext";
 import type { Serie } from "../../types/media";
-import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 import SerieInfo from "./SerieInfo";
 
 type SerieHeaderProps = {
@@ -25,15 +15,7 @@ const PILL_ACTIVE =
   "rounded-full border border-focus-yellow bg-focus-yellow px-4 py-2 text-sm font-semibold text-focus-void";
 
 function SerieHeader({ serie }: SerieHeaderProps) {
-  const { isAuthenticated } = useAuth();
-  const { tracks, toggleFavorite, toggleWatchlist } = useTracks();
-
   const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const currentTrack = tracks.find((track) => track.mediaId === serie.id);
-
-  const isFavorite = currentTrack?.isFavorite ?? false;
-  const isInWatchlist = currentTrack?.isInWatchlist ?? false;
 
   const year = serie.releasedAt
     ? new Date(serie.releasedAt).getFullYear()
@@ -41,42 +23,6 @@ function SerieHeader({ serie }: SerieHeaderProps) {
 
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  }
-
-  async function handleFavoriteClick() {
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleFavorite(serie.id);
-    } catch (error) {
-      console.error(
-        isFavorite
-          ? "Impossible de retirer la série des favoris :"
-          : "Impossible d'ajouter la série aux favoris :",
-        error,
-      );
-    }
-  }
-
-  async function handleWatchlistClick() {
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleWatchlist(serie.id);
-    } catch (error) {
-      console.error(
-        isInWatchlist
-          ? "Impossible de retirer la série de la watchlist :"
-          : "Impossible d'ajouter la série à la watchlist :",
-        error,
-      );
-    }
   }
 
   return (
@@ -150,49 +96,12 @@ function SerieHeader({ serie }: SerieHeaderProps) {
         <SerieInfo serie={serie} />
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton
-            label="Favoris"
-            icon={Heart}
-            ariaLabel={
-              isFavorite
-                ? `Retirer ${serie.name} des favoris`
-                : `Ajouter ${serie.name} aux favoris`
-            }
-            isPressed={isFavorite}
-            fillIcon={isFavorite}
-            buttonClassName="border-focus-coral text-focus-coral"
-            onClick={handleFavoriteClick}
-          />
-
-          <ActionButton
-            label="Watchlist"
-            icon={isInWatchlist ? Minus : Plus}
-            ariaLabel={
-              isInWatchlist
-                ? `Retirer ${serie.name} de la watchlist`
-                : `Ajouter ${serie.name} à la watchlist`
-            }
-            isPressed={isInWatchlist}
-            buttonClassName={
-              isInWatchlist
-                ? "border-focus-cream bg-focus-cream text-focus-void"
-                : "border-focus-cream text-focus-cream"
-            }
-            onClick={handleWatchlistClick}
-          />
-
-          <ActionButton
-            label="Vu"
-            icon={Check}
-            buttonClassName="border-focus-teal text-focus-teal"
-            disabled
-          />
-
-          <ActionButton
-            label="Noter"
-            icon={Star}
-            buttonClassName="border-focus-yellow text-focus-yellow"
-            disabled
+          <TrackActions
+            mediaId={serie.id}
+            mediaName={serie.name}
+            showWatchlist
+            showSeen
+            showRating
           />
 
           <PlatformList platforms={serie.platforms} />

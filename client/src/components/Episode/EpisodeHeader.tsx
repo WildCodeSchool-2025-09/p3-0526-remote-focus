@@ -1,11 +1,9 @@
-import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { useTracks } from "../../contexts/TrackContext";
 import type { EpisodeDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 
 type EpisodeHeaderProps = {
   episode: EpisodeDetail;
@@ -14,16 +12,7 @@ type EpisodeHeaderProps = {
 const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
 
 function EpisodeHeader({ episode }: EpisodeHeaderProps) {
-  const { isAuthenticated } = useAuth();
-  const { tracks, toggleFavorite } = useTracks();
-
   const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const currentTrack = tracks.find(
-    (track) => track.mediaId === episode.serie.id,
-  );
-
-  const isFavorite = currentTrack?.isFavorite ?? false;
 
   const releasedAt = episode.releasedAt
     ? new Date(episode.releasedAt).toLocaleDateString("fr-FR")
@@ -31,24 +20,6 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
 
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  }
-
-  async function handleFavoriteClick() {
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleFavorite(episode.serie.id);
-    } catch (error) {
-      console.error(
-        isFavorite
-          ? "Impossible de retirer la série des favoris :"
-          : "Impossible d'ajouter la série aux favoris :",
-        error,
-      );
-    }
   }
 
   return (
@@ -110,25 +81,10 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
         )}
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton
-            label="Favoris"
-            icon={Heart}
-            ariaLabel={
-              isFavorite
-                ? `Retirer ${episode.serie.name} des favoris`
-                : `Ajouter ${episode.serie.name} aux favoris`
-            }
-            isPressed={isFavorite}
-            fillIcon={isFavorite}
-            buttonClassName="border-focus-coral text-focus-coral"
-            onClick={handleFavoriteClick}
-          />
-
-          <ActionButton
-            label="Vu"
-            icon={Check}
-            buttonClassName="border-focus-teal text-focus-teal"
-            disabled
+          <TrackActions
+            mediaId={episode.serie.id}
+            mediaName={episode.serie.name}
+            showSeen
           />
 
           <PlatformList platforms={episode.platforms} />

@@ -1,19 +1,9 @@
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Heart,
-  Minus,
-  Plus,
-  Star,
-} from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { useTracks } from "../../contexts/TrackContext";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
@@ -26,15 +16,7 @@ const PILL_ACTIVE =
   "rounded-full border border-focus-yellow bg-focus-yellow px-4 py-2 text-sm font-semibold text-focus-void";
 
 function MovieHeader({ media }: MovieHeaderProps) {
-  const { isAuthenticated } = useAuth();
-  const { tracks, toggleFavorite, toggleWatchlist } = useTracks();
-
   const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const currentTrack = tracks.find((track) => track.mediaId === media.id);
-
-  const isFavorite = currentTrack?.isFavorite ?? false;
-  const isInWatchlist = currentTrack?.isInWatchlist ?? false;
 
   const year = media.releasedAt
     ? new Date(media.releasedAt).getFullYear()
@@ -42,42 +24,6 @@ function MovieHeader({ media }: MovieHeaderProps) {
 
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  }
-
-  async function handleFavoriteClick() {
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleFavorite(media.id);
-    } catch (error) {
-      console.error(
-        isFavorite
-          ? "Impossible de retirer le média des favoris :"
-          : "Impossible d'ajouter le média aux favoris :",
-        error,
-      );
-    }
-  }
-
-  async function handleWatchlistClick() {
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleWatchlist(media.id);
-    } catch (error) {
-      console.error(
-        isInWatchlist
-          ? "Impossible de retirer le média de la watchlist :"
-          : "Impossible d'ajouter le média à la watchlist :",
-        error,
-      );
-    }
   }
 
   return (
@@ -144,49 +90,12 @@ function MovieHeader({ media }: MovieHeaderProps) {
         <MovieInfo media={media} />
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton
-            label="Favoris"
-            icon={Heart}
-            ariaLabel={
-              isFavorite
-                ? `Retirer ${media.name} des favoris`
-                : `Ajouter ${media.name} aux favoris`
-            }
-            isPressed={isFavorite}
-            fillIcon={isFavorite}
-            buttonClassName="border-focus-coral text-focus-coral"
-            onClick={handleFavoriteClick}
-          />
-
-          <ActionButton
-            label="Watchlist"
-            icon={isInWatchlist ? Minus : Plus}
-            ariaLabel={
-              isInWatchlist
-                ? `Retirer ${media.name} de la watchlist`
-                : `Ajouter ${media.name} à la watchlist`
-            }
-            isPressed={isInWatchlist}
-            buttonClassName={
-              isInWatchlist
-                ? "border-focus-cream bg-focus-cream text-focus-void"
-                : "border-focus-cream text-focus-cream"
-            }
-            onClick={handleWatchlistClick}
-          />
-
-          <ActionButton
-            label="Vu"
-            icon={Check}
-            buttonClassName="border-focus-teal text-focus-teal"
-            disabled
-          />
-
-          <ActionButton
-            label="Noter"
-            icon={Star}
-            buttonClassName="border-focus-yellow text-focus-yellow"
-            disabled
+          <TrackActions
+            mediaId={media.id}
+            mediaName={media.name}
+            showWatchlist
+            showSeen
+            showRating
           />
 
           <PlatformList platforms={media.platforms} />

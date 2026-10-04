@@ -1,11 +1,9 @@
-import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { useTracks } from "../../contexts/TrackContext";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 
 type SeasonHeaderProps = {
   season: SeasonDetail;
@@ -14,16 +12,7 @@ type SeasonHeaderProps = {
 const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
 
 function SeasonHeader({ season }: SeasonHeaderProps) {
-  const { isAuthenticated } = useAuth();
-  const { tracks, toggleFavorite } = useTracks();
-
   const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const currentTrack = tracks.find(
-    (track) => track.mediaId === season.serie.id,
-  );
-
-  const isFavorite = currentTrack?.isFavorite ?? false;
 
   const year = season.releasedAt
     ? new Date(season.releasedAt).getFullYear()
@@ -31,24 +20,6 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
 
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  }
-
-  async function handleFavoriteClick() {
-    if (!isAuthenticated) {
-      window.alert("Vous devez être connecté pour réaliser cette action.");
-      return;
-    }
-
-    try {
-      await toggleFavorite(season.serie.id);
-    } catch (error) {
-      console.error(
-        isFavorite
-          ? "Impossible de retirer la série des favoris :"
-          : "Impossible d'ajouter la série aux favoris :",
-        error,
-      );
-    }
   }
 
   return (
@@ -116,25 +87,10 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
         )}
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton
-            label="Favoris"
-            icon={Heart}
-            ariaLabel={
-              isFavorite
-                ? `Retirer ${season.serie.name} des favoris`
-                : `Ajouter ${season.serie.name} aux favoris`
-            }
-            isPressed={isFavorite}
-            fillIcon={isFavorite}
-            buttonClassName="border-focus-coral text-focus-coral"
-            onClick={handleFavoriteClick}
-          />
-
-          <ActionButton
-            label="Vu"
-            icon={Check}
-            buttonClassName="border-focus-teal text-focus-teal"
-            disabled
+          <TrackActions
+            mediaId={season.serie.id}
+            mediaName={season.serie.name}
+            showSeen
           />
 
           <PlatformList platforms={season.platforms} />
