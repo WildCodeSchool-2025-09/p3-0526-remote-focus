@@ -1,4 +1,5 @@
 import { Check, Heart, Minus, Plus, Star } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 import { useTrackActions } from "../hooks/useTrackActions";
 import ActionButton from "./ActionButton";
 import AuthRequiredModal from "./AuthRequiredModal";
@@ -9,6 +10,8 @@ type TrackActionsProps = {
   showWatchlist?: boolean;
   showSeen?: boolean;
   showRating?: boolean;
+  isSeen?: boolean;
+  onSeenClick?: () => void;
 };
 
 function TrackActions({
@@ -17,15 +20,28 @@ function TrackActions({
   showWatchlist = false,
   showSeen = false,
   showRating = false,
+  isSeen = false,
+  onSeenClick,
 }: TrackActionsProps) {
+  const { isAuthenticated } = useAuth();
   const {
     isFavorite,
     isInWatchlist,
     handleFavorite,
     handleWatchlist,
     isAuthModalOpen,
+    openAuthModal,
     closeAuthModal,
   } = useTrackActions(mediaId);
+
+  function handleSeen() {
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
+
+    onSeenClick?.();
+  }
 
   return (
     <>
@@ -66,8 +82,14 @@ function TrackActions({
         <ActionButton
           label="Vu"
           icon={Check}
-          buttonClassName="border-focus-teal text-focus-teal"
-          disabled
+          ariaLabel={isSeen ? "Retirer des médias vus" : "Marquer comme vu"}
+          isPressed={isSeen}
+          buttonClassName={
+            isSeen
+              ? "!border-focus-teal !bg-focus-teal !text-focus-void"
+              : "!border-focus-teal text-focus-teal hover:!bg-focus-teal hover:!text-focus-void"
+          }
+          onClick={handleSeen}
         />
       )}
 

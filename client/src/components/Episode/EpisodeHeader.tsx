@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { EpisodeDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import PlatformList from "../PlatformList";
@@ -13,6 +14,8 @@ const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
 
 function EpisodeHeader({ episode }: EpisodeHeaderProps) {
   const [isMetaOpen, setIsMetaOpen] = useState(false);
+  const { isEpisodeWatched, toggleWatchedEpisode } = useWatch();
+  const isThisEpisodeWatched = isEpisodeWatched(episode.id);
 
   const releasedAt = episode.releasedAt
     ? new Date(episode.releasedAt).toLocaleDateString("fr-FR")
@@ -85,6 +88,8 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
             mediaId={episode.serie.id}
             mediaName={episode.serie.name}
             showSeen
+            isSeen={isThisEpisodeWatched}
+            onSeenClick={() => toggleWatchedEpisode(episode.id)}
           />
 
           <PlatformList platforms={episode.platforms} />

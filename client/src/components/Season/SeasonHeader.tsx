@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import PlatformList from "../PlatformList";
@@ -7,11 +8,12 @@ import TrackActions from "../TrackActions";
 
 type SeasonHeaderProps = {
   season: SeasonDetail;
+  isSeasonComplete: boolean;
 };
 
 const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
 
-function SeasonHeader({ season }: SeasonHeaderProps) {
+function SeasonHeader({ season, isSeasonComplete }: SeasonHeaderProps) {
   const [isMetaOpen, setIsMetaOpen] = useState(false);
 
   const year = season.releasedAt
@@ -21,6 +23,9 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
   }
+
+  const { toggleWatchedSeason } = useWatch();
+  const episodeIds = season.episodes.map((episode) => episode.id);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -91,6 +96,8 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
             mediaId={season.serie.id}
             mediaName={season.serie.name}
             showSeen
+            isSeen={isSeasonComplete}
+            onSeenClick={() => toggleWatchedSeason(season.id, episodeIds)}
           />
 
           <PlatformList platforms={season.platforms} />

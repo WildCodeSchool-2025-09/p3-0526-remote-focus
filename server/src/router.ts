@@ -15,6 +15,7 @@ import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
 import trackActions from "./modules/track/trackActions";
 import userActions from "./modules/user/userActions";
+import watchingActions from "./modules/watching/watchingActions";
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ router.use(optionalAuth);
 // Define Your API Routes Here
 /* ************************************************************************* */
 router.get("/api/medias/search", searchActions.browse);
+
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 router.get("/api/medias", catalogActions.browse);
 router.get("/api/genres", catalogActions.browseGenres);
@@ -65,4 +67,18 @@ router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
 
 router.patch("/api/me/medias/:id/watchlist", trackActions.toggleWatchlist);
 
+/* Connected user, add authentication when ready*/
+
+router.patch("/api/me/medias/:id/watched", watchingActions.toggleMediaWatched);
+router.patch("/api/me/series/:id/watched", watchingActions.toggleSeriesWatched);
+router.patch(
+  "/api/me/seasons/:id/watched",
+  watchingActions.toggleSeasonWatched,
+);
+router.patch(
+  "/api/me/episodes/:id/watched",
+  watchingActions.toggleEpisodeWatched,
+);
+router.get("/api/me/medias/watched", watchingActions.readMediaWatched);
+router.get("/api/me/episodes/watched", watchingActions.readEpisodeWatched);
 export default router;

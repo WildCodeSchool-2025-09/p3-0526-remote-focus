@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
 import { TrackProvider } from "./contexts/TrackContext";
 // Import necessary modules from React and React Router
+import { WatchingProvider } from "./contexts/WatchingContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
@@ -105,11 +106,12 @@ if (rootElement == null) {
 createRoot(rootElement).render(
   <AuthProvider>
     <SearchProvider>
-      <TrackProvider>
-        <RouterProvider router={router} />
-      </TrackProvider>
+      <WatchingProvider>
+        <TrackProvider>
+          <RouterProvider router={router} />
+        </TrackProvider>
+      </WatchingProvider>
     </SearchProvider>
-    ,
   </AuthProvider>,
 );
 

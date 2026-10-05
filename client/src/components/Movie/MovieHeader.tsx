@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import PlatformList from "../PlatformList";
@@ -25,6 +26,9 @@ function MovieHeader({ media }: MovieHeaderProps) {
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
   }
+
+  const { isWatched, toggleWatchedMovie } = useWatch();
+  const isMovieWatched = isWatched(media.id);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -95,6 +99,8 @@ function MovieHeader({ media }: MovieHeaderProps) {
             mediaName={media.name}
             showWatchlist
             showSeen
+            isSeen={isMovieWatched}
+            onSeenClick={() => toggleWatchedMovie(media.id)}
             showRating
           />
 

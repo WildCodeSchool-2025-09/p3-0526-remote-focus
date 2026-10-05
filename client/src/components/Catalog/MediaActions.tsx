@@ -1,5 +1,7 @@
 import { Check, Heart, Minus, Plus } from "lucide-react";
 import type { MouseEvent } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import { useTrackActions } from "../../hooks/useTrackActions";
 import type { Media } from "../../types/Catalog";
 import AuthRequiredModal from "../AuthRequiredModal";
@@ -12,14 +14,19 @@ const buttonsClass =
   "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/70 shadow-badge";
 
 function MediaActions({ media }: MediaActionsProps) {
+  const { isAuthenticated } = useAuth();
+  const { isWatched, toggleWatchedMovie, toggleWatchedSeries } = useWatch();
   const {
     isFavorite,
     isInWatchlist,
     handleFavorite,
     handleWatchlist,
     isAuthModalOpen,
+    openAuthModal,
     closeAuthModal,
   } = useTrackActions(media.id);
+
+  const isMediaWatched = isWatched(media.id);
 
   function handleFavoriteClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
@@ -33,6 +40,22 @@ function MediaActions({ media }: MediaActionsProps) {
     event.stopPropagation();
 
     handleWatchlist();
+  }
+
+  function handleWatchedClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
+
+    if (media.type === "movie") {
+      toggleWatchedMovie(media.id);
+    } else if (media.type === "tv") {
+      toggleWatchedSeries(media.id);
+    }
   }
 
   return (
@@ -71,8 +94,18 @@ function MediaActions({ media }: MediaActionsProps) {
 
       <button
         type="button"
-        aria-label={`Ajouter ${media.name} aux médias vus`}
-        className={`${buttonsClass} btn-secondary`}
+        aria-label={
+          isMediaWatched
+            ? `Supprimer ${media.name} des médias vus`
+            : `Ajouter ${media.name} aux médias vus`
+        }
+        aria-pressed={isMediaWatched}
+        className={
+          isMediaWatched
+            ? `${buttonsClass} btn-secondary !bg-focus-teal`
+            : `${buttonsClass} btn-secondary`
+        }
+        onClick={handleWatchedClick}
       >
         <Check size={14} />
       </button>

@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Serie } from "../../types/media";
 import PlatformList from "../PlatformList";
 import TrackActions from "../TrackActions";
@@ -24,6 +25,9 @@ function SerieHeader({ serie }: SerieHeaderProps) {
   function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
   }
+
+  const { isWatched, toggleWatchedSeries } = useWatch();
+  const isSeriesComplete = isWatched(serie.id);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -101,6 +105,8 @@ function SerieHeader({ serie }: SerieHeaderProps) {
             mediaName={serie.name}
             showWatchlist
             showSeen
+            isSeen={isSeriesComplete}
+            onSeenClick={() => toggleWatchedSeries(serie.id)}
             showRating
           />
 

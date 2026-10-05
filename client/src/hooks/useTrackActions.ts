@@ -49,6 +49,10 @@ export function useTrackActions(mediaId: number) {
     }
   }
 
+  function openAuthModal() {
+    setIsAuthModalOpen(true);
+  }
+
   function closeAuthModal() {
     setIsAuthModalOpen(false);
   }
@@ -59,6 +63,7 @@ export function useTrackActions(mediaId: number) {
     handleFavorite,
     handleWatchlist,
     isAuthModalOpen,
+    openAuthModal,
     closeAuthModal,
   };
 }
