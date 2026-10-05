@@ -8,6 +8,7 @@ type UseWatchlistResult = {
   loading: boolean;
   loadingMore: boolean;
   error: boolean;
+  loadMoreError: boolean;
   hasMore: boolean;
   loadMore: () => void;
 };
@@ -31,6 +32,7 @@ const useWatchlist = (
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
   const [page, setPage] = useState(1);
   const generation = useRef(0);
 
@@ -44,6 +46,7 @@ const useWatchlist = (
     setPage(1);
     setLoading(true);
     setError(false);
+    setLoadMoreError(false);
 
     fetchWatchlist({ page: 1, type, seen: toSeenParam(status) })
       .then((data) => {
@@ -73,6 +76,7 @@ const useWatchlist = (
     const generationAtStart = generation.current;
 
     setLoadingMore(true);
+    setLoadMoreError(false);
 
     fetchWatchlist({ page: nextPage, type, seen: toSeenParam(status) })
       .then((data) => {
@@ -85,13 +89,21 @@ const useWatchlist = (
       })
       .catch(() => {
         if (generation.current === generationAtStart) {
-          setError(true);
+          setLoadMoreError(true);
         }
       })
       .finally(() => setLoadingMore(false));
   };
 
-  return { medias, loading, loadingMore, error, hasMore, loadMore };
+  return {
+    medias,
+    loading,
+    loadingMore,
+    error,
+    loadMoreError,
+    hasMore,
+    loadMore,
+  };
 };
 
 export default useWatchlist;
