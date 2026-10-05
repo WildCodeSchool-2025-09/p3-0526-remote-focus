@@ -1,12 +1,12 @@
 import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
-import PlatformList from "../PlatformList";
-import { useWatch } from "../../contexts/WatchingContext";
-import { useAuth } from "../../contexts/AuthContext";
 import AuthRequiredModal from "../AuthRequiredModal";
+import PlatformList from "../PlatformList";
 
 type SeasonHeaderProps = {
   season: SeasonDetail;

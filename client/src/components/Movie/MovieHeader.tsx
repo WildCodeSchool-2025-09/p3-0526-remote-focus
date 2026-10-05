@@ -1,13 +1,13 @@
 import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
 import MovieInfo from "./MovieInfo";
-import { useWatch } from "../../contexts/WatchingContext";
-import AuthRequiredModal from "../AuthRequiredModal";
-import { useAuth } from "../../contexts/AuthContext";
 
 type MovieHeaderProps = {
   media: Media;

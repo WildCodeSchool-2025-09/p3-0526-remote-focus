@@ -1,12 +1,12 @@
 import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Serie } from "../../types/media";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
 import SerieInfo from "./SerieInfo";
-import { useWatch } from "../../contexts/WatchingContext";
-import AuthRequiredModal from "../AuthRequiredModal";
-import { useAuth } from "../../contexts/AuthContext";
 
 type SerieHeaderProps = {
   serie: Serie;

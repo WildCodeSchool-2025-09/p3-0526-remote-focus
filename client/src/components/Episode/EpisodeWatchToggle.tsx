@@ -1,8 +1,8 @@
 import { Check } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useWatch } from "../../contexts/WatchingContext";
 import AuthRequiredModal from "../AuthRequiredModal";
-import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
 
 interface EpisodeWatchToggleProps {
   episodeId: number;

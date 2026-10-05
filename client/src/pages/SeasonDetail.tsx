@@ -4,10 +4,10 @@ import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import EpisodeList from "../components/EpisodeList";
 import SeasonHeader from "../components/Season/SeasonHeader";
+import { useWatch } from "../contexts/WatchingContext";
 import useFetch from "../hooks/useFetch";
 import useSelectedActor from "../hooks/useSelectedActor";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
-import { useWatch } from "../contexts/WatchingContext";
 
 function SeasonDetail() {
   const { seriesId, seasonId } = useParams();

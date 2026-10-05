@@ -1,9 +1,9 @@
 import { Check, Heart, Plus } from "lucide-react";
-import type { Media } from "../../types/Catalog";
-import { useWatch } from "../../contexts/WatchingContext";
-import { useAuth } from "../../contexts/AuthContext";
-import AuthRequiredModal from "../AuthRequiredModal";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
+import type { Media } from "../../types/Catalog";
+import AuthRequiredModal from "../AuthRequiredModal";
 
 interface MediaActionsProps {
   media: Media;
