@@ -47,9 +47,9 @@ CREATE TABLE media(
 CREATE TABLE season(
    ID INT AUTO_INCREMENT,
    tmdb_id INT NOT NULL,
-   name VARCHAR(150),
+   name VARCHAR(255),
    released_at DATE,
-   poster VARCHAR(255),
+   poster VARCHAR(150),
    synopsis TEXT,
    is_finished BOOLEAN NOT NULL,
    number INT,
@@ -62,7 +62,7 @@ CREATE TABLE season(
 CREATE TABLE episode(
    ID INT AUTO_INCREMENT,
    tmdb_id INT NOT NULL,
-   name VARCHAR(150),
+   name VARCHAR(255),
    number INT,
    released_at DATE,
    synopsis TEXT,

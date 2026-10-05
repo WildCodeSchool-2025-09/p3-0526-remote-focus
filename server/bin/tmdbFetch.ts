@@ -62,7 +62,7 @@ const FETCH_PERSON_DETAILS = true;
  */
 type EpisodeCastMode = "all" | "guests";
 
-const EPISODE_CAST_MODE = "guests" as EpisodeCastMode;
+const EPISODE_CAST_MODE = "all" as EpisodeCastMode;
 
 /** Écarte les séries fleuves (One Piece, Détective Conan…). */
 const MAX_EPISODES_PER_MEDIA = 200;
