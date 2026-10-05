@@ -1,8 +1,11 @@
 import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
 import MovieInfo from "./MovieInfo";
 
@@ -24,6 +27,12 @@ function MovieHeader({ media }: MovieHeaderProps) {
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
   };
+
+  const { isWatched, toggleWatchedMovie } = useWatch();
+  const isMovieWatched = isWatched(media.id);
+
+  const { isAuthenticated } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -84,11 +93,27 @@ function MovieHeader({ media }: MovieHeaderProps) {
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color={isMovieWatched ? "#0D1117" : "#17B890"}
+            bgColor={isMovieWatched ? "#17B890" : "#0D1117"}
+            icon={Check}
+            onClick={() => {
+              if (isAuthenticated) {
+                toggleWatchedMovie(media.id);
+              } else {
+                setShowAuthMessage(true);
+              }
+            }}
+          />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
           <PlatformList platforms={media.platforms} />
         </div>
       </div>
+      <AuthRequiredModal
+        isOpen={showAuthMessage}
+        onClose={() => setShowAuthMessage(false)}
+      />
     </div>
   );
 }

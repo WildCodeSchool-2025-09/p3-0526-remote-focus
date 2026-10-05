@@ -62,7 +62,7 @@ CREATE TABLE season(
 CREATE TABLE episode(
    ID INT AUTO_INCREMENT,
    tmdb_id INT NOT NULL,
-   name VARCHAR(150),
+   name VARCHAR(255),
    number INT,
    released_at DATE,
    synopsis TEXT,

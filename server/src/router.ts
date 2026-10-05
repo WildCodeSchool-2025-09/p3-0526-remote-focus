@@ -23,6 +23,7 @@ router.get("/api/medias/search", searchActions.browse);
 
 import hashPassword from "./middlewares/hashPassword";
 import catalogActions from "./modules/catalog/catalogActions";
+import watchingActions from "./modules/watching/watchingActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 router.get("/api/medias", catalogActions.browse);
@@ -57,4 +58,18 @@ router.post(
 );
 router.post("/api/auth/login", authActions.login);
 
+/* Connected user, add authentication when ready*/
+
+router.patch("/api/me/medias/:id/watched", watchingActions.toggleMediaWatched);
+router.patch("/api/me/series/:id/watched", watchingActions.toggleSeriesWatched);
+router.patch(
+  "/api/me/seasons/:id/watched",
+  watchingActions.toggleSeasonWatched,
+);
+router.patch(
+  "/api/me/episodes/:id/watched",
+  watchingActions.toggleEpisodeWatched,
+);
+router.get("/api/me/medias/watched", watchingActions.readMediaWatched);
+router.get("/api/me/episodes/watched", watchingActions.readEpisodeWatched);
 export default router;

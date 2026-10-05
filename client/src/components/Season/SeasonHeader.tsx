@@ -1,17 +1,21 @@
 import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
 
 type SeasonHeaderProps = {
   season: SeasonDetail;
+  isSeasonComplete: boolean;
 };
 
 const PILL = "rounded-full border border-base-content/30 px-4 py-2 text-sm";
 
-function SeasonHeader({ season }: SeasonHeaderProps) {
+function SeasonHeader({ season, isSeasonComplete }: SeasonHeaderProps) {
   const year = season.releasedAt
     ? new Date(season.releasedAt).getFullYear()
     : null;
@@ -21,6 +25,12 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
   };
+
+  const { toggleWatchedSeason } = useWatch();
+  const episodeIds = season.episodes.map((episode) => episode.id);
+
+  const { isAuthenticated } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -84,10 +94,26 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
 
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color={isSeasonComplete ? "#0D1117" : "#17B890"}
+            bgColor={isSeasonComplete ? "#17B890" : "#0D1117"}
+            icon={Check}
+            onClick={() => {
+              if (isAuthenticated) {
+                toggleWatchedSeason(season.id, episodeIds);
+              } else {
+                setShowAuthMessage(true);
+              }
+            }}
+          />
           <PlatformList platforms={season.platforms} />
         </div>
       </div>
+      <AuthRequiredModal
+        isOpen={showAuthMessage}
+        onClose={() => setShowAuthMessage(false)}
+      />
     </div>
   );
 }

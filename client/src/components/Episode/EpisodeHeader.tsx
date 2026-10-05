@@ -1,8 +1,11 @@
 import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { EpisodeDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
 
 type EpisodeHeaderProps = {
@@ -12,6 +15,9 @@ type EpisodeHeaderProps = {
 const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
 
 function EpisodeHeader({ episode }: EpisodeHeaderProps) {
+  const { isEpisodeWatched, toggleWatchedEpisode } = useWatch();
+  const isThisEpisodeWatched = isEpisodeWatched(episode.id);
+
   const releasedAt = episode.releasedAt
     ? new Date(episode.releasedAt).toLocaleDateString("fr-FR")
     : null;
@@ -21,6 +27,9 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
   };
+
+  const { isAuthenticated } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -78,10 +87,26 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
 
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color={isThisEpisodeWatched ? "#0D1117" : "#17B890"}
+            bgColor={isThisEpisodeWatched ? "#17B890" : "#0D1117"}
+            icon={Check}
+            onClick={() => {
+              if (isAuthenticated) {
+                toggleWatchedEpisode(episode.id);
+              } else {
+                setShowAuthMessage(true);
+              }
+            }}
+          />{" "}
           <PlatformList platforms={episode.platforms} />
         </div>
       </div>
+      <AuthRequiredModal
+        isOpen={showAuthMessage}
+        onClose={() => setShowAuthMessage(false)}
+      />
     </div>
   );
 }
