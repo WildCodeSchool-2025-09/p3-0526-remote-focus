@@ -31,17 +31,27 @@ const SearchBar = ({
     ? "text-error"
     : value
       ? "text-warning"
-      : "opacity-60";
+      : isCompact
+        ? "text-base-content"
+        : "opacity-60";
 
   const shapeClass = isCompact
     ? "w-12 h-12 justify-center gap-0 rounded-full"
-    : "w-full gap-2 rounded-3xl";
+    : "w-full gap-2 rounded-3xl lg:min-w-[32rem]";
+
+  const containerClass = isCompact
+    ? "border-transparent bg-transparent"
+    : "bg-base-300";
 
   return (
     <label
-      className={`input input-bordered mx-2 flex items-center bg-base-300 ${shapeClass} ${borderClass}`}
+      className={`input input-bordered mx-2 flex items-center ${containerClass} ${shapeClass} ${borderClass}`}
     >
-      <Search aria-hidden="true" className={`size-4 shrink-0 ${iconClass}`} />
+      <Search
+        aria-hidden="true"
+        size={isCompact ? 22 : 16}
+        className={`shrink-0 ${iconClass}`}
+      />
       <input
         type="search"
         aria-label="Rechercher un film, une série ou un animé"
@@ -51,8 +61,8 @@ const SearchBar = ({
           !showPlaceholder
             ? ""
             : isDesktop
-              ? "Rechercher un film, une série,..."
-              : "Recherche"
+              ? "Rechercher un film, une série, un acteur..."
+              : "Rechercher"
         }
         className={isCompact ? "w-0 border-0 p-0" : "grow"}
       />
