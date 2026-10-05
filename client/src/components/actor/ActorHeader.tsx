@@ -27,9 +27,17 @@ function ActorHeader({ actor }: ActorHeaderProps) {
 
         <ActionButton
           label="Favoris"
-          color="#E83658"
           icon={Heart}
           align="start"
+          ariaLabel={
+            isFavorite
+              ? `Retirer ${actor.name} des favoris`
+              : `Ajouter ${actor.name} aux favoris`
+          }
+          isPressed={isFavorite}
+          fillIcon={isFavorite}
+          buttonClassName="border-focus-coral text-focus-coral"
+          onClick={handleFavoriteClick}
         />
       </div>
     </div>

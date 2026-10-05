@@ -2,7 +2,6 @@ import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
 import hashPassword from "./middlewares/hashPassword";
 import optionalAuth from "./middlewares/optionalAuth";
-import fakeAuth from "./middlewares/requireAuth";
 import requireAuth from "./middlewares/requireAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
@@ -47,8 +46,6 @@ router.get(
 router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
-router.get("/api/me/dashboard", userActions.readDashboard);
-
 router.post(
   "/api/users",
   validateRegister,
@@ -59,6 +56,8 @@ router.post(
 router.post("/api/auth/login", authActions.login);
 
 router.use("/api/me", requireAuth);
+
+router.get("/api/me/dashboard", userActions.readDashboard);
 
 router.get("/api/me/tracks", trackActions.browse);
 

@@ -35,7 +35,7 @@ function ActionButton({
         aria-pressed={isPressed}
         disabled={disabled}
         onClick={onClick}
-        className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12 ${buttonClassName}`}
+        className={`btn btn-circle bg-focus-void hover:bg-focus-void flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12 ${buttonClassName}`}
       >
         <Icon
           size={22}
@@ -44,7 +44,7 @@ function ActionButton({
         />
       </button>
 
-      <span className="text-sm text-focus-muted">{label}</span>
+      <span className="hidden text-sm text-focus-muted md:inline">{label}</span>
     </div>
   );
 }

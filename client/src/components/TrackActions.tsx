@@ -39,7 +39,7 @@ function TrackActions({
         }
         isPressed={isFavorite}
         fillIcon={isFavorite}
-        buttonClassName="border-focus-coral text-focus-coral"
+        buttonClassName="btn-accent border-focus-coral text-focus-coral hover:!bg-focus-coral hover:!text-focus-cream"
         onClick={handleFavorite}
       />
 
@@ -55,8 +55,8 @@ function TrackActions({
           isPressed={isInWatchlist}
           buttonClassName={
             isInWatchlist
-              ? "border-focus-cream bg-focus-cream text-focus-void"
-              : "border-focus-cream text-focus-cream"
+              ? "!border-focus-cream !bg-focus-cream !text-focus-void"
+              : "!border-focus-cream !text-focus-cream hover:!bg-focus-cream hover:!text-focus-void"
           }
           onClick={handleWatchlist}
         />
