@@ -3,20 +3,17 @@ import {
   Bookmark,
   ChevronRight,
   Heart,
-  LogOut,
   Settings,
-  User,
+  Users,
 } from "lucide-react";
 import { Link } from "react-router";
 import DashboardCard from "../components/profile/DashboardCard";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import useFetch from "../hooks/useFetch";
-import useLogout from "../hooks/useLogout";
 import type { DashboardData } from "../types/Dashboard";
 
 function Profile() {
   const { data, loading, error } = useFetch<DashboardData>("/api/me/dashboard");
-  const { handleLogout } = useLogout();
 
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
@@ -24,7 +21,10 @@ function Profile() {
 
   if (error != null || data == null) {
     return (
-      <p className="p-8 text-focus-muted">Impossible de charger le profil.</p>
+      <p className="p-8 text-focus-muted">
+        Une erreur est survenue lors du chargement du profil. Merci d'actualiser
+        la page.
+      </p>
     );
   }
 
@@ -47,19 +47,20 @@ function Profile() {
           to="/profile/favorites"
           icon={Heart}
           iconColor="#E83658"
+          iconFilled
           title="Favoris"
           subtitle={`${data.counts.favorites} titres`}
         />
         <DashboardCard
           to="/profile/watchlist"
           icon={Bookmark}
-          iconColor="#F2B705"
+          iconColor="#F5F5F0"
           title="Watchlist"
           subtitle={`${data.counts.watchlist} titres`}
         />
         <DashboardCard
           to="/profile/actors"
-          icon={User}
+          icon={Users}
           iconColor="#17B890"
           title="Mes Acteurs"
           subtitle={`${data.counts.actors} suivis`}
@@ -67,13 +68,13 @@ function Profile() {
         <DashboardCard
           to="/profile/statistics"
           icon={BarChart3}
-          iconColor="#2E6373"
+          iconColor="#F2B705"
           title="Statistiques"
           subtitle="voir mon activité"
         />
       </div>
 
-      <div className="flex flex-col gap-2 lg:hidden">
+      <div className="lg:hidden">
         <Link
           to="/profile/settings"
           className="flex items-center justify-between rounded-lg border border-white/10 bg-base-200 px-4 py-3"
@@ -84,15 +85,6 @@ function Profile() {
           </span>
           <ChevronRight size={16} />
         </Link>
-
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg px-4 py-3 text-left font-semibold text-[#E83658]"
-        >
-          <LogOut size={16} />
-          Déconnexion
-        </button>
       </div>
     </div>
   );
