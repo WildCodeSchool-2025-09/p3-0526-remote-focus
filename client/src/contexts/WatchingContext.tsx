@@ -35,6 +35,7 @@ interface WatchingContextType {
     episodeIds: number[],
   ) => Promise<void>;
   toggleWatchedEpisode: (episodeId: number) => Promise<void>;
+  watchError: string | null;
 }
 
 const WatchingContext = createContext<WatchingContextType | undefined>(
@@ -42,6 +43,7 @@ const WatchingContext = createContext<WatchingContextType | undefined>(
 );
 
 function WatchingProvider({ children }: { children: ReactNode }) {
+  const [watchError, setWatchError] = useState<string | null>(null);
   const { token } = useAuth();
   const headers: HeadersInit = {};
 
@@ -82,6 +84,9 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         } else {
           setWatchedMediaIds((ids) => ids.filter((id) => id !== mediaId));
         }
+      })
+      .catch(() => {
+        setWatchError("Impossible de modifier le statut du média.");
       });
   }
 
@@ -114,6 +119,10 @@ function WatchingProvider({ children }: { children: ReactNode }) {
           );
         }
         return data;
+      })
+      .catch((error) => {
+        setWatchError("Impossible de modifier le statut de la série.");
+        throw error;
       });
   }
 
@@ -149,6 +158,10 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         } else {
           setWatchedMediaIds((ids) => ids.filter((id) => id !== mediaId));
         }
+      })
+      .catch((error) => {
+        setWatchError("Impossible de modifier le statut de la saison.");
+        throw error;
       });
   }
 
@@ -182,7 +195,8 @@ function WatchingProvider({ children }: { children: ReactNode }) {
           setWatchedMediaIds((ids) => ids.filter((id) => id !== mediaId));
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        setWatchError("Impossible de modifier le statut de l'épisode.");
         if (wasWatched) {
           setWatchedEpisodeIds((ids) => {
             return [...ids, episodeId];
@@ -190,6 +204,7 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         } else {
           setWatchedEpisodeIds((ids) => ids.filter((id) => id !== episodeId));
         }
+        throw error;
       });
   }
 
@@ -197,13 +212,13 @@ function WatchingProvider({ children }: { children: ReactNode }) {
     data: watchedMediaIdsData,
     // loading: mediaLoading,
     // error: mediaError,
-  } = useFetch<number[]>("/api/me/medias/watched");
+  } = useFetch<number[]>(token ? "/api/me/medias/watched" : null);
 
   const {
     data: watchedEpisodeIdsData,
     // loading: episodeLoading,
     // error: episodeError,
-  } = useFetch<number[]>("/api/me/episodes/watched");
+  } = useFetch<number[]>(token ? "/api/me/episodes/watched" : null);
 
   useEffect(() => {
     if (token === null) {
@@ -220,6 +235,17 @@ function WatchingProvider({ children }: { children: ReactNode }) {
       setWatchedEpisodeIds(watchedEpisodeIdsData);
     }
   }, [watchedMediaIdsData, watchedEpisodeIdsData, token]);
+  useEffect(() => {
+    if (watchError === null) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setWatchError(null);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [watchError]);
   return (
     <WatchingContext.Provider
       value={{
@@ -230,8 +256,14 @@ function WatchingProvider({ children }: { children: ReactNode }) {
         toggleWatchedSeries,
         toggleWatchedSeason,
         toggleWatchedEpisode,
+        watchError,
       }}
     >
+      {watchError !== null && (
+        <p className="fixed bottom-4 right-4 z-50 rounded bg-focus-coral px-4 py-2 text-white">
+          {watchError}
+        </p>
+      )}
       {children}
     </WatchingContext.Provider>
   );

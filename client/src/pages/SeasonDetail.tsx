@@ -35,9 +35,9 @@ function SeasonDetail() {
       <p className="p-8 text-focus-muted">Cette saison est introuvable.</p>
     );
   }
-  const isSeasonComplete = seasonDetail.episodes.every((episode) =>
-    isEpisodeWatched(episode.id),
-  );
+  const isSeasonComplete =
+    seasonDetail.episodes.length > 0 &&
+    seasonDetail.episodes.every((episode) => isEpisodeWatched(episode.id));
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">

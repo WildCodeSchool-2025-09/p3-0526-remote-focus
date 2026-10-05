@@ -23,13 +23,13 @@ function ActionButton({
     >
       <button
         type="button"
-        className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12"
+        className="btn btn-circle flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 bg-focus-void md:h-12 md:w-12 hover:bg-focus-void"
         style={{ borderColor: color, backgroundColor: bgColor, color }}
         onClick={onClick}
       >
         <Icon size={22} strokeWidth={1.8} />
       </button>
-      <span className="text-sm text-white/60">{label}</span>
+      <span className="text-sm text-white/60 hidden md:inline">{label}</span>
     </div>
   );
 }
