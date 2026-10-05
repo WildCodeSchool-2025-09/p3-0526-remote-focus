@@ -24,6 +24,8 @@ function SeasonDetail() {
   const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
     useSelectedActor();
 
+  const { isEpisodeWatched } = useWatch();
+
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
@@ -33,8 +35,6 @@ function SeasonDetail() {
       <p className="p-8 text-focus-muted">Cette saison est introuvable.</p>
     );
   }
-
-  const { isEpisodeWatched } = useWatch();
   const isSeasonComplete = seasonDetail.episodes.every((episode) =>
     isEpisodeWatched(episode.id),
   );

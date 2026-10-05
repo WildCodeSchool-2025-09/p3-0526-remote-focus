@@ -5,6 +5,8 @@ import { formatDuration } from "../../utils/formatDuration";
 import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
 import { useWatch } from "../../contexts/WatchingContext";
+import { useAuth } from "../../contexts/AuthContext";
+import AuthRequiredModal from "../AuthRequiredModal";
 
 type EpisodeHeaderProps = {
   episode: EpisodeDetail;
@@ -25,6 +27,9 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
   };
+
+  const { isAuthenticated } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -87,11 +92,21 @@ function EpisodeHeader({ episode }: EpisodeHeaderProps) {
             color={isThisEpisodeWatched ? "#0D1117" : "#17B890"}
             bgColor={isThisEpisodeWatched ? "#17B890" : "#0D1117"}
             icon={Check}
-            onClick={() => toggleWatchedEpisode(episode.id)}
+            onClick={() => {
+              if (isAuthenticated) {
+                toggleWatchedEpisode(episode.id);
+              } else {
+                setShowAuthMessage(true);
+              }
+            }}
           />{" "}
           <PlatformList platforms={episode.platforms} />
         </div>
       </div>
+      <AuthRequiredModal
+        isOpen={showAuthMessage}
+        onClose={() => setShowAuthMessage(false)}
+      />
     </div>
   );
 }

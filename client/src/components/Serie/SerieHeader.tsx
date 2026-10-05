@@ -5,6 +5,8 @@ import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
 import SerieInfo from "./SerieInfo";
 import { useWatch } from "../../contexts/WatchingContext";
+import AuthRequiredModal from "../AuthRequiredModal";
+import { useAuth } from "../../contexts/AuthContext";
 
 type SerieHeaderProps = {
   serie: Serie;
@@ -27,6 +29,9 @@ function SerieHeader({ serie }: SerieHeaderProps) {
 
   const { isWatched, toggleWatchedSeries } = useWatch();
   const isSeriesComplete = isWatched(serie.id);
+
+  const { isAuthenticated } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -98,12 +103,22 @@ function SerieHeader({ serie }: SerieHeaderProps) {
             color={isSeriesComplete ? "#0D1117" : "#17B890"}
             bgColor={isSeriesComplete ? "#17B890" : "#0D1117"}
             icon={Check}
-            onClick={() => toggleWatchedSeries(serie.id)}
-          />{" "}
+            onClick={() => {
+              if (isAuthenticated) {
+                toggleWatchedSeries(serie.id);
+              } else {
+                setShowAuthMessage(true);
+              }
+            }}
+          />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
           <PlatformList platforms={serie.platforms} />
         </div>
       </div>
+      <AuthRequiredModal
+        isOpen={showAuthMessage}
+        onClose={() => setShowAuthMessage(false)}
+      />
     </div>
   );
 }
