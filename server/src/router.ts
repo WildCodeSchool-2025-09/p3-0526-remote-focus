@@ -10,6 +10,7 @@ import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
+import trackActions from "./modules/track/trackActions";
 import userActions from "./modules/user/userActions";
 
 const router = express.Router();
@@ -47,6 +48,7 @@ router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 router.get("/api/me/dashboard", userActions.readDashboard);
+router.get("/api/me/watchlist", trackActions.browseWatchlist);
 
 router.post(
   "/api/users",
