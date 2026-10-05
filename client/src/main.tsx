@@ -19,6 +19,7 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import SeasonDetail from "./pages/SeasonDetail";
 import SerieDetail from "./pages/SerieDetail";
+import Watchlist from "./pages/Watchlist";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/watchlist",
+        element: (
+          <PrivateRoute>
+            <Watchlist />
           </PrivateRoute>
         ),
       },
