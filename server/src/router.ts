@@ -63,6 +63,7 @@ router.use("/api/me", requireAuth);
 router.get("/api/me/dashboard", userActions.readDashboard);
 
 router.get("/api/me/tracks", trackActions.browse);
+router.get("/api/me/favorites", trackActions.browseFavorites);
 
 router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
 router.get("/api/me/actors/favorites", favoriteActions.browse);
