@@ -1,4 +1,4 @@
-import type { Actor, FilmographyPage } from "../types/media";
+import type { Actor, CastPage, FilmographyPage } from "../types/media";
 import type { SearchResults } from "../types/search";
 
 export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
@@ -59,6 +59,27 @@ export async function fetchFilmography(
 
   if (!response.ok) {
     throw new Error("Filmographie indisponible");
+  }
+
+  return response.json();
+}
+
+type FetchCastOptions = {
+  page?: number;
+};
+
+export async function fetchCast(
+  mediaId: number,
+  { page = 1 }: FetchCastOptions = {},
+): Promise<CastPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  const response = await fetch(
+    `${API_URL}/api/medias/${mediaId}/cast?${params}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Casting indisponible");
   }
 
   return response.json();
