@@ -2,34 +2,49 @@ import type { LucideIcon } from "lucide-react";
 
 type ActionButtonProps = {
   label: string;
-  color: string;
-  bgColor?: string;
   icon: LucideIcon;
+  buttonClassName: string;
   align?: "center" | "start";
+  ariaLabel?: string;
+  isPressed?: boolean;
+  fillIcon?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
 };
 
 function ActionButton({
   label,
-  color,
-  bgColor,
   icon: Icon,
+  buttonClassName,
   align = "center",
+  ariaLabel,
+  isPressed,
+  fillIcon = false,
   onClick,
+  disabled = false,
 }: ActionButtonProps) {
   return (
     <div
-      className={`flex flex-col gap-2 ${align === "start" ? "items-start" : "items-center"}`}
+      className={`flex flex-col gap-2 ${
+        align === "start" ? "items-start" : "items-center"
+      }`}
     >
       <button
         type="button"
-        className="btn btn-circle flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 bg-focus-void md:h-12 md:w-12 hover:bg-focus-void"
-        style={{ borderColor: color, backgroundColor: bgColor, color }}
+        aria-label={ariaLabel ?? label}
+        aria-pressed={isPressed}
+        disabled={disabled}
         onClick={onClick}
+        className={`btn btn-circle bg-focus-void hover:bg-focus-void flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-2 md:h-12 md:w-12 ${buttonClassName}`}
       >
-        <Icon size={22} strokeWidth={1.8} />
+        <Icon
+          size={22}
+          strokeWidth={1.8}
+          fill={fillIcon ? "currentColor" : "none"}
+        />
       </button>
-      <span className="text-sm text-white/60 hidden md:inline">{label}</span>
+
+      <span className="hidden text-sm text-focus-muted md:inline">{label}</span>
     </div>
   );
 }

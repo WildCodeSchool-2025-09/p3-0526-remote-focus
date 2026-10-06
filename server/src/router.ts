@@ -1,16 +1,22 @@
 import express from "express";
 import checkAvailability from "./middlewares/checkAvailability";
+import hashPassword from "./middlewares/hashPassword";
 import optionalAuth from "./middlewares/optionalAuth";
+import requireAuth from "./middlewares/requireAuth";
 import validateRegister from "./middlewares/validateRegister";
 import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
+import catalogActions from "./modules/catalog/catalogActions";
 import episodeActions from "./modules/episode/episodeActions";
+import favoriteActions from "./modules/favorite/favoriteActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
+import trackActions from "./modules/track/trackActions";
 import userActions from "./modules/user/userActions";
+import watchingActions from "./modules/watching/watchingActions";
 
 const router = express.Router();
 
@@ -20,10 +26,6 @@ router.use(optionalAuth);
 // Define Your API Routes Here
 /* ************************************************************************* */
 router.get("/api/medias/search", searchActions.browse);
-
-import hashPassword from "./middlewares/hashPassword";
-import catalogActions from "./modules/catalog/catalogActions";
-import watchingActions from "./modules/watching/watchingActions";
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
 router.get("/api/medias", catalogActions.browse);
@@ -59,7 +61,17 @@ router.post(
 );
 router.post("/api/auth/login", authActions.login);
 
-/* Connected user, add authentication when ready*/
+router.use("/api/me", requireAuth);
+
+router.get("/api/me/dashboard", userActions.readDashboard);
+
+router.get("/api/me/tracks", trackActions.browse);
+
+router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
+router.get("/api/me/actors/favorites", favoriteActions.browse);
+
+router.patch("/api/me/actors/:id/favorite", favoriteActions.toggleFavorite);
+router.patch("/api/me/medias/:id/watchlist", trackActions.toggleWatchlist);
 
 router.patch("/api/me/medias/:id/watched", watchingActions.toggleMediaWatched);
 router.patch("/api/me/series/:id/watched", watchingActions.toggleSeriesWatched);
