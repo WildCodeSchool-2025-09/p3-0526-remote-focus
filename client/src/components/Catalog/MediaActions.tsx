@@ -1,7 +1,8 @@
-import { Check, Heart, Plus } from "lucide-react";
-import { useState } from "react";
+import { Check, Heart, Minus, Plus } from "lucide-react";
+import type { MouseEvent } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useWatch } from "../../contexts/WatchingContext";
+import { useTrackActions } from "../../hooks/useTrackActions";
 import type { Media } from "../../types/Catalog";
 import AuthRequiredModal from "../AuthRequiredModal";
 
@@ -9,63 +10,119 @@ interface MediaActionsProps {
   media: Media;
 }
 
-const buttonsClass = "min-h-0 h-7 w-7 btn-circle btn shadow-badge";
+const buttonsClass =
+  "min-h-0 h-7 w-7 btn-outline btn-circle btn bg-focus-void/70 shadow-badge";
 
 function MediaActions({ media }: MediaActionsProps) {
-  const { isWatched, toggleWatchedMovie, toggleWatchedSeries } = useWatch();
-  const isMediaWatched = isWatched(media.id);
   const { isAuthenticated } = useAuth();
-  const [showAuthMessage, setShowAuthMessage] = useState(false);
+  const { isWatched, toggleWatchedMovie, toggleWatchedSeries } = useWatch();
+  const {
+    isFavorite,
+    isInWatchlist,
+    handleFavorite,
+    handleWatchlist,
+    errorMessage,
+    isAuthModalOpen,
+    openAuthModal,
+    closeAuthModal,
+  } = useTrackActions(media.id);
+
+  const isMediaWatched = isWatched(media.id);
+
+  function handleFavoriteClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    handleFavorite();
+  }
+
+  function handleWatchlistClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    handleWatchlist();
+  }
+
+  function handleWatchedClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
+
+    if (media.type === "movie") {
+      toggleWatchedMovie(media.id);
+    } else if (media.type === "tv") {
+      toggleWatchedSeries(media.id);
+    }
+  }
 
   return (
-    <>
-      <div className="pointer-events-none absolute top-2 right-2 flex flex-col gap-1 md:pointer-events-auto">
-        <button
-          type="button"
-          aria-label={`Ajouter ${media.name} aux favoris`}
-          className={`${buttonsClass} btn-accent btn-outline bg-focus-void/70`}
+    <div className="absolute top-2 right-2 flex flex-col gap-1">
+      <button
+        type="button"
+        aria-label={
+          isFavorite
+            ? `Retirer ${media.name} des favoris`
+            : `Ajouter ${media.name} aux favoris`
+        }
+        aria-pressed={isFavorite}
+        className={`${buttonsClass} btn-accent`}
+        onClick={handleFavoriteClick}
+      >
+        <Heart size={14} fill={isFavorite ? "currentColor" : "none"} />
+      </button>
+
+      <button
+        type="button"
+        aria-label={
+          isInWatchlist
+            ? `Retirer ${media.name} de la watchlist`
+            : `Ajouter ${media.name} à la watchlist`
+        }
+        aria-pressed={isInWatchlist}
+        className={`${buttonsClass} ${
+          isInWatchlist
+            ? "!border-focus-cream !bg-focus-cream !text-focus-void"
+            : ""
+        }`}
+        onClick={handleWatchlistClick}
+      >
+        {isInWatchlist ? <Minus size={14} /> : <Plus size={14} />}
+      </button>
+
+      <button
+        type="button"
+        aria-label={
+          isMediaWatched
+            ? `Supprimer ${media.name} des médias vus`
+            : `Ajouter ${media.name} aux médias vus`
+        }
+        aria-pressed={isMediaWatched}
+        className={
+          isMediaWatched
+            ? `${buttonsClass} btn-secondary !bg-focus-teal !text-focus-void !border-focus-teal`
+            : `${buttonsClass} btn-secondary`
+        }
+        onClick={handleWatchedClick}
+      >
+        <Check size={14} />
+      </button>
+
+      {errorMessage !== null && (
+        <p
+          role="alert"
+          className="absolute right-full top-0 mr-2 w-44 rounded-md border border-focus-coral/40 bg-focus-void/90 px-2 py-1 text-xs text-focus-coral"
         >
-          <Heart size={14} />
-        </button>
-        <button
-          type="button"
-          aria-label={`Ajouter ${media.name} à la watchlist`}
-          className={`${buttonsClass} btn-outline bg-focus-void/70`}
-        >
-          <Plus size={14} />
-        </button>
-        <button
-          type="button"
-          aria-label={
-            isMediaWatched
-              ? `Supprimer ${media.name} des médias vus`
-              : `Ajouter ${media.name} aux médias vus`
-          }
-          className={
-            isMediaWatched
-              ? `${buttonsClass} btn-secondary bg-focus-teal`
-              : `${buttonsClass} btn-secondary btn-outline bg-focus-void/70`
-          }
-          onClick={() => {
-            if (isAuthenticated) {
-              if (media.type === "movie") {
-                toggleWatchedMovie(media.id);
-              } else if (media.type === "tv") {
-                toggleWatchedSeries(media.id);
-              }
-            } else {
-              setShowAuthMessage(true);
-            }
-          }}
-        >
-          <Check size={14} />
-        </button>
-        <AuthRequiredModal
-          isOpen={showAuthMessage}
-          onClose={() => setShowAuthMessage(false)}
-        />
-      </div>
-    </>
+          {errorMessage}
+        </p>
+      )}
+
+      <AuthRequiredModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
+    </div>
   );
 }
+
 export default MediaActions;
