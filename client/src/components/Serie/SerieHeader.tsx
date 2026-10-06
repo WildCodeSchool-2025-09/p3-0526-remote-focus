@@ -1,37 +1,33 @@
-import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
 import { useWatch } from "../../contexts/WatchingContext";
 import type { Serie } from "../../types/media";
-import ActionButton from "../ActionButton";
-import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 import SerieInfo from "./SerieInfo";
 
 type SerieHeaderProps = {
   serie: Serie;
 };
 
-const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
+const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
+
 const PILL_ACTIVE =
-  "rounded-full border border-[#F2B705] bg-[#F2B705] px-4 py-2 text-sm font-semibold text-[#0D1117]";
+  "rounded-full border border-focus-yellow bg-focus-yellow px-4 py-2 text-sm font-semibold text-focus-void";
 
 function SerieHeader({ serie }: SerieHeaderProps) {
+  const [isMetaOpen, setIsMetaOpen] = useState(false);
+
   const year = serie.releasedAt
     ? new Date(serie.releasedAt).getFullYear()
     : null;
 
-  const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const handleToggleMeta = () => {
+  function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  };
+  }
 
   const { isWatched, toggleWatchedSeries } = useWatch();
   const isSeriesComplete = isWatched(serie.id);
-
-  const { isAuthenticated } = useAuth();
-  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -52,6 +48,7 @@ function SerieHeader({ serie }: SerieHeaderProps) {
               {genre.name}
             </span>
           ))}
+
           {year != null && <span className={PILL}>{year}</span>}
 
           <button
@@ -59,32 +56,39 @@ function SerieHeader({ serie }: SerieHeaderProps) {
             onClick={handleToggleMeta}
             aria-expanded={isMetaOpen}
             aria-label="Afficher plus d'informations"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
-            style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-focus-cream/30 text-sm md:hidden ${
+              isMetaOpen ? "text-focus-yellow" : "text-focus-cream"
+            }`}
           >
             {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div
-            className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
+            className={`${
+              isMetaOpen ? "flex" : "hidden"
+            } w-full flex-wrap gap-2 rounded-lg border border-focus-cream/15 bg-focus-surface p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
           >
             {serie.originalLanguage != null && (
               <span className={PILL}>
                 VO : {serie.originalLanguage.toUpperCase()}
               </span>
             )}
+
             {serie.seasons.length > 0 && (
               <span className={PILL}>
                 {serie.seasons.length} saison
                 {serie.seasons.length > 1 ? "s" : ""}
               </span>
             )}
+
             {serie.overallRating != null && (
               <span className={PILL}>★ {serie.overallRating}</span>
             )}
+
             {serie.status != null && (
               <span className={PILL}>{serie.status}</span>
             )}
+
             {serie.pegi != null && (
               <span className={PILL}>PEGI {serie.pegi}</span>
             )}
@@ -96,29 +100,19 @@ function SerieHeader({ serie }: SerieHeaderProps) {
         <SerieInfo serie={serie} />
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
-          <ActionButton
-            label="Vu"
-            color={isSeriesComplete ? "#0D1117" : "#17B890"}
-            bgColor={isSeriesComplete ? "#17B890" : "#0D1117"}
-            icon={Check}
-            onClick={() => {
-              if (isAuthenticated) {
-                toggleWatchedSeries(serie.id);
-              } else {
-                setShowAuthMessage(true);
-              }
-            }}
+          <TrackActions
+            mediaId={serie.id}
+            mediaName={serie.name}
+            showWatchlist
+            showSeen
+            isSeen={isSeriesComplete}
+            onSeenClick={() => toggleWatchedSeries(serie.id)}
+            showRating
           />
-          <ActionButton label="Noter" color="#F2B705" icon={Star} />
+
           <PlatformList platforms={serie.platforms} />
         </div>
       </div>
-      <AuthRequiredModal
-        isOpen={showAuthMessage}
-        onClose={() => setShowAuthMessage(false)}
-      />
     </div>
   );
 }
