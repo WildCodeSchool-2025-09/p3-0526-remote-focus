@@ -33,6 +33,7 @@ router.get("/api/medias/home", homepageActions.browseHomepage);
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
+router.get("/api/medias/:id/cast", mediaActions.browseCast);
 router.get("/api/actors/:id", actorActions.read);
 router.get("/api/series/:id", serieActions.read);
 router.get("/api/series/:id/seasons/:seasonId", seasonActions.read);

@@ -34,15 +34,15 @@ class MediaRepository {
     return rows;
   }
 
-  async readCast(id: number, limit = 10) {
+  async readCast(id: number, limit = 10, offset = 0) {
     const [rows] = await databaseClient.query<Rows>(
       `SELECT pe.ID, pe.name, pe.photo, mp.personnage_name, mp.role
        FROM person AS pe
        JOIN media_person AS mp ON mp.ID_person = pe.ID
        WHERE mp.ID_media = ? AND mp.role = 'actor'
-       ORDER BY pe.ID ASC
-       LIMIT ?`,
-      [id, limit],
+       ORDER BY pe.ID ASC, mp.personnage_name ASC
+       LIMIT ? OFFSET ?`,
+      [id, limit, offset],
     );
     return rows;
   }
