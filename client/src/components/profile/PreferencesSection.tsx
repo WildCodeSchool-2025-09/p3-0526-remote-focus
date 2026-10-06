@@ -10,7 +10,7 @@ function PreferencesSection({
   onPegiChange,
 }: PreferencesSectionProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 md:w-2/3">
       <h3>Préférences</h3>
       <div className="bg-focus-surface input input-bordered flex justify-between items-center py-9">
         <div>

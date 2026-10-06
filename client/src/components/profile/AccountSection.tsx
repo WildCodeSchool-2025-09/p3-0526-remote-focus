@@ -36,7 +36,7 @@ function AccountSection({ profile }: AccountSectionProps) {
             <input
               type="text"
               name="pseudo"
-              className="input input-bordered bg-focus-surface w-2/3"
+              className="input input-bordered bg-focus-surface w-full md:w-2/3"
               value={`${profile.name}`}
             />
             <button
@@ -56,7 +56,7 @@ function AccountSection({ profile }: AccountSectionProps) {
             <input
               type="text"
               name="email"
-              className="input input-bordered bg-focus-surface w-2/3"
+              className="input input-bordered bg-focus-surface w-full md:w-2/3"
               value={`${profile.email}`}
             />
             <button
@@ -76,7 +76,7 @@ function AccountSection({ profile }: AccountSectionProps) {
             <input
               type="text"
               name="password"
-              className="input input-bordered bg-focus-surface w-2/3"
+              className="input input-bordered bg-focus-surface w-full md:w-2/3"
               value="****"
             />
             <button
