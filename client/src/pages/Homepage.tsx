@@ -1,3 +1,4 @@
+import DiscoverSection from "../components/Catalog/DiscoverSection";
 import HomeHero from "../components/Homepage/HomeHero";
 import HomeSection from "../components/Homepage/HomeSection";
 import VisitorBanner from "../components/Homepage/VisitorBanner";
@@ -10,6 +11,7 @@ function Homepage() {
     <>
       <HomeHero />
       {!isAuthenticated && <VisitorBanner />}
+      <DiscoverSection showGenreSections={false} />
       <HomeSection />
     </>
   );
