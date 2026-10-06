@@ -1,7 +1,14 @@
 import type { RequestHandler } from "express";
 
+import { formatMedias } from "../../utils/formatters";
 import mediaRepository from "../media/mediaRepository";
-import trackRepository from "./trackRepository";
+import trackRepository, { type WatchlistType } from "./trackRepository";
+
+const LIMIT = 10;
+
+function isMediaType(value: unknown): value is "movie" | "tv" | "anime" {
+  return value === "movie" || value === "tv" || value === "anime";
+}
 
 const browse: RequestHandler = async (req, res, next) => {
   try {
@@ -94,8 +101,67 @@ const toggleWatchlist: RequestHandler = async (req, res, next) => {
   }
 };
 
+const browseWatchlist: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.status(401).json({
+        error: "Vous devez être connecté.",
+      });
+      return;
+    }
+
+    const {
+      type: requestedType,
+      seen: requestedSeen,
+      page: requestedPage,
+    } = req.query;
+
+    if (requestedType !== undefined && !isMediaType(requestedType)) {
+      res.status(400).json({ error: "Type de média invalide." });
+      return;
+    }
+
+    if (
+      requestedSeen !== undefined &&
+      requestedSeen !== "true" &&
+      requestedSeen !== "false"
+    ) {
+      res.status(400).json({ error: "Filtre de visionnage invalide." });
+      return;
+    }
+
+    const page = requestedPage === undefined ? 1 : Number(requestedPage);
+
+    if (!Number.isInteger(page) || page < 1) {
+      res.status(400).json({ error: "Numéro de page invalide." });
+      return;
+    }
+
+    const type: WatchlistType = isMediaType(requestedType)
+      ? requestedType
+      : null;
+    const seen = requestedSeen === undefined ? null : requestedSeen === "true";
+    const offset = (page - 1) * LIMIT;
+
+    const [rows, total] = await Promise.all([
+      trackRepository.browseWatchlist(userId, type, seen, LIMIT, offset),
+      trackRepository.countWatchlistByFilters(userId, type, seen),
+    ]);
+
+    res.json({
+      medias: formatMedias(rows),
+      hasMore: offset + rows.length < total,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   browse,
+  browseWatchlist,
   toggleFavorite,
   toggleWatchlist,
 };
