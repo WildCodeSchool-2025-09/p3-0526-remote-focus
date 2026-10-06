@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 
 import userRepository from "../user/userRepository";
+import watchingRepository from "../watching/watchingRepository";
 import {
   createGenreSections,
   enrichMedias,
@@ -125,4 +126,38 @@ const browseGenres: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { readDiscoverSections, browse, browseGenres };
+const readRecommendations: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.status(401).json({
+        error: "Vous devez être connecté.",
+      });
+      return;
+    }
+
+    const watchedIds = await watchingRepository.readMediaWatched(userId);
+
+    const medias = await catalogRepository.readRecommended(
+      userId,
+      watchedIds,
+      10,
+    );
+
+    const topRated = await catalogRepository.readTopRated(null);
+    const enrichedTopRated = enrichRanking(topRated);
+    const enrichedMedias = enrichMedias(medias, enrichedTopRated);
+
+    res.json({ forYou: enrichedMedias });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default {
+  readDiscoverSections,
+  browse,
+  browseGenres,
+  readRecommendations,
+};

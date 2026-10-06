@@ -117,6 +117,27 @@ ${GENRE_NAME}
     return rows[0].total;
   }
 
+  async readRecommended(
+    userId: number,
+    watchedIds: number[],
+    limit = 10,
+  ): Promise<Media[]> {
+    const [rows] = await databaseClient.query<Media[]>(
+      `SELECT ${MEDIA_COLUMNS}, ${GENRE_NAME}
+      FROM media AS m
+      WHERE m.overall_rating > 6 AND m.released_at <= CURDATE()
+      AND EXISTS (
+        SELECT 1 FROM classify_as
+        JOIN like_ ON like_.ID_genre = classify_as.ID_genre
+        WHERE classify_as.ID_media = m.ID AND like_.ID_user = ?
+      )
+      ${watchedIds.length > 0 ? "AND m.ID NOT IN (?)" : ""}
+      ORDER BY m.overall_rating DESC, m.ID ASC LIMIT ?`,
+      watchedIds.length > 0 ? [userId, watchedIds, limit] : [userId, limit],
+    );
+    return rows;
+  }
+
   async readGenres(): Promise<LikedGenre[]> {
     const [rows] = await databaseClient.query<LikedGenre[]>(
       `SELECT ID AS id, name
