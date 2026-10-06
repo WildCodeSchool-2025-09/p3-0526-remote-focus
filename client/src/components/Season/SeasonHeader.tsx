@@ -1,26 +1,31 @@
-import { Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 
 type SeasonHeaderProps = {
   season: SeasonDetail;
+  isSeasonComplete: boolean;
 };
 
-const PILL = "rounded-full border border-base-content/30 px-4 py-2 text-sm";
+const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
 
-function SeasonHeader({ season }: SeasonHeaderProps) {
+function SeasonHeader({ season, isSeasonComplete }: SeasonHeaderProps) {
+  const [isMetaOpen, setIsMetaOpen] = useState(false);
+
   const year = season.releasedAt
     ? new Date(season.releasedAt).getFullYear()
     : null;
 
-  const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const handleToggleMeta = () => {
+  function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  };
+  }
+
+  const { toggleWatchedSeason } = useWatch();
+  const episodeIds = season.episodes.map((episode) => episode.id);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -39,6 +44,7 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
 
         <div className="flex flex-wrap items-center gap-2">
           {year != null && <span className={PILL}>{year}</span>}
+
           {season.serie.originalLanguage != null && (
             <span className={PILL}>
               VO : {season.serie.originalLanguage.toUpperCase()}
@@ -50,15 +56,17 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
             onClick={handleToggleMeta}
             aria-expanded={isMetaOpen}
             aria-label="Afficher plus d'informations"
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-base-content/30 text-sm md:hidden ${
-              isMetaOpen ? "text-primary" : "text-base-content"
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-focus-cream/30 text-sm md:hidden ${
+              isMetaOpen ? "text-focus-yellow" : "text-focus-cream"
             }`}
           >
             {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div
-            className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-base-content/15 bg-base-200 p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
+            className={`${
+              isMetaOpen ? "flex" : "hidden"
+            } w-full flex-wrap gap-2 rounded-lg border border-focus-cream/15 bg-focus-surface p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
           >
             {season.episodeCount > 0 && (
               <span className={PILL}>
@@ -66,6 +74,7 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
                 {season.episodeCount > 1 ? "s" : ""}
               </span>
             )}
+
             {season.totalDuration != null && (
               <span className={PILL}>
                 {formatDuration(season.totalDuration)}
@@ -77,14 +86,20 @@ function SeasonHeader({ season }: SeasonHeaderProps) {
 
       <div className="col-span-2 row-start-2 flex flex-col gap-4 md:col-span-1 md:col-start-2">
         {season.synopsis != null && (
-          <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
+          <p className="max-w-[660px] text-base leading-relaxed text-focus-cream/80">
             {season.synopsis}
           </p>
         )}
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <TrackActions
+            mediaId={season.serie.id}
+            mediaName={season.serie.name}
+            showSeen
+            isSeen={isSeasonComplete}
+            onSeenClick={() => toggleWatchedSeason(season.id, episodeIds)}
+          />
+
           <PlatformList platforms={season.platforms} />
         </div>
       </div>

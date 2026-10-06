@@ -9,7 +9,10 @@
     "start": "tsx ./src/main",
     "test": "jest --verbose",
     "tmdb:fetch": "tsx ./bin/tmdbFetch.ts",
-    "tmdb:seed": "tsx ./bin/tmdbSeed.ts"
+    "tmdb:seed": "tsx ./bin/tmdbSeed.ts",
+    "tmdb:fetch:specific": "tsx ./bin/tmdbFetchSpecific",
+    "tmdb:fetch:cast": "tsx ./bin/tmdbFetchCast",
+    "tmdbAct:seed": "tsx ./bin/tmdbActSeed"
   },
   "dependencies": {
     "argon2": "^0.45.1",

@@ -1,29 +1,34 @@
-import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Media } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
-import ActionButton from "../ActionButton";
 import PlatformList from "../PlatformList";
+import TrackActions from "../TrackActions";
 import MovieInfo from "./MovieInfo";
 
 type MovieHeaderProps = {
   media: Media;
 };
 
-const PILL = "rounded-full border border-white/30 px-4 py-2 text-sm";
+const PILL = "rounded-full border border-focus-cream/30 px-4 py-2 text-sm";
+
 const PILL_ACTIVE =
-  "rounded-full border border-[#F2B705] bg-[#F2B705] px-4 py-2 text-sm font-semibold text-[#0D1117]";
+  "rounded-full border border-focus-yellow bg-focus-yellow px-4 py-2 text-sm font-semibold text-focus-void";
 
 function MovieHeader({ media }: MovieHeaderProps) {
+  const [isMetaOpen, setIsMetaOpen] = useState(false);
+
   const year = media.releasedAt
     ? new Date(media.releasedAt).getFullYear()
     : null;
 
-  const [isMetaOpen, setIsMetaOpen] = useState(false);
-
-  const handleToggleMeta = () => {
+  function handleToggleMeta() {
     setIsMetaOpen(!isMetaOpen);
-  };
+  }
+
+  const { isWatched, toggleWatchedMovie } = useWatch();
+  const isMovieWatched = isWatched(media.id);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -44,6 +49,7 @@ function MovieHeader({ media }: MovieHeaderProps) {
               {genre.name}
             </span>
           ))}
+
           {year != null && <span className={PILL}>{year}</span>}
 
           <button
@@ -51,26 +57,32 @@ function MovieHeader({ media }: MovieHeaderProps) {
             onClick={handleToggleMeta}
             aria-expanded={isMetaOpen}
             aria-label="Afficher plus d'informations"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/30 text-sm md:hidden"
-            style={{ color: isMetaOpen ? "#F2B705" : "#F5F5F0" }}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-focus-cream/30 text-sm md:hidden ${
+              isMetaOpen ? "text-focus-yellow" : "text-focus-cream"
+            }`}
           >
             {isMetaOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           <div
-            className={`${isMetaOpen ? "flex" : "hidden"} w-full flex-wrap gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
+            className={`${
+              isMetaOpen ? "flex" : "hidden"
+            } w-full flex-wrap gap-2 rounded-lg border border-focus-cream/15 bg-focus-surface p-2 md:contents md:w-auto md:border-0 md:bg-transparent md:p-0`}
           >
             {media.originalLanguage != null && (
               <span className={PILL}>
                 VO : {media.originalLanguage.toUpperCase()}
               </span>
             )}
+
             {media.duration != null && (
               <span className={PILL}>{formatDuration(media.duration)}</span>
             )}
+
             {media.overallRating != null && (
               <span className={PILL}>★ {media.overallRating}</span>
             )}
+
             {media.pegi != null && (
               <span className={PILL}>PEGI {media.pegi}</span>
             )}
@@ -82,10 +94,16 @@ function MovieHeader({ media }: MovieHeaderProps) {
         <MovieInfo media={media} />
 
         <div className="flex flex-wrap items-start gap-4">
-          <ActionButton label="Favoris" color="#E83658" icon={Heart} />
-          <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
-          <ActionButton label="Noter" color="#F2B705" icon={Star} />
+          <TrackActions
+            mediaId={media.id}
+            mediaName={media.name}
+            showWatchlist
+            showSeen
+            isSeen={isMovieWatched}
+            onSeenClick={() => toggleWatchedMovie(media.id)}
+            showRating
+          />
+
           <PlatformList platforms={media.platforms} />
         </div>
       </div>
