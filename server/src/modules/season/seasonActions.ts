@@ -89,4 +89,41 @@ const read: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { read, readEpisodes };
+const CAST_PAGE_SIZE = 10;
+
+const browseCast: RequestHandler = async (req, res, next) => {
+  try {
+    const seriesId = Number(req.params.id);
+    const seasonId = Number(req.params.seasonId);
+    const requestedPage = Math.floor(Number(req.query.page));
+
+    if (Number.isNaN(seriesId) || Number.isNaN(seasonId)) {
+      res.sendStatus(400);
+      return;
+    }
+
+    const season = await seasonRepository.read(seasonId);
+
+    if (season == null || season.ID_media !== seriesId) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const page = requestedPage >= 1 ? requestedPage : 1;
+    const offset = (page - 1) * CAST_PAGE_SIZE;
+
+    const [cast, total] = await Promise.all([
+      seasonRepository.readCast(seasonId, CAST_PAGE_SIZE, offset),
+      seasonRepository.countCast(seasonId),
+    ]);
+
+    res.json({
+      items: formatCast(cast),
+      hasMore: offset + cast.length < total,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { read, readEpisodes, browseCast };

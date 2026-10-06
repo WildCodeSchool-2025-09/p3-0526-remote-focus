@@ -41,6 +41,8 @@ router.get(
   "/api/series/:id/seasons/:seasonId/episodes",
   seasonActions.readEpisodes,
 );
+
+router.get("/api/series/:id/seasons/:seasonId/cast", seasonActions.browseCast);
 router.get(
   "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
   episodeActions.read,
