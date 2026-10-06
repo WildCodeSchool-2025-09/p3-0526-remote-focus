@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { UnauthorizedError } from "../services/errors";
 import {
   type TrackState,
   fetchTracks,
@@ -26,7 +27,7 @@ type TrackProviderProps = {
 export const TrackContext = createContext<TrackContextValue | null>(null);
 
 export function TrackProvider({ children }: TrackProviderProps) {
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, logout } = useAuth();
   const [tracks, setTracks] = useState<TrackState[]>([]);
 
   useEffect(() => {
@@ -39,10 +40,15 @@ export function TrackProvider({ children }: TrackProviderProps) {
       .then((data) => {
         setTracks(data);
       })
-      .catch(() => {
+      .catch((error) => {
         setTracks([]);
+
+        // Le serveur refuse le token : la session n'est plus valable.
+        if (error instanceof UnauthorizedError) {
+          logout();
+        }
       });
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, logout]);
 
   async function toggleFavorite(mediaId: number) {
     if (token === null) {

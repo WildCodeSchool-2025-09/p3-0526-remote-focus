@@ -10,8 +10,13 @@ type ActorHeaderProps = {
 };
 
 function ActorHeader({ actor }: ActorHeaderProps) {
-  const { isFavorite, handleFavorite, isAuthModalOpen, closeAuthModal } =
-    useActorFavoriteActions(actor.id);
+  const {
+    isFavorite,
+    handleFavorite,
+    errorMessage,
+    isAuthModalOpen,
+    closeAuthModal,
+  } = useActorFavoriteActions(actor.id);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
@@ -44,6 +49,12 @@ function ActorHeader({ actor }: ActorHeaderProps) {
           buttonClassName="btn-accent border-focus-coral text-focus-coral hover:!bg-focus-coral hover:!text-focus-cream"
           onClick={handleFavorite}
         />
+
+        {errorMessage !== null && (
+          <p role="alert" className="text-sm text-focus-coral">
+            {errorMessage}
+          </p>
+        )}
 
         <AuthRequiredModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
       </div>

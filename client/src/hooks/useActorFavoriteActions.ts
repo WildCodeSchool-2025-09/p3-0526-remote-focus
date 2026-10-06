@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useActorFavorites } from "../contexts/ActorFavoriteContext";
 import { useAuth } from "../contexts/AuthContext";
+import { UnauthorizedError } from "../services/errors";
+import { useActionError } from "./useActionError";
 
 export function useActorFavoriteActions(actorId: number) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { favorites, toggleFavorite } = useActorFavorites();
+  const { errorMessage, showError } = useActionError();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -19,11 +22,18 @@ export function useActorFavoriteActions(actorId: number) {
     try {
       await toggleFavorite(actorId);
     } catch (error) {
-      console.error(
+      // Token refusé par le serveur : on ferme la session et on invite à se
+      // reconnecter plutôt que d'échouer silencieusement.
+      if (error instanceof UnauthorizedError) {
+        logout();
+        setIsAuthModalOpen(true);
+        return;
+      }
+
+      showError(
         isFavorite
-          ? "Impossible de retirer l'acteur des favoris :"
-          : "Impossible d'ajouter l'acteur aux favoris :",
-        error,
+          ? "Impossible de retirer cet acteur des favoris. Réessayez plus tard."
+          : "Impossible d'ajouter cet acteur aux favoris. Réessayez plus tard.",
       );
     }
   }
@@ -35,6 +45,7 @@ export function useActorFavoriteActions(actorId: number) {
   return {
     isFavorite,
     handleFavorite,
+    errorMessage,
     isAuthModalOpen,
     closeAuthModal,
   };

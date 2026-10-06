@@ -29,6 +29,7 @@ function TrackActions({
     isInWatchlist,
     handleFavorite,
     handleWatchlist,
+    errorMessage,
     isAuthModalOpen,
     openAuthModal,
     closeAuthModal,
@@ -100,6 +101,12 @@ function TrackActions({
           buttonClassName="border-focus-yellow text-focus-yellow"
           disabled
         />
+      )}
+
+      {errorMessage !== null && (
+        <p role="alert" className="w-full text-sm text-focus-coral">
+          {errorMessage}
+        </p>
       )}
 
       <AuthRequiredModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />

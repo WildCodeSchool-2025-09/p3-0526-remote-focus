@@ -1,3 +1,5 @@
+import { UnauthorizedError } from "./errors";
+
 export type TrackState = {
   mediaId: number;
   isFavorite: boolean;
@@ -15,6 +17,10 @@ export async function fetchTracks(token: string): Promise<TrackState[]> {
     headers: getAuthHeaders(token),
   });
 
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
+
   if (!response.ok) {
     throw new Error("Impossible de récupérer vos favoris et votre watchlist.");
   }
@@ -30,6 +36,10 @@ export async function toggleFavorite(
     method: "PATCH",
     headers: getAuthHeaders(token),
   });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
 
   if (!response.ok) {
     throw new Error("Impossible de modifier ce favori.");
@@ -49,6 +59,10 @@ export async function toggleWatchlist(
       headers: getAuthHeaders(token),
     },
   );
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
 
   if (!response.ok) {
     throw new Error("Impossible de modifier la watchlist.");

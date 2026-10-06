@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTracks } from "../contexts/TrackContext";
+import { UnauthorizedError } from "../services/errors";
+import { useActionError } from "./useActionError";
 
 export function useTrackActions(mediaId: number) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { tracks, toggleFavorite, toggleWatchlist } = useTracks();
+  const { errorMessage, showError } = useActionError();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -13,40 +16,46 @@ export function useTrackActions(mediaId: number) {
   const isFavorite = currentTrack?.isFavorite ?? false;
   const isInWatchlist = currentTrack?.isInWatchlist ?? false;
 
-  async function handleFavorite() {
+  async function runToggle(
+    toggle: (mediaId: number) => Promise<void>,
+    failureMessage: string,
+  ) {
     if (!isAuthenticated) {
       setIsAuthModalOpen(true);
       return;
     }
 
     try {
-      await toggleFavorite(mediaId);
+      await toggle(mediaId);
     } catch (error) {
-      console.error(
-        isFavorite
-          ? "Impossible de retirer le média des favoris :"
-          : "Impossible d'ajouter le média aux favoris :",
-        error,
-      );
+      // Token refusé par le serveur : on ferme la session et on invite à se
+      // reconnecter plutôt que d'échouer silencieusement.
+      if (error instanceof UnauthorizedError) {
+        logout();
+        setIsAuthModalOpen(true);
+        return;
+      }
+
+      showError(failureMessage);
     }
   }
 
-  async function handleWatchlist() {
-    if (!isAuthenticated) {
-      setIsAuthModalOpen(true);
-      return;
-    }
+  function handleFavorite() {
+    return runToggle(
+      toggleFavorite,
+      isFavorite
+        ? "Impossible de retirer ce média des favoris. Réessayez plus tard."
+        : "Impossible d'ajouter ce média aux favoris. Réessayez plus tard.",
+    );
+  }
 
-    try {
-      await toggleWatchlist(mediaId);
-    } catch (error) {
-      console.error(
-        isInWatchlist
-          ? "Impossible de retirer le média de la watchlist :"
-          : "Impossible d'ajouter le média à la watchlist :",
-        error,
-      );
-    }
+  function handleWatchlist() {
+    return runToggle(
+      toggleWatchlist,
+      isInWatchlist
+        ? "Impossible de retirer ce média de la watchlist. Réessayez plus tard."
+        : "Impossible d'ajouter ce média à la watchlist. Réessayez plus tard.",
+    );
   }
 
   function openAuthModal() {
@@ -62,6 +71,7 @@ export function useTrackActions(mediaId: number) {
     isInWatchlist,
     handleFavorite,
     handleWatchlist,
+    errorMessage,
     isAuthModalOpen,
     openAuthModal,
     closeAuthModal,

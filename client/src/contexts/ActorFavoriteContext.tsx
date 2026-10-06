@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { UnauthorizedError } from "../services/errors";
 import {
   type ActorFavoriteState,
   fetchActorFavorites,
@@ -26,7 +27,7 @@ export function ActorFavoriteProvider({
 }: {
   children: ReactNode;
 }) {
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, logout } = useAuth();
   const [favorites, setFavorites] = useState<ActorFavoriteState[]>([]);
 
   useEffect(() => {
@@ -45,15 +46,23 @@ export function ActorFavoriteProvider({
         }
       })
       .catch((error) => {
-        if (!cancelled) {
-          console.error("Impossible de charger les acteurs favoris :", error);
+        if (cancelled) {
+          return;
         }
+
+        // Le serveur refuse le token : la session n'est plus valable.
+        if (error instanceof UnauthorizedError) {
+          logout();
+          return;
+        }
+
+        console.error("Impossible de charger les acteurs favoris :", error);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, logout]);
 
   async function toggleFavorite(actorId: number) {
     if (token === null) {

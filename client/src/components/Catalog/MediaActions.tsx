@@ -21,6 +21,7 @@ function MediaActions({ media }: MediaActionsProps) {
     isInWatchlist,
     handleFavorite,
     handleWatchlist,
+    errorMessage,
     isAuthModalOpen,
     openAuthModal,
     closeAuthModal,
@@ -109,6 +110,15 @@ function MediaActions({ media }: MediaActionsProps) {
       >
         <Check size={14} />
       </button>
+
+      {errorMessage !== null && (
+        <p
+          role="alert"
+          className="absolute right-full top-0 mr-2 w-44 rounded-md border border-focus-coral/40 bg-focus-void/90 px-2 py-1 text-xs text-focus-coral"
+        >
+          {errorMessage}
+        </p>
+      )}
 
       <AuthRequiredModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
     </div>

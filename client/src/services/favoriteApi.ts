@@ -1,3 +1,5 @@
+import { UnauthorizedError } from "./errors";
+
 export type ActorFavoriteState = {
   actorId: number;
   isFavorite: boolean;
@@ -18,6 +20,10 @@ export async function fetchActorFavorites(
     headers: getAuthHeaders(token),
   });
 
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
+
   if (!response.ok) {
     throw new Error("Impossible de récupérer vos acteurs favoris.");
   }
@@ -33,6 +39,10 @@ export async function toggleActorFavorite(
     method: "PATCH",
     headers: getAuthHeaders(token),
   });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
 
   if (!response.ok) {
     throw new Error("Impossible de modifier ce favori.");
