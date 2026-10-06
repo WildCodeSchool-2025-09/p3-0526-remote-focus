@@ -48,6 +48,7 @@ router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
 router.get("/api/me/dashboard", userActions.readDashboard);
+router.get("/api/me/settings", userActions.readSettings);
 
 router.post(
   "/api/users",

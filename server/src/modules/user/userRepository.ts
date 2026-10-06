@@ -69,7 +69,9 @@ class UserRepository {
 
   async readProfile(userId: number) {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
-      "SELECT login, avatar, created_at FROM user_ WHERE ID = ?",
+      `SELECT firstname, lastname, email, born_at, login, avatar, created_at, dark_theme, is_pegi16
+      FROM user_ 
+      WHERE ID = ?`,
       [userId],
     );
 
@@ -102,6 +104,7 @@ class UserRepository {
 
     return rows.length > 0;
   }
+
   async addLikedGenres(userId: number, genreIds: number[]): Promise<void> {
     if (genreIds.length === 0) {
       return;
