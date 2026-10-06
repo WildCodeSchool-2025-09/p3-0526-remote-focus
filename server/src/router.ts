@@ -8,6 +8,7 @@ import actorActions from "./modules/actor/actorActions";
 import authActions from "./modules/auth/authActions";
 import catalogActions from "./modules/catalog/catalogActions";
 import episodeActions from "./modules/episode/episodeActions";
+import favoriteActions from "./modules/favorite/favoriteActions";
 import homepageActions from "./modules/homepage/homepageActions";
 import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
@@ -64,10 +65,10 @@ router.get("/api/me/dashboard", userActions.readDashboard);
 router.get("/api/me/tracks", trackActions.browse);
 
 router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
+router.get("/api/me/actors/favorites", favoriteActions.browse);
 
+router.patch("/api/me/actors/:id/favorite", favoriteActions.toggleFavorite);
 router.patch("/api/me/medias/:id/watchlist", trackActions.toggleWatchlist);
-
-/* Connected user, add authentication when ready*/
 
 router.patch("/api/me/medias/:id/watched", watchingActions.toggleMediaWatched);
 router.patch("/api/me/series/:id/watched", watchingActions.toggleSeriesWatched);

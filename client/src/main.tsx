@@ -1,9 +1,9 @@
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { ActorFavoriteProvider } from "./contexts/ActorFavoriteContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
 import { TrackProvider } from "./contexts/TrackContext";
-// Import necessary modules from React and React Router
 import { WatchingProvider } from "./contexts/WatchingContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
@@ -108,7 +108,9 @@ createRoot(rootElement).render(
     <SearchProvider>
       <WatchingProvider>
         <TrackProvider>
-          <RouterProvider router={router} />
+          <ActorFavoriteProvider>
+            <RouterProvider router={router} />
+          </ActorFavoriteProvider>
         </TrackProvider>
       </WatchingProvider>
     </SearchProvider>

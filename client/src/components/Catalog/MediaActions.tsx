@@ -102,7 +102,7 @@ function MediaActions({ media }: MediaActionsProps) {
         aria-pressed={isMediaWatched}
         className={
           isMediaWatched
-            ? `${buttonsClass} btn-secondary !bg-focus-teal`
+            ? `${buttonsClass} btn-secondary !bg-focus-teal !text-focus-void !border-focus-teal`
             : `${buttonsClass} btn-secondary`
         }
         onClick={handleWatchedClick}

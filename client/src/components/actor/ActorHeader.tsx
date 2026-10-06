@@ -1,6 +1,8 @@
 import { Heart } from "lucide-react";
+import { useActorFavoriteActions } from "../../hooks/useActorFavoriteActions";
 import type { Actor } from "../../types/media";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import ActorInfo from "./ActorInfo";
 
 type ActorHeaderProps = {
@@ -8,6 +10,9 @@ type ActorHeaderProps = {
 };
 
 function ActorHeader({ actor }: ActorHeaderProps) {
+  const { isFavorite, handleFavorite, isAuthModalOpen, closeAuthModal } =
+    useActorFavoriteActions(actor.id);
+
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:gap-8">
       {actor.photo != null ? (
@@ -29,8 +34,18 @@ function ActorHeader({ actor }: ActorHeaderProps) {
           label="Favoris"
           icon={Heart}
           align="start"
-          buttonClassName="border-focus-coral text-focus-coral"
+          ariaLabel={
+            isFavorite
+              ? `Retirer ${actor.name} des favoris`
+              : `Ajouter ${actor.name} aux favoris`
+          }
+          isPressed={isFavorite}
+          fillIcon={isFavorite}
+          buttonClassName="btn-accent border-focus-coral text-focus-coral hover:!bg-focus-coral hover:!text-focus-cream"
+          onClick={handleFavorite}
         />
+
+        <AuthRequiredModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
       </div>
     </div>
   );
