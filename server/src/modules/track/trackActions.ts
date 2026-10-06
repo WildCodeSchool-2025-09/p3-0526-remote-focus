@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 
+import mediaRepository from "../media/mediaRepository";
 import trackRepository from "./trackRepository";
 
 const browse: RequestHandler = async (req, res, next) => {
@@ -40,6 +41,15 @@ const toggleFavorite: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    const media = await mediaRepository.read(mediaId);
+
+    if (media == null) {
+      res.status(404).json({
+        error: "Média introuvable.",
+      });
+      return;
+    }
+
     const track = await trackRepository.toggleFavorite(userId, mediaId);
 
     res.json(track);
@@ -63,6 +73,15 @@ const toggleWatchlist: RequestHandler = async (req, res, next) => {
     if (!Number.isInteger(mediaId) || mediaId <= 0) {
       res.status(400).json({
         error: "Identifiant du média invalide.",
+      });
+      return;
+    }
+
+    const media = await mediaRepository.read(mediaId);
+
+    if (media == null) {
+      res.status(404).json({
+        error: "Média introuvable.",
       });
       return;
     }
