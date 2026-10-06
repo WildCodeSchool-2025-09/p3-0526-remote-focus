@@ -10,7 +10,7 @@ function MovieInfo({ media }: MovieInfoProps) {
   }
 
   return (
-    <p className="max-w-[660px] text-base leading-relaxed text-[#C9D6DB]">
+    <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
       {media.synopsis}
     </p>
   );

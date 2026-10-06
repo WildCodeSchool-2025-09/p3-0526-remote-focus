@@ -59,7 +59,7 @@ function SeasonDetail() {
       <SeasonHeader season={seasonDetail} isSeasonComplete={isSeasonComplete} />
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-bold md:text-2xl">Épisodes</h2>
-        <div className="overflow-hidden rounded-xl border border-white/15">
+        <div className="overflow-hidden rounded-xl border border-base-content/15">
           <EpisodeList
             episodes={seasonDetail.episodes}
             seriesId={seasonDetail.serie.id}
