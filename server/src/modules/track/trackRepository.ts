@@ -57,10 +57,13 @@ class TrackRepository {
         ID_media,
         favorite_media,
         user_rating,
-        watchlist
+        watchlist,
+        favorited_at,
+        watchlisted_at
       )
-      VALUES (?, ?, TRUE, NULL, FALSE)
+      VALUES (?, ?, TRUE, NULL, FALSE, NOW(), NULL)
       ON DUPLICATE KEY UPDATE
+        favorited_at = IF(favorite_media, NULL, NOW()),
         favorite_media = NOT favorite_media`,
       [userId, mediaId],
     );
@@ -81,10 +84,13 @@ class TrackRepository {
         ID_media,
         favorite_media,
         user_rating,
-        watchlist
+        watchlist,
+        favorited_at,
+        watchlisted_at
       )
-      VALUES (?, ?, FALSE, NULL, TRUE)
+      VALUES (?, ?, FALSE, NULL, TRUE, NULL, NOW())
       ON DUPLICATE KEY UPDATE
+        watchlisted_at = IF(watchlist, NULL, NOW()),
         watchlist = NOT watchlist`,
       [userId, mediaId],
     );

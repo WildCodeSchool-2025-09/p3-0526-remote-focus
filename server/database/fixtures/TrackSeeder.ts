@@ -39,16 +39,24 @@ class TrackSeeder extends AbstractSeeder {
       for (const mediaId of pickedMediaIds) {
         // 3. Générer des valeurs plausibles
         const hasRated = this.faker.datatype.boolean({ probability: 0.6 });
+        const isFavorite = this.faker.datatype.boolean({ probability: 0.3 });
+        const isInWatchlist = this.faker.datatype.boolean({ probability: 0.4 });
 
         const fakeTrack = {
           ID_user: userId,
           ID_media: mediaId,
-          favorite_media: this.faker.datatype.boolean({ probability: 0.3 }),
+          favorite_media: isFavorite,
           // DECIMAL(2,1) → 1 chiffre avant la virgule, 1 après : 0.0 à 5.0 max
           user_rating: hasRated
             ? this.faker.number.float({ min: 0, max: 5.0, fractionDigits: 1 })
             : null,
-          watchlist: this.faker.datatype.boolean({ probability: 0.4 }),
+          watchlist: isInWatchlist,
+          favorited_at: isFavorite
+            ? this.faker.date.recent({ days: 180 })
+            : null,
+          watchlisted_at: isInWatchlist
+            ? this.faker.date.recent({ days: 180 })
+            : null,
         };
 
         // 4. Insertion (pas de refName : aucune autre table ne référence "track")
