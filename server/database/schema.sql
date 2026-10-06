@@ -10,6 +10,7 @@ CREATE TABLE user_(
    is_pegi16 BOOLEAN NOT NULL DEFAULT FALSE,
    role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
    avatar VARCHAR(255) NOT NULL DEFAULT '/assets/images/default-avatar.svg',
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
    CONSTRAINT PK_user_ PRIMARY KEY(ID),
    CONSTRAINT AK_user_ UNIQUE(email),
    CONSTRAINT AK_user__1 UNIQUE(login)
@@ -61,7 +62,7 @@ CREATE TABLE season(
 CREATE TABLE episode(
    ID INT AUTO_INCREMENT,
    tmdb_id INT NOT NULL,
-   name VARCHAR(150),
+   name VARCHAR(255),
    number INT,
    released_at DATE,
    synopsis TEXT,

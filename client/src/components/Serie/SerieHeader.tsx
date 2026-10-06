@@ -1,7 +1,10 @@
 import { Check, ChevronDown, ChevronUp, Heart, Plus, Star } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWatch } from "../../contexts/WatchingContext";
 import type { Serie } from "../../types/media";
 import ActionButton from "../ActionButton";
+import AuthRequiredModal from "../AuthRequiredModal";
 import PlatformList from "../PlatformList";
 import SerieInfo from "./SerieInfo";
 
@@ -23,6 +26,12 @@ function SerieHeader({ serie }: SerieHeaderProps) {
   const handleToggleMeta = () => {
     setIsMetaOpen(!isMetaOpen);
   };
+
+  const { isWatched, toggleWatchedSeries } = useWatch();
+  const isSeriesComplete = isWatched(serie.id);
+
+  const { isAuthenticated } = useAuth();
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
   return (
     <div className="grid grid-cols-[128px_minmax(0,1fr)] gap-4 md:grid-cols-[264px_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-8">
@@ -89,11 +98,27 @@ function SerieHeader({ serie }: SerieHeaderProps) {
         <div className="flex flex-wrap items-start gap-4">
           <ActionButton label="Favoris" color="#E83658" icon={Heart} />
           <ActionButton label="Watchlist" color="#F5F5F0" icon={Plus} />
-          <ActionButton label="Vu" color="#17B890" icon={Check} />
+          <ActionButton
+            label="Vu"
+            color={isSeriesComplete ? "#0D1117" : "#17B890"}
+            bgColor={isSeriesComplete ? "#17B890" : "#0D1117"}
+            icon={Check}
+            onClick={() => {
+              if (isAuthenticated) {
+                toggleWatchedSeries(serie.id);
+              } else {
+                setShowAuthMessage(true);
+              }
+            }}
+          />
           <ActionButton label="Noter" color="#F2B705" icon={Star} />
           <PlatformList platforms={serie.platforms} />
         </div>
       </div>
+      <AuthRequiredModal
+        isOpen={showAuthMessage}
+        onClose={() => setShowAuthMessage(false)}
+      />
     </div>
   );
 }

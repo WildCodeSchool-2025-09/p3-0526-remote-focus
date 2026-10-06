@@ -1,16 +1,36 @@
-import { ChevronDown, Power } from "lucide-react";
+import {
+  BarChart3,
+  Bookmark,
+  ChevronDown,
+  CircleUserRound,
+  Heart,
+  LogOut,
+  Settings,
+  Users,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { useAuth } from "../contexts/AuthContext";
+import useLogout from "../hooks/useLogout";
+import { API_URL } from "../services/api";
+
+const DEFAULT_AVATAR = "/assets/images/default-avatar.svg";
+
+const LINKS = [
+  { to: "/profile", label: "Profil", icon: CircleUserRound },
+  { to: "/profile/favorites", label: "Favoris", icon: Heart },
+  { to: "/profile/watchlist", label: "Watchlist", icon: Bookmark },
+  { to: "/profile/actors", label: "Mes Acteurs", icon: Users },
+  { to: "/profile/statistics", label: "Statistiques", icon: BarChart3 },
+  { to: "/profile/settings", label: "Réglages", icon: Settings },
+];
 
 function ProfileMenu() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user } = useAuth();
+  const { handleLogout: triggerLogout, isLoggingOut } = useLogout();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,15 +62,6 @@ function ProfileMenu() {
     };
   }, [isOpen]);
 
-  // La session n'est fermée qu'une fois l'accueil affiché : si l'utilisateur
-  // était sur une page protégée, PrivateRoute ne doit pas rediriger vers /login.
-  useEffect(() => {
-    if (isLoggingOut && location.pathname === "/") {
-      logout();
-      setIsLoggingOut(false);
-    }
-  }, [isLoggingOut, location.pathname, logout]);
-
   if (user === null) {
     return null;
   }
@@ -61,11 +72,8 @@ function ProfileMenu() {
 
   const handleLogout = () => {
     setIsOpen(false);
-    setIsLoggingOut(true);
-    navigate("/", { replace: true });
+    triggerLogout();
   };
-
-  const initial = user.firstName.charAt(0).toUpperCase();
 
   return (
     <div ref={menuRef} className="relative">
@@ -75,44 +83,45 @@ function ProfileMenu() {
         disabled={isLoggingOut}
         aria-expanded={isOpen}
         aria-controls="profile-menu"
-        aria-label={`Menu du profil de ${user.firstName}`}
-        className="flex items-center gap-2 rounded-full border border-focus-line/30 bg-base-200 p-1 transition hover:border-focus-line/60 disabled:opacity-50 lg:pr-3"
+        aria-label={`Menu du profil de ${user.login}`}
+        className="flex items-center gap-2 rounded-full border border-base-content/40 py-1 pr-3 pl-1 text-sm font-semibold text-base-content transition hover:bg-base-200 disabled:opacity-50"
       >
-        <span
-          aria-hidden="true"
-          className="flex size-7 items-center justify-center rounded-full bg-warning text-xs font-semibold text-warning-content"
-        >
-          {initial}
-        </span>
-
-        <span className="hidden text-sm font-semibold text-base-content lg:inline">
-          {user.firstName}
-        </span>
-
+        <img
+          src={`${API_URL}${user.avatar ?? DEFAULT_AVATAR}`}
+          alt={user.login}
+          className="h-7 w-7 rounded-full object-cover"
+        />
+        <span className="hidden sm:inline">{user.login}</span>
         <ChevronDown
-          size={16}
+          size={14}
           aria-hidden="true"
-          className={`hidden text-base-content/60 transition lg:block ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
         <div
           id="profile-menu"
-          className="absolute right-0 top-full z-40 mt-2 w-56 rounded-box border border-focus-line/30 bg-base-200 p-2 shadow-xl"
+          className="absolute right-0 top-full z-40 mt-2 w-48 overflow-hidden rounded-lg border border-focus-line/20 bg-base-100 shadow-lg"
         >
-          <p className="truncate px-3 py-2 text-xs text-base-content/60">
-            {user.email}
-          </p>
+          {LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm text-base-content transition hover:bg-base-200"
+            >
+              <link.icon size={16} />
+              {link.label}
+            </Link>
+          ))}
 
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-error transition hover:bg-error/10"
+            className="flex w-full items-center gap-2 border-t border-focus-line/20 px-4 py-2.5 text-left text-sm text-[#E83658] transition hover:bg-base-200"
           >
-            <Power size={16} aria-hidden="true" />
+            <LogOut size={16} />
             Déconnexion
           </button>
         </div>

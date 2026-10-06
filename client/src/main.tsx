@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SearchProvider } from "./contexts/SearchContext";
-// Import necessary modules from React and React Router
+import { WatchingProvider } from "./contexts/WatchingContext";
 import SearchResults from "./pages/SearchResults";
 import "./globals.css";
 import App from "./App";
@@ -102,9 +102,11 @@ if (rootElement == null) {
 // Render the app inside the root element
 createRoot(rootElement).render(
   <AuthProvider>
-    <SearchProvider>
-      <RouterProvider router={router} />
-    </SearchProvider>
+    <WatchingProvider>
+      <SearchProvider>
+        <RouterProvider router={router} />
+      </SearchProvider>
+    </WatchingProvider>
   </AuthProvider>,
 );
 
