@@ -6,11 +6,12 @@ export type TrackState = {
   isInWatchlist: boolean;
 };
 
-export type TrackedList = "favorite";
+export type TrackedList = "favorite" | "watchlist";
 export type TrackedType = "movie" | "tv" | "anime" | null;
 
 const TRACKED_LISTS = {
   favorite: { flag: "t.favorite_media = TRUE", dateColumn: "t.favorited_at" },
+  watchlist: { flag: "t.watchlist = TRUE", dateColumn: "t.watchlisted_at" },
 } as const;
 
 const MEDIA_TYPE_FILTER = `

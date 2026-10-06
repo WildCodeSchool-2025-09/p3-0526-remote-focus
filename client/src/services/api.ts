@@ -12,6 +12,7 @@ export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
 const TRACKED_PATHS: Record<TrackedList, string> = {
   favorite: "/api/me/favorites",
+  watchlist: "/api/me/watchlist",
 };
 
 const searchMedias = async (

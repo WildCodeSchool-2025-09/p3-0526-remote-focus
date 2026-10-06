@@ -23,11 +23,14 @@ describe("GET /api/me/favorites et /api/me/watchlist", () => {
     process.env.JWT_SECRET = JWT_SECRET;
   });
 
-  it("GET /api/me/favorites renvoie 401 sans token", async () => {
-    const response = await supertest(app).get("/api/me/favorites");
+  it.each(["/api/me/favorites", "/api/me/watchlist"])(
+    "%s renvoie 401 sans token",
+    async (path) => {
+      const response = await supertest(app).get(path);
 
-    expect(response.status).toBe(401);
-  });
+      expect(response.status).toBe(401);
+    },
+  );
 
   it("GET /api/me/favorites renvoie 200 avec les médias filtrés", async () => {
     const token = jwt.sign({ id: 1 }, JWT_SECRET);

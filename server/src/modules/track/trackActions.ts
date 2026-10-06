@@ -175,6 +175,7 @@ const toggleWatchlist: RequestHandler = async (req, res, next) => {
 export default {
   browse,
   browseFavorites: browseTrackedList("favorite"),
+  browseWatchlist: browseTrackedList("watchlist"),
   toggleFavorite,
   toggleWatchlist,
 };

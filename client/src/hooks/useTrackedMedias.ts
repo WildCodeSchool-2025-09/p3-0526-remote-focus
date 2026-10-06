@@ -97,7 +97,9 @@ const useTrackedMedias = (
 
     const matchesFilters = (mediaId: number) => {
       const track = tracks.find((item) => item.mediaId === mediaId);
-      if (track?.isFavorite !== true) {
+      const inList =
+        list === "favorite" ? track?.isFavorite : track?.isInWatchlist;
+      if (inList !== true) {
         return false;
       }
 

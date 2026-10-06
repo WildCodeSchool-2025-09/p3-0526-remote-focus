@@ -17,11 +17,14 @@ type TrackedMediaListProps = {
 
 const EMPTY_MESSAGES: Record<TrackedList, string> = {
   favorite: "Aucun média dans vos favoris pour ce filtre.",
+  watchlist: "Aucun média dans votre watchlist pour ce filtre.",
 };
 
 const ERROR_MESSAGES: Record<TrackedList, string> = {
   favorite:
     "Une erreur est survenue lors du chargement de vos favoris. Merci d'actualiser la page.",
+  watchlist:
+    "Une erreur est survenue lors du chargement de votre watchlist. Merci d'actualiser la page.",
 };
 
 function parseWatchStatus(value: string | null): WatchStatus {
@@ -65,7 +68,7 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       <TypeFilter />
 
       <ProfileListSwitch
-        active="favorites"
+        active={list === "favorite" ? "favorites" : "watchlist"}
         favoritesCount={favoritesCount}
         watchlistCount={watchlistCount}
       />
