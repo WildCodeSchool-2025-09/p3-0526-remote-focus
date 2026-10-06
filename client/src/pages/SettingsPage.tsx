@@ -83,7 +83,7 @@ function SettingsPage() {
             <button
               type="button"
               aria-label="Enregistrer les changements"
-              className="w-32 rounded-md bg-warning py-2.5 text-center text-sm font-semibold text-warning-content"
+              className="w-32 btn bg-warning py-2.5 text-center text-sm font-semibold text-warning-content transition hover:brightness-95 hover:text-focus-cream"
               onClick={handleSave}
             >
               Enregistrer
@@ -91,7 +91,7 @@ function SettingsPage() {
             <button
               type="button"
               aria-label="Annuler les changements"
-              className="w-32 rounded-md py-2.5 text-center text-sm font-semibold text-focus-muted"
+              className="w-32 btn py-2.5 text-center text-sm font-semibold text-focus-muted"
               onClick={() => setFormData(settings)}
             >
               Annuler
