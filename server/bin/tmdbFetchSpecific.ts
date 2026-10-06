@@ -940,7 +940,10 @@ const isAnime = (detail: TvDetail): boolean =>
   (detail.genres ?? []).some((genre) => genre.id === ANIMATION_GENRE_ID) &&
   (detail.origin_country ?? []).includes(ANIME_ORIGIN_COUNTRY);
 
-const fetchTv = async (detail: TvDetail, anime: boolean): Promise<SeedMedia> => {
+const fetchTv = async (
+  detail: TvDetail,
+  anime: boolean,
+): Promise<SeedMedia> => {
   let synopsis = orNull(detail.overview);
 
   if (!synopsis) {

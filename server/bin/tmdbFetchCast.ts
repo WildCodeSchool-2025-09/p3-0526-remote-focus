@@ -470,7 +470,9 @@ const main = async () => {
       };
 
   const doneMedia = new Set(
-    output.media_cast.map((entry) => `${entry.media_type}:${entry.media_tmdb_id}`),
+    output.media_cast.map(
+      (entry) => `${entry.media_type}:${entry.media_tmdb_id}`,
+    ),
   );
   const doneEpisodes = new Set(
     output.episode_cast.map((entry) => entry.episode_tmdb_id),
