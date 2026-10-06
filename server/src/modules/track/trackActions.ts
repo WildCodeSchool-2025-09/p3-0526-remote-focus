@@ -1,24 +1,11 @@
 import type { RequestHandler } from "express";
 import { formatMedias } from "../../utils/formatters";
-import trackRepository, { type WatchlistType } from "./trackRepository";
+import trackRepository from "./trackRepository";
 
-const VALID_TYPES = ["movie", "tv", "anime"];
 const LIMIT = 10;
 
-function parseType(value: unknown): WatchlistType {
-  return typeof value === "string" && VALID_TYPES.includes(value)
-    ? (value as WatchlistType)
-    : null;
-}
-
-function parseSeen(value: unknown): boolean | null {
-  if (value === "true") {
-    return true;
-  }
-  if (value === "false") {
-    return false;
-  }
-  return null;
+function isMediaType(value: unknown): value is "movie" | "tv" | "anime" {
+  return value === "movie" || value === "tv" || value === "anime";
 }
 
 const browseWatchlist: RequestHandler = async (req, res, next) => {
@@ -30,9 +17,35 @@ const browseWatchlist: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const type = parseType(req.query.type);
-    const seen = parseSeen(req.query.seen);
-    const page = Number(req.query.page) || 1;
+    const {
+      type: requestedType,
+      seen: requestedSeen,
+      page: requestedPage,
+    } = req.query;
+
+    if (requestedType !== undefined && !isMediaType(requestedType)) {
+      res.status(400).json({ error: "Invalid media type" });
+      return;
+    }
+
+    if (
+      requestedSeen !== undefined &&
+      requestedSeen !== "true" &&
+      requestedSeen !== "false"
+    ) {
+      res.status(400).json({ error: "Invalid seen filter" });
+      return;
+    }
+
+    const page = requestedPage === undefined ? 1 : Number(requestedPage);
+
+    if (!Number.isInteger(page) || page < 1) {
+      res.status(400).json({ error: "Invalid page number" });
+      return;
+    }
+
+    const type = isMediaType(requestedType) ? requestedType : null;
+    const seen = requestedSeen === undefined ? null : requestedSeen === "true";
     const offset = (page - 1) * LIMIT;
 
     const [rows, total] = await Promise.all([

@@ -8,11 +8,15 @@ const mockedTrackRepository = trackRepository as jest.Mocked<
   typeof trackRepository
 >;
 
-const createResponse = () =>
-  ({
+const createResponse = () => {
+  const res = {
     sendStatus: jest.fn(),
+    status: jest.fn(),
     json: jest.fn(),
-  }) as unknown as Response;
+  };
+  res.status.mockReturnValue(res);
+  return res as unknown as Response;
+};
 
 describe("trackActions.browseWatchlist", () => {
   beforeEach(() => {
@@ -29,11 +33,50 @@ describe("trackActions.browseWatchlist", () => {
     expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
   });
 
-  test("ignore un type invalide et interroge sans filtre", async () => {
+  test("renvoie 400 si le type est invalide", async () => {
     const req = {
       user: { id: 1 },
       query: { type: "documentary" },
     } as unknown as Request;
+    const res = createResponse();
+
+    await trackActions.browseWatchlist(req, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+  });
+
+  test("renvoie 400 si le filtre seen est invalide", async () => {
+    const req = {
+      user: { id: 1 },
+      query: { seen: "yes" },
+    } as unknown as Request;
+    const res = createResponse();
+
+    await trackActions.browseWatchlist(req, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+  });
+
+  test.each([["0"], ["-1"], ["abc"]])(
+    "renvoie 400 si la page vaut %s",
+    async (page) => {
+      const req = {
+        user: { id: 1 },
+        query: { page },
+      } as unknown as Request;
+      const res = createResponse();
+
+      await trackActions.browseWatchlist(req, res, jest.fn());
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+    },
+  );
+
+  test("interroge sans filtre quand aucun paramètre n'est fourni", async () => {
+    const req = { user: { id: 1 }, query: {} } as unknown as Request;
     const res = createResponse();
 
     mockedTrackRepository.browseWatchlist.mockResolvedValue([]);

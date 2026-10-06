@@ -58,7 +58,7 @@ class TrackRepository {
          AND t.watchlist = 1
          AND ${MEDIA_TYPE_FILTER}
          ${buildSeenFilter(seen)}
-       ORDER BY t.added_at DESC
+       ORDER BY t.added_at DESC, t.ID_media DESC
        LIMIT ? OFFSET ?`,
       [userId, type, type, type, type, limit, offset],
     );
