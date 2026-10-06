@@ -103,4 +103,23 @@ export async function fetchSeasonCast(
   return response.json();
 }
 
+export async function fetchEpisodeCast(
+  serieId: number,
+  seasonId: number,
+  episodeId: number,
+  { page = 1 }: FetchCastOptions = {},
+): Promise<CastPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  const response = await fetch(
+    `${API_URL}/api/series/${serieId}/seasons/${seasonId}/episodes/${episodeId}/cast?${params}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Casting indisponible");
+  }
+
+  return response.json();
+}
+
 export { searchMedias };
