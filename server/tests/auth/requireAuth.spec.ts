@@ -1,33 +1,35 @@
-import { describe, expect, it, jest } from "@jest/globals";
 import type { NextFunction, Request, Response } from "express";
-
 import requireAuth from "../../src/middlewares/requireAuth";
 
-function runMiddleware(req: Request) {
-  const res = { sendStatus: jest.fn() };
-  const next = jest.fn();
-
-  requireAuth(req, res as unknown as Response, next as unknown as NextFunction);
-
-  return { res, next };
-}
+const createResponse = () =>
+  ({
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  }) as unknown as Response;
 
 describe("requireAuth middleware", () => {
-  it("calls next when the user is authenticated", () => {
-    const req = { user: { id: 2 } } as unknown as Request;
+  test("renvoie 401 sans utilisateur authentifié", () => {
+    const req = {} as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn();
 
-    const { res, next } = runMiddleware(req);
+    requireAuth(req, res, next as unknown as NextFunction);
 
-    expect(next).toHaveBeenCalledTimes(1);
-    expect(res.sendStatus).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Authentification requise.",
+    });
+    expect(next).not.toHaveBeenCalled();
   });
 
-  it("returns 401 when the user is not authenticated", () => {
-    const req = {} as unknown as Request;
+  test("passe à la suite quand l'utilisateur est authentifié", () => {
+    const req = { user: { id: 1 } } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn();
 
-    const { res, next } = runMiddleware(req);
+    requireAuth(req, res, next as unknown as NextFunction);
 
-    expect(res.sendStatus).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
   });
 });
