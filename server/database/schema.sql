@@ -132,7 +132,8 @@ CREATE TABLE track(
    favorite_media BOOLEAN NOT NULL,
    user_rating DECIMAL(2,1),
    watchlist BOOLEAN NOT NULL,
-   added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   favorited_at DATETIME NULL,
+   watchlisted_at DATETIME NULL,
    CONSTRAINT PK_track PRIMARY KEY(ID_user, ID_media),
    CONSTRAINT FK_track_user_ FOREIGN KEY(ID_user) REFERENCES user_(ID),
    CONSTRAINT FK_track_media FOREIGN KEY(ID_media) REFERENCES media(ID)

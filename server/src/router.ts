@@ -49,9 +49,6 @@ router.get(
 router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
 
-router.get("/api/me/dashboard", userActions.readDashboard);
-router.get("/api/me/settings", userActions.readSettings);
-
 router.post(
   "/api/users",
   validateRegister,
@@ -64,8 +61,10 @@ router.post("/api/auth/login", authActions.login);
 router.use("/api/me", requireAuth);
 
 router.get("/api/me/dashboard", userActions.readDashboard);
+router.get("/api/me/settings", userActions.readSettings);
 
 router.get("/api/me/tracks", trackActions.browse);
+router.get("/api/me/favorites", trackActions.browseFavorites);
 router.get("/api/me/watchlist", trackActions.browseWatchlist);
 
 router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);

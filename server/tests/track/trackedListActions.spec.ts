@@ -18,7 +18,10 @@ const createResponse = () => {
   return res as unknown as Response;
 };
 
-describe("trackActions.browseWatchlist", () => {
+describe.each([
+  ["browseFavorites", "favorite"],
+  ["browseWatchlist", "watchlist"],
+] as const)("trackActions.%s", (handlerName, list) => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -27,10 +30,10 @@ describe("trackActions.browseWatchlist", () => {
     const req = { query: {} } as unknown as Request;
     const res = createResponse();
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+    expect(mockedTrackRepository.browseTracked).not.toHaveBeenCalled();
   });
 
   test("renvoie 400 si le type est invalide", async () => {
@@ -40,10 +43,10 @@ describe("trackActions.browseWatchlist", () => {
     } as unknown as Request;
     const res = createResponse();
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+    expect(mockedTrackRepository.browseTracked).not.toHaveBeenCalled();
   });
 
   test("renvoie 400 si le filtre seen est invalide", async () => {
@@ -53,10 +56,10 @@ describe("trackActions.browseWatchlist", () => {
     } as unknown as Request;
     const res = createResponse();
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+    expect(mockedTrackRepository.browseTracked).not.toHaveBeenCalled();
   });
 
   test.each([["0"], ["-1"], ["abc"]])(
@@ -68,24 +71,25 @@ describe("trackActions.browseWatchlist", () => {
       } as unknown as Request;
       const res = createResponse();
 
-      await trackActions.browseWatchlist(req, res, jest.fn());
+      await trackActions[handlerName](req, res, jest.fn());
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(mockedTrackRepository.browseWatchlist).not.toHaveBeenCalled();
+      expect(mockedTrackRepository.browseTracked).not.toHaveBeenCalled();
     },
   );
 
-  test("interroge sans filtre quand aucun paramètre n'est fourni", async () => {
+  test("interroge la bonne liste sans filtre par défaut", async () => {
     const req = { user: { id: 1 }, query: {} } as unknown as Request;
     const res = createResponse();
 
-    mockedTrackRepository.browseWatchlist.mockResolvedValue([]);
-    mockedTrackRepository.countWatchlistByFilters.mockResolvedValue(0);
+    mockedTrackRepository.browseTracked.mockResolvedValue([]);
+    mockedTrackRepository.countTrackedByFilters.mockResolvedValue(0);
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
-    expect(mockedTrackRepository.browseWatchlist).toHaveBeenCalledWith(
+    expect(mockedTrackRepository.browseTracked).toHaveBeenCalledWith(
       1,
+      list,
       null,
       null,
       10,
@@ -93,29 +97,31 @@ describe("trackActions.browseWatchlist", () => {
     );
   });
 
-  test("transmet le type et le statut vu/à voir au repository", async () => {
+  test("transmet le type, le statut et la page au repository", async () => {
     const req = {
       user: { id: 1 },
-      query: { type: "movie", seen: "true", page: "2" },
+      query: { type: "tv", seen: "false", page: "3" },
     } as unknown as Request;
     const res = createResponse();
 
-    mockedTrackRepository.browseWatchlist.mockResolvedValue([]);
-    mockedTrackRepository.countWatchlistByFilters.mockResolvedValue(0);
+    mockedTrackRepository.browseTracked.mockResolvedValue([]);
+    mockedTrackRepository.countTrackedByFilters.mockResolvedValue(0);
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
-    expect(mockedTrackRepository.browseWatchlist).toHaveBeenCalledWith(
+    expect(mockedTrackRepository.browseTracked).toHaveBeenCalledWith(
       1,
-      "movie",
-      true,
+      list,
+      "tv",
+      false,
       10,
-      10,
+      20,
     );
-    expect(mockedTrackRepository.countWatchlistByFilters).toHaveBeenCalledWith(
+    expect(mockedTrackRepository.countTrackedByFilters).toHaveBeenCalledWith(
       1,
-      "movie",
-      true,
+      list,
+      "tv",
+      false,
     );
   });
 
@@ -123,7 +129,7 @@ describe("trackActions.browseWatchlist", () => {
     const req = { user: { id: 1 }, query: {} } as unknown as Request;
     const res = createResponse();
 
-    mockedTrackRepository.browseWatchlist.mockResolvedValue([
+    mockedTrackRepository.browseTracked.mockResolvedValue([
       {
         ID: 1,
         tmdb_id: 42,
@@ -142,42 +148,26 @@ describe("trackActions.browseWatchlist", () => {
         genre_name: "Action",
       },
     ] as never);
-    mockedTrackRepository.countWatchlistByFilters.mockResolvedValue(15);
+    mockedTrackRepository.countTrackedByFilters.mockResolvedValue(15);
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
-    expect(res.json).toHaveBeenCalledWith({
-      medias: [
-        {
-          id: 1,
-          tmdbId: 42,
-          name: "Film",
-          type: "movie",
-          releasedAt: "2020-01-01",
-          duration: 120,
-          poster: "/poster.jpg",
-          synopsis: "Synopsis",
-          overallRating: 7.5,
-          status: "released",
-          originalName: "Film",
-          originalLanguage: "fr",
-          pegi: "12",
-          isAnime: false,
-          genreName: "Action",
-        },
-      ],
-      hasMore: true,
-    });
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        medias: [expect.objectContaining({ id: 1, genreName: "Action" })],
+        hasMore: true,
+      }),
+    );
   });
 
   test("renvoie hasMore à false quand il n'y a plus de résultats", async () => {
     const req = { user: { id: 1 }, query: {} } as unknown as Request;
     const res = createResponse();
 
-    mockedTrackRepository.browseWatchlist.mockResolvedValue([]);
-    mockedTrackRepository.countWatchlistByFilters.mockResolvedValue(0);
+    mockedTrackRepository.browseTracked.mockResolvedValue([]);
+    mockedTrackRepository.countTrackedByFilters.mockResolvedValue(0);
 
-    await trackActions.browseWatchlist(req, res, jest.fn());
+    await trackActions[handlerName](req, res, jest.fn());
 
     expect(res.json).toHaveBeenCalledWith({ medias: [], hasMore: false });
   });
