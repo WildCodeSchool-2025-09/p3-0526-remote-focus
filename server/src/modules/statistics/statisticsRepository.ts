@@ -67,6 +67,30 @@ class StatisticsRepository {
       totalDuration: Number(row.totalDuration),
     }));
   }
+
+  async readGenreBreakdown(
+    userId: number,
+  ): Promise<{ genreName: string | null; total: number }[]> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT genre_name AS genreName, COUNT(*) AS total
+       FROM (
+         SELECT (SELECT genre.name FROM classify_as
+                   JOIN genre ON genre.ID = classify_as.ID_genre
+                   WHERE classify_as.ID_media = m.ID LIMIT 1) AS genre_name
+         FROM media_user AS mu
+         JOIN media AS m ON m.ID = mu.ID_media
+         WHERE mu.ID_user = ?
+       ) AS watched
+       GROUP BY genre_name
+       ORDER BY total DESC`,
+      [userId],
+    );
+
+    return rows.map((row) => ({
+      genreName: row.genreName == null ? null : String(row.genreName),
+      total: Number(row.total),
+    }));
+  }
 }
 
 export default new StatisticsRepository();
