@@ -93,11 +93,15 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       )}
 
       {!loading && error && (
-        <p className="text-focus-muted">{ERROR_MESSAGES[list]}</p>
+        <p className="text-focus-muted" aria-live="polite">
+          {ERROR_MESSAGES[list]}
+        </p>
       )}
 
       {!loading && !error && medias.length === 0 && (
-        <p className="text-focus-muted">{EMPTY_MESSAGES[list]}</p>
+        <p className="text-focus-muted" aria-live="polite">
+          {EMPTY_MESSAGES[list]}
+        </p>
       )}
 
       {!loading && !error && medias.length > 0 && (
@@ -116,7 +120,7 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       {hasMore && (
         <div className="flex flex-col items-center gap-2">
           {loadMoreError && (
-            <p className="text-sm text-focus-muted">
+            <p className="text-sm text-focus-muted" aria-live="polite">
               Impossible de charger la suite. Réessaie.
             </p>
           )}
