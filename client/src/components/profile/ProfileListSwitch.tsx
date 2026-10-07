@@ -10,7 +10,7 @@ function getPillClasses(isActive: boolean) {
   if (isActive) {
     return "flex items-center gap-2 rounded-full bg-focus-yellow px-4 py-2 text-sm font-semibold text-focus-void";
   }
-  return "flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-base-content transition-colors hover:border-white/60";
+  return "flex items-center gap-2 rounded-full border border-focus-muted-dark/40 px-4 py-2 text-sm font-semibold text-base-content transition-colors hover:border-focus-muted";
 }
 
 function ProfileListSwitch({
