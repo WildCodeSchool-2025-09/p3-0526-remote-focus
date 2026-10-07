@@ -29,11 +29,12 @@ function WatchStatusFilter() {
   }
 
   return (
-    <search className="flex gap-4 justify-center md:justify-start md:gap-8 border-b border-white/10 pt-3 text-xs md:text-base">
+    <search className="flex gap-4 justify-center md:justify-start md:gap-8 border-b border-focus-line/20 pt-3 text-xs md:text-base">
       {OPTIONS.map((option) => (
         <button
           key={option.value}
           type="button"
+          aria-pressed={activeStatus === option.value}
           className={getButtonClasses(option.value)}
           onClick={() => handleStatusChange(option.value)}
         >

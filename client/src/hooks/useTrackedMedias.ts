@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import { useTracks } from "../contexts/TrackContext";
 import { useWatch } from "../contexts/WatchingContext";
 import { fetchTrackedMedias, toSeenParam } from "../services/api";
+import { UnauthorizedError } from "../services/errors";
 import type { Media, MediaType } from "../types/Catalog";
 import type { TrackedList, WatchStatus } from "../types/Tracked";
 
@@ -42,6 +44,7 @@ const useTrackedMedias = (
   type: MediaType | undefined,
   status: WatchStatus,
 ): UseTrackedMediasResult => {
+  const { logout } = useAuth();
   const { tracks } = useTracks();
   const { watchedMediaIds } = useWatch();
 
@@ -78,17 +81,21 @@ const useTrackedMedias = (
         setMedias(data.medias);
         setHasMore(data.hasMore);
       })
-      .catch(() => {
-        if (generation.current === current) {
-          setError(true);
+      .catch((err) => {
+        if (generation.current !== current) {
+          return;
         }
+        if (err instanceof UnauthorizedError) {
+          logout();
+        }
+        setError(true);
       })
       .finally(() => {
         if (generation.current === current) {
           setLoading(false);
         }
       });
-  }, [list, type, status]);
+  }, [list, type, status, logout]);
 
   useEffect(() => {
     if (tracks.length === 0) {
@@ -137,12 +144,16 @@ const useTrackedMedias = (
         setMedias(data.medias);
         setHasMore(data.hasMore);
       })
-      .catch(() => {
-        if (generation.current === current) {
-          setError(true);
+      .catch((err) => {
+        if (generation.current !== current) {
+          return;
         }
+        if (err instanceof UnauthorizedError) {
+          logout();
+        }
+        setError(true);
       });
-  }, [tracks, watchedMediaIds, list, type, status]);
+  }, [tracks, watchedMediaIds, list, type, status, logout]);
 
   const loadMore = () => {
     const nextPage = loadedPages.current + 1;
@@ -162,10 +173,14 @@ const useTrackedMedias = (
         setMedias(mediasRef.current);
         setHasMore(data.hasMore);
       })
-      .catch(() => {
-        if (generation.current === current) {
-          setLoadMoreError(true);
+      .catch((err) => {
+        if (generation.current !== current) {
+          return;
         }
+        if (err instanceof UnauthorizedError) {
+          logout();
+        }
+        setLoadMoreError(true);
       })
       .finally(() => setLoadingMore(false));
   };

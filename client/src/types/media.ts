@@ -49,6 +49,11 @@ export type FilmographyPage = {
   hasMore: boolean;
 };
 
+export type CastPage = {
+  items: CastMember[];
+  hasMore: boolean;
+};
+
 export type Actor = {
   id: number;
   name: string;

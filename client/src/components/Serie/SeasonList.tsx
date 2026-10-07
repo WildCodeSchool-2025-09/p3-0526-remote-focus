@@ -36,17 +36,17 @@ function SeasonList({ seasons, serieId }: SeasonListProps) {
           return (
             <div
               key={season.id}
-              className="overflow-hidden rounded-xl border"
-              style={{
-                borderColor: isOpen ? "#F2B705" : "rgba(255,255,255,0.15)",
-              }}
+              className={`overflow-hidden rounded-xl border ${
+                isOpen ? "border-primary" : "border-base-content/15"
+              }`}
             >
               <button
                 type="button"
                 onClick={() => handleToggleSeason(season.id)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left md:px-6"
-                style={{ color: isOpen ? "#F2B705" : "#F5F5F0" }}
+                className={`flex w-full items-center justify-between gap-4 px-4 py-4 text-left md:px-6 ${
+                  isOpen ? "text-primary" : "text-base-content"
+                }`}
               >
                 <span className="font-semibold">
                   Saison {season.number} - {season.episodeCount} épisode
@@ -61,7 +61,7 @@ function SeasonList({ seasons, serieId }: SeasonListProps) {
                   <SeasonEpisodes serieId={serieId} seasonId={season.id} />
                   <Link
                     to={`/series/${serieId}/seasons/${season.id}`}
-                    className="block border-t border-white/10 px-4 py-3 text-sm text-[#F2B705] hover:underline md:px-6"
+                    className="block border-t border-base-content/10 px-4 py-3 text-sm text-primary hover:underline md:px-6"
                   >
                     Voir la saison →
                   </Link>

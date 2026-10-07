@@ -76,31 +76,40 @@ class ActorRepository {
     offset = 0,
   ) {
     const [rows] = await databaseClient.query<Rows>(
-      `(SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime,
-        mp.personnage_name AS characterNames
-     FROM media AS m
-     JOIN media_person AS mp ON mp.ID_media = m.ID
-     JOIN media_user AS mu ON mu.ID_media = m.ID
-     WHERE mp.ID_person = ?
-       AND mp.role = 'actor'
-       AND mu.ID_user = ?
-       AND m.ID <> ?)
+      `SELECT  ID,  name,  poster,  type,  released_at,  overall_rating,  is_anime,
+        GROUP_CONCAT(DISTINCT characterNames SEPARATOR ', ') AS characterNames
+      FROM (
+        (
+          SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime, mp.personnage_name AS characterNames
+          FROM media AS m
+          JOIN media_person AS mp ON mp.ID_media = m.ID
+          JOIN media_user AS mu ON mu.ID_media = m.ID
+          WHERE mp.ID_person = ?
+            AND mp.role = 'actor'
+            AND mu.ID_user = ?
+            AND m.ID <> ?
+        )
 
-     UNION ALL
+        UNION ALL
 
-     (SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime,
-        GROUP_CONCAT(DISTINCT ep.personnage_name SEPARATOR ', ') AS characterNames
-     FROM media AS m
-     JOIN season AS s ON s.ID_media = m.ID
-     JOIN episode AS e ON e.ID_season = s.ID
-     JOIN episode_person AS ep ON ep.ID_episode = e.ID
-     JOIN episode_user AS eu ON eu.ID_episode = e.ID
-     WHERE ep.ID_person = ?
-       AND ep.role = 'actor'
-       AND eu.ID_user = ?
-       AND m.ID <> ?
-     GROUP BY m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime) 
-     ORDER BY overall_rating DESC LIMIT ? OFFSET ?`,
+        (
+          SELECT m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime,
+            GROUP_CONCAT(DISTINCT ep.personnage_name SEPARATOR ', ') AS characterNames
+          FROM media AS m
+          JOIN season AS s ON s.ID_media = m.ID
+          JOIN episode AS e ON e.ID_season = s.ID
+          JOIN episode_person AS ep ON ep.ID_episode = e.ID
+          JOIN episode_user AS eu ON eu.ID_episode = e.ID
+          WHERE ep.ID_person = ?
+            AND ep.role = 'actor'
+            AND eu.ID_user = ?
+            AND m.ID <> ?
+          GROUP BY m.ID, m.name, m.poster, m.type, m.released_at, m.overall_rating, m.is_anime
+        )
+      ) AS seen_medias
+      GROUP BY  ID,  name,  poster,  type,  released_at,  overall_rating,  is_anime
+      ORDER BY overall_rating DESC
+      LIMIT ? OFFSET ?`,
       [
         personId,
         userId,
@@ -123,30 +132,34 @@ class ActorRepository {
     const [rows] = await databaseClient.query<
       (RowDataPacket & { total: number })[]
     >(
-      `SELECT SUM(total) AS total
-     FROM (
-       SELECT COUNT(DISTINCT m.ID) AS total
-       FROM media AS m
-       JOIN media_person AS mp ON mp.ID_media = m.ID
-       JOIN media_user AS mu ON mu.ID_media = m.ID
-       WHERE mp.ID_person = ?
-         AND mp.role = 'actor'
-         AND mu.ID_user = ?
-         AND m.ID <> ?
+      `SELECT COUNT(DISTINCT ID) AS total
+      FROM (
+        (
+          SELECT m.ID
+          FROM media AS m
+          JOIN media_person AS mp ON mp.ID_media = m.ID
+          JOIN media_user AS mu ON mu.ID_media = m.ID
+          WHERE mp.ID_person = ?
+            AND mp.role = 'actor'
+            AND mu.ID_user = ?
+            AND m.ID <> ?
+        )
 
-       UNION ALL
+        UNION ALL
 
-       SELECT COUNT(DISTINCT m.ID) AS total
-       FROM media AS m
-       JOIN season AS s ON s.ID_media = m.ID
-       JOIN episode AS e ON e.ID_season = s.ID
-       JOIN episode_person AS ep ON ep.ID_episode = e.ID
-       JOIN episode_user AS eu ON eu.ID_episode = e.ID
-       WHERE ep.ID_person = ?
-         AND ep.role = 'actor'
-         AND eu.ID_user = ?
-         AND m.ID <> ?
-     ) AS counts`,
+        (
+          SELECT m.ID
+          FROM media AS m
+          JOIN season AS s ON s.ID_media = m.ID
+          JOIN episode AS e ON e.ID_season = s.ID
+          JOIN episode_person AS ep ON ep.ID_episode = e.ID
+          JOIN episode_user AS eu ON eu.ID_episode = e.ID
+          WHERE ep.ID_person = ?
+            AND ep.role = 'actor'
+            AND eu.ID_user = ?
+            AND m.ID <> ?
+        )
+      ) AS seen_medias`,
       [personId, userId, excludeMediaId, personId, userId, excludeMediaId],
     );
 

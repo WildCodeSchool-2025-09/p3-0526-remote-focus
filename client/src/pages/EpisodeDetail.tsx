@@ -6,6 +6,7 @@ import CastList from "../components/CastList";
 import EpisodeHeader from "../components/Episode/EpisodeHeader";
 import useFetch from "../hooks/useFetch";
 import useSelectedActor from "../hooks/useSelectedActor";
+import { fetchEpisodeCast } from "../services/api";
 import type { EpisodeDetail as EpisodeDetailType } from "../types/media";
 
 function EpisodeDetail() {
@@ -76,6 +77,14 @@ function EpisodeDetail() {
         castTotal={episodeDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
+        fetchMore={(page) =>
+          fetchEpisodeCast(
+            episodeDetail.serie.id,
+            episodeDetail.season.id,
+            episodeDetail.id,
+            { page },
+          )
+        }
       />
 
       {selectedPersonId != null && (
