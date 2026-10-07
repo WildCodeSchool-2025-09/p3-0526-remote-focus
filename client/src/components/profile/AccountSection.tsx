@@ -1,7 +1,11 @@
 import { CameraIcon } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { updateEmail, updateLogin } from "../../services/accountApi";
+import {
+  updateEmail,
+  updateLogin,
+  updatePassword,
+} from "../../services/accountApi";
 import { API_URL } from "../../services/api";
 import { UnauthorizedError } from "../../services/errors";
 import type { SettingsProfile } from "../../types/Dashboard";
@@ -78,6 +82,52 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
     setEmailValue(profile.email);
     setEmailError(null);
     setIsEditingEmail(false);
+  }
+
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+  function resetPasswordFields() {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  }
+
+  async function handleSavePassword() {
+    setPasswordError(null);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    setIsSavingPassword(true);
+
+    try {
+      await updatePassword(currentPassword, newPassword);
+      resetPasswordFields();
+      setIsEditingPassword(false);
+    } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        logout();
+        return;
+      }
+      setPasswordError(
+        error instanceof Error ? error.message : "La modification a échoué.",
+      );
+    } finally {
+      setIsSavingPassword(false);
+    }
+  }
+
+  function handleCancelPassword() {
+    resetPasswordFields();
+    setPasswordError(null);
+    setIsEditingPassword(false);
   }
 
   return (
@@ -207,20 +257,85 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
           <label htmlFor="password" className="text-focus-muted">
             Mot de passe
           </label>
-          <div className="border-b border-focus-line/20 pb-6 flex mt-2 mb-6 flex-col items-start gap-4 lg:flex-row">
-            <input
-              type="text"
-              name="password"
-              className="input input-bordered bg-focus-surface w-full md:w-2/3"
-              value="****"
-            />
-            <button
-              type="button"
-              className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
-              aria-label="Modifier le Mot de passe"
-            >
-              Modifier
-            </button>
+          <div className="border-b border-focus-line/20 pb-6">
+            {isEditingPassword ? (
+              <div className="flex flex-col gap-4 mt-2">
+                <input
+                  type="password"
+                  name="currentPassword"
+                  placeholder="Mot de passe actuel"
+                  aria-label="Mot de passe actuel"
+                  className="input input-bordered bg-focus-surface w-full md:w-2/3"
+                  value={currentPassword}
+                  disabled={isSavingPassword}
+                  onChange={(event) => setCurrentPassword(event.target.value)}
+                />
+                <input
+                  type="password"
+                  name="newPassword"
+                  placeholder="Nouveau mot de passe"
+                  aria-label="Nouveau mot de passe"
+                  className="input input-bordered bg-focus-surface w-full md:w-2/3"
+                  value={newPassword}
+                  disabled={isSavingPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirmer le nouveau mot de passe"
+                  aria-label="Confirmer le nouveau mot de passe"
+                  className="input input-bordered bg-focus-surface w-full md:w-2/3"
+                  value={confirmPassword}
+                  disabled={isSavingPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                    aria-label="Valider le mot de passe"
+                    disabled={isSavingPassword}
+                    onClick={handleSavePassword}
+                  >
+                    {isSavingPassword ? "..." : "Valider"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                    aria-label="Annuler la modification du mot de passe"
+                    disabled={isSavingPassword}
+                    onClick={handleCancelPassword}
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex mt-2 flex-col items-start gap-4 lg:flex-row">
+                <input
+                  type="text"
+                  name="password"
+                  aria-label="Mot de passe"
+                  className="input input-bordered bg-focus-surface w-full md:w-2/3"
+                  value="****"
+                  disabled
+                />
+                <button
+                  type="button"
+                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  aria-label="Modifier le Mot de passe"
+                  onClick={() => setIsEditingPassword(true)}
+                >
+                  Modifier
+                </button>
+              </div>
+            )}
+            {passwordError != null && (
+              <p className="text-sm text-error" aria-live="polite">
+                {passwordError}
+              </p>
+            )}
           </div>
         </div>
       </div>
