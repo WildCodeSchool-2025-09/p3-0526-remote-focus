@@ -62,6 +62,18 @@ const toggleEpisodeWatched: RequestHandler = async (req, res, next) => {
       mediaId,
     );
 
+    if (seriesFullyWatched) {
+      const isMediaWatched = await watchingRepository.isMediaWatched(
+        userId,
+        mediaId,
+      );
+      if (isMediaWatched.length === 0) {
+        await watchingRepository.markMediaAsWatched(userId, mediaId);
+      }
+    } else {
+      await watchingRepository.unmarkMediaAsWatched(userId, mediaId);
+    }
+
     res.json({
       watched: isEpisodeWatched.length === 0,
       mediaId,
