@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 
 import type { RegisterUserInput } from "../../types/User/User.types";
+import { validateLoginValue } from "../../utils/accountValidators";
 import favoriteRepository from "../favorite/favoriteRepository";
 import trackRepository from "../track/trackRepository";
 import userRepository from "./userRepository";
@@ -99,4 +100,37 @@ const readSettings: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { add, readDashboard, readSettings };
+const updateLogin: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const loginError = validateLoginValue(req.body.login);
+
+    if (loginError != null) {
+      res.status(400).json({ error: loginError });
+      return;
+    }
+
+    const login = (req.body.login as string).trim();
+
+    const loginTaken = await userRepository.findByLogin(login, userId);
+
+    if (loginTaken) {
+      res.status(409).json({ error: "Ce pseudo est déjà utilisé." });
+      return;
+    }
+
+    await userRepository.updateLogin(userId, login);
+
+    res.json({ login });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { add, readDashboard, readSettings, updateLogin };
