@@ -167,7 +167,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  className="btn-outline-focus"
                   aria-label="Valider le pseudo"
                   disabled={isSavingLogin}
                   onClick={handleSaveLogin}
@@ -176,7 +176,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
                 </button>
                 <button
                   type="button"
-                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  className="btn-outline-focus"
                   aria-label="Annuler la modification du pseudo"
                   disabled={isSavingLogin}
                   onClick={handleCancelLogin}
@@ -187,7 +187,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
             ) : (
               <button
                 type="button"
-                className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                className="btn-outline-focus"
                 aria-label="Modifier le Pseudo"
                 onClick={() => setIsEditingLogin(true)}
               >
@@ -219,7 +219,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  className="btn-outline-focus"
                   aria-label="Valider l'email"
                   disabled={isSavingEmail}
                   onClick={handleSaveEmail}
@@ -228,7 +228,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
                 </button>
                 <button
                   type="button"
-                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  className="btn-outline-focus"
                   aria-label="Annuler la modification de l'email"
                   disabled={isSavingEmail}
                   onClick={handleCancelEmail}
@@ -239,7 +239,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
             ) : (
               <button
                 type="button"
-                className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                className="btn-outline-focus"
                 aria-label="Modifier le Mail"
                 onClick={() => setIsEditingEmail(true)}
               >
@@ -293,7 +293,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                    className="btn-outline-focus"
                     aria-label="Valider le mot de passe"
                     disabled={isSavingPassword}
                     onClick={handleSavePassword}
@@ -302,7 +302,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
                   </button>
                   <button
                     type="button"
-                    className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                    className="btn-outline-focus"
                     aria-label="Annuler la modification du mot de passe"
                     disabled={isSavingPassword}
                     onClick={handleCancelPassword}
@@ -323,7 +323,7 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
                 />
                 <button
                   type="button"
-                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  className="btn-outline-focus"
                   aria-label="Modifier le Mot de passe"
                   onClick={() => setIsEditingPassword(true)}
                 >

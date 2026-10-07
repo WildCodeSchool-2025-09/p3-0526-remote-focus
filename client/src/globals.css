@@ -151,6 +151,10 @@
   .btn-cta-pill:hover {
     @apply bg-focus-yellow text-focus-void;
   }
+
+  .btn-outline-focus {
+    @apply btn px-6 border-focus-muted-dark/40 bg-focus-void transition-colors hover:border-focus-yellow focus-visible:border-focus-yellow active:border-focus-yellow;
+  }
 }
 
 /* ================================================================== *
