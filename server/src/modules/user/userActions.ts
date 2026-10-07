@@ -1,7 +1,10 @@
 import type { RequestHandler } from "express";
 
 import type { RegisterUserInput } from "../../types/User/User.types";
-import { validateLoginValue } from "../../utils/accountValidators";
+import {
+  validateEmailValue,
+  validateLoginValue,
+} from "../../utils/accountValidators";
 import favoriteRepository from "../favorite/favoriteRepository";
 import trackRepository from "../track/trackRepository";
 import userRepository from "./userRepository";
@@ -133,4 +136,45 @@ const updateLogin: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { add, readDashboard, readSettings, updateLogin };
+const updateEmail: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const emailError = validateEmailValue(req.body.email);
+
+    if (emailError != null) {
+      res.status(400).json({ error: emailError });
+      return;
+    }
+
+    const email = (req.body.email as string).trim().toLowerCase();
+
+    const emailTaken = await userRepository.findByEmail(email, userId);
+
+    if (emailTaken) {
+      res
+        .status(409)
+        .json({ error: "Cette adresse e-mail est déjà utilisée." });
+      return;
+    }
+
+    await userRepository.updateEmail(userId, email);
+
+    res.json({ email });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default {
+  add,
+  readDashboard,
+  readSettings,
+  updateLogin,
+  updateEmail,
+};
