@@ -22,8 +22,9 @@ function ActorPortraitCard({
       className="flex w-[104px] shrink-0 cursor-pointer flex-col items-center gap-2 md:w-[140px]"
     >
       <div
-        className="rounded-full border-[2.5px] p-1"
-        style={{ borderColor: isSelected ? "#F2B705" : "transparent" }}
+        className={`rounded-full border-[2.5px] p-1 ${
+          isSelected ? "border-primary" : "border-transparent"
+        }`}
       >
         {person.photo != null ? (
           <img
@@ -32,7 +33,7 @@ function ActorPortraitCard({
             className="h-[82px] w-[82px] rounded-full object-cover md:h-[96px] md:w-[96px]"
           />
         ) : (
-          <div className="flex h-[82px] w-[82px] items-center justify-center rounded-full bg-white/10 text-2xl md:h-[96px] md:w-[96px]">
+          <div className="flex h-[82px] w-[82px] items-center justify-center rounded-full bg-base-content/10 text-2xl md:h-[96px] md:w-[96px]">
             {person.name.charAt(0)}
           </div>
         )}
@@ -40,12 +41,13 @@ function ActorPortraitCard({
 
       <div className="flex flex-col items-center gap-0.5 text-center">
         <span
-          className="text-base font-semibold"
-          style={{ color: isSelected ? "#F2B705" : "#F5F5F0" }}
+          className={`text-base font-semibold ${
+            isSelected ? "text-primary" : "text-base-content"
+          }`}
         >
           {person.name}
         </span>
-        <span className="text-sm text-[#9FB4BD]">{person.characterName}</span>
+        <span className="text-sm text-focus-muted">{person.characterName}</span>
       </div>
     </button>
   );

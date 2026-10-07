@@ -35,6 +35,7 @@ router.get("/api/medias/home", homepageActions.browseHomepage);
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
+router.get("/api/medias/:id/cast", mediaActions.browseCast);
 router.get("/api/actors/:id", actorActions.read);
 router.get("/api/series/:id", serieActions.read);
 router.get("/api/series/:id/seasons/:seasonId", seasonActions.read);
@@ -42,9 +43,15 @@ router.get(
   "/api/series/:id/seasons/:seasonId/episodes",
   seasonActions.readEpisodes,
 );
+
+router.get("/api/series/:id/seasons/:seasonId/cast", seasonActions.browseCast);
 router.get(
   "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
   episodeActions.read,
+);
+router.get(
+  "/api/series/:id/seasons/:seasonId/episodes/:episodeId/cast",
+  episodeActions.browseCast,
 );
 router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);

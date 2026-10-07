@@ -41,17 +41,19 @@ class SeasonRepository {
     return rows;
   }
 
-  async readCast(id: number, limit = 10) {
+  async readCast(id: number, limit = 10, offset = 0) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT DISTINCT pe.ID, pe.name, pe.photo,
-              ep.personnage_name, ep.role
+      `SELECT pe.ID, pe.name, pe.photo,
+              GROUP_CONCAT(DISTINCT ep.personnage_name SEPARATOR ', ') AS personnage_name,
+              'actor' AS role
        FROM person AS pe
        JOIN episode_person AS ep ON ep.ID_person = pe.ID
        JOIN episode AS e ON e.ID = ep.ID_episode
        WHERE e.ID_season = ? AND ep.role = 'actor'
+       GROUP BY pe.ID, pe.name, pe.photo
        ORDER BY pe.ID ASC
-       LIMIT ?`,
-      [id, limit],
+       LIMIT ? OFFSET ?`,
+      [id, limit, offset],
     );
     return rows;
   }

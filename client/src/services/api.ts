@@ -4,7 +4,7 @@ import type {
   TrackedMediaResponse,
   WatchStatus,
 } from "../types/Tracked";
-import type { Actor, FilmographyPage } from "../types/media";
+import type { Actor, CastPage, FilmographyPage } from "../types/media";
 import type { SearchResults } from "../types/search";
 import { getAuthHeaders } from "../utils/authStorage";
 
@@ -71,6 +71,64 @@ export async function fetchFilmography(
 
   if (!response.ok) {
     throw new Error("Filmographie indisponible");
+  }
+
+  return response.json();
+}
+
+type FetchCastOptions = {
+  page?: number;
+};
+
+export async function fetchCast(
+  mediaId: number,
+  { page = 1 }: FetchCastOptions = {},
+): Promise<CastPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  const response = await fetch(
+    `${API_URL}/api/medias/${mediaId}/cast?${params}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Casting indisponible");
+  }
+
+  return response.json();
+}
+
+export async function fetchSeasonCast(
+  serieId: number,
+  seasonId: number,
+  { page = 1 }: FetchCastOptions = {},
+): Promise<CastPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  const response = await fetch(
+    `${API_URL}/api/series/${serieId}/seasons/${seasonId}/cast?${params}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Casting indisponible");
+  }
+
+  return response.json();
+}
+
+export async function fetchEpisodeCast(
+  serieId: number,
+  seasonId: number,
+  episodeId: number,
+  { page = 1 }: FetchCastOptions = {},
+): Promise<CastPage> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  const response = await fetch(
+    `${API_URL}/api/series/${serieId}/seasons/${seasonId}/episodes/${episodeId}/cast?${params}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Casting indisponible");
   }
 
   return response.json();

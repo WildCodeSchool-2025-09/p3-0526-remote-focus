@@ -53,4 +53,33 @@ const read: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { read };
+const CAST_PAGE_SIZE = 10;
+
+const browseCast: RequestHandler = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const requestedPage = Math.floor(Number(req.query.page));
+
+    if (Number.isNaN(id)) {
+      res.sendStatus(400);
+      return;
+    }
+
+    const page = requestedPage >= 1 ? requestedPage : 1;
+    const offset = (page - 1) * CAST_PAGE_SIZE;
+
+    const [cast, total] = await Promise.all([
+      mediaRepository.readCast(id, CAST_PAGE_SIZE, offset),
+      mediaRepository.countCast(id),
+    ]);
+
+    res.json({
+      items: formatCast(cast),
+      hasMore: offset + cast.length < total,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { read, browseCast };

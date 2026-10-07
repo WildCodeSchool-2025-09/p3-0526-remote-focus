@@ -6,6 +6,7 @@ import SeasonList from "../components/Serie/SeasonList";
 import SerieHeader from "../components/Serie/SerieHeader";
 import useFetch from "../hooks/useFetch";
 import useSelectedActor from "../hooks/useSelectedActor";
+import { fetchCast } from "../services/api";
 import type { Serie } from "../types/media";
 
 function SerieDetail() {
@@ -49,6 +50,7 @@ function SerieDetail() {
         castTotal={serieDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
+        fetchMore={(page) => fetchCast(serieDetail.id, { page })}
       />
       {selectedPersonId != null && (
         <ActorKnownForWidget
