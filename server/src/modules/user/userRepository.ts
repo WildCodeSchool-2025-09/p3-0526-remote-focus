@@ -147,6 +147,20 @@ class UserRepository {
       [login, userId],
     );
   }
+
+  async updateEmail(userId: number, email: string): Promise<void> {
+    await databaseClient.query<Result>(
+      "UPDATE user_ SET email = ? WHERE ID = ?",
+      [email, userId],
+    );
+  }
+
+  async updatePassword(userId: number, hashedPassword: string): Promise<void> {
+    await databaseClient.query<Result>(
+      "UPDATE user_ SET hashed_password = ? WHERE ID = ?",
+      [hashedPassword, userId],
+    );
+  }
 }
 
 export default new UserRepository();
