@@ -46,9 +46,11 @@ function Statistics() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="flex flex-col justify-center rounded-lg border border-focus-line/20 bg-base-200 p-4 text-center">
+            <div className="flex flex-col rounded-lg border border-focus-line/20 bg-base-200 p-4 text-center">
               <h2 className="mb-4 font-semibold">Répartition par genre</h2>
-              <GenreDonutChart data={data.genreDistribution} />
+              <div className="flex flex-1 items-center justify-center">
+                <GenreDonutChart data={data.genreDistribution} />
+              </div>
             </div>
 
             <div className="rounded-lg border border-focus-line/20 bg-base-200 p-4">
