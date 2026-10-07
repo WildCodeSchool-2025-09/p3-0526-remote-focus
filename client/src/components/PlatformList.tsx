@@ -11,8 +11,8 @@ function PlatformList({ platforms }: PlatformListProps) {
 
   return (
     <>
-      <div className="hidden h-12 w-px bg-white/15 md:block" />
-      <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#0F242F] p-2">
+      <div className="hidden h-12 w-px bg-base-content/15 md:block" />
+      <div className="flex items-center gap-2 rounded-lg border border-base-content/15 bg-base-200 p-2">
         {platforms.map((platform) => (
           <img
             key={platform.id}

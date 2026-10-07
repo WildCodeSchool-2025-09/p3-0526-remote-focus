@@ -7,6 +7,7 @@ import SeasonHeader from "../components/Season/SeasonHeader";
 import { useWatch } from "../contexts/WatchingContext";
 import useFetch from "../hooks/useFetch";
 import useSelectedActor from "../hooks/useSelectedActor";
+import { fetchSeasonCast } from "../services/api";
 import type { SeasonDetail as SeasonDetailType } from "../types/media";
 
 function SeasonDetail() {
@@ -58,7 +59,7 @@ function SeasonDetail() {
       <SeasonHeader season={seasonDetail} isSeasonComplete={isSeasonComplete} />
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-bold md:text-2xl">Épisodes</h2>
-        <div className="overflow-hidden rounded-xl border border-white/15">
+        <div className="overflow-hidden rounded-xl border border-base-content/15">
           <EpisodeList
             episodes={seasonDetail.episodes}
             seriesId={seasonDetail.serie.id}
@@ -71,6 +72,9 @@ function SeasonDetail() {
         castTotal={seasonDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
+        fetchMore={(page) =>
+          fetchSeasonCast(seasonDetail.serie.id, seasonDetail.id, { page })
+        }
       />
       {selectedPersonId != null && (
         <ActorKnownForWidget

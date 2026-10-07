@@ -15,7 +15,7 @@ function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav
       aria-label="Fil d'Ariane"
-      className="flex flex-wrap items-center gap-2 text-sm text-[#9FB4BD]"
+      className="flex flex-wrap items-center gap-2 text-sm text-focus-muted"
     >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
@@ -27,17 +27,17 @@ function Breadcrumb({ items }: BreadcrumbProps) {
             className={isHiddenOnMobile ? "hidden md:contents" : "contents"}
           >
             {isLast ? (
-              <span aria-current="page" className="font-medium text-[#F2B705]">
+              <span aria-current="page" className="font-medium text-primary]">
                 {item.label}
               </span>
             ) : item.to != null ? (
-              <Link to={item.to} className="hover:text-[#F5F5F0]">
+              <Link to={item.to} className="hover:text-base-content">
                 {item.label}
               </Link>
             ) : (
               <span>{item.label}</span>
             )}
-            {!isLast && <span className="text-[#5E7079]">›</span>}
+            {!isLast && <span className="text-base-content/40">›</span>}
           </span>
         );
       })}

@@ -40,7 +40,7 @@ function FilmographyCard({ item, onNavigate }: FilmographyCardProps) {
               className="h-[180px] w-[120px] rounded-lg object-cover md:h-[255px] md:w-[170px]"
             />
           ) : (
-            <div className="h-[180px] w-[120px] rounded-lg bg-white/10 md:h-[255px] md:w-[170px]" />
+            <div className="h-[180px] w-[120px] rounded-lg bg-base-content/10 md:h-[255px] md:w-[170px]" />
           )}
           {mediaIcon && (
             <span

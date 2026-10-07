@@ -35,6 +35,7 @@ router.get("/api/medias/home", homepageActions.browseHomepage);
 
 /* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
+router.get("/api/medias/:id/cast", mediaActions.browseCast);
 router.get("/api/actors/:id", actorActions.read);
 router.get("/api/series/:id", serieActions.read);
 router.get("/api/series/:id/seasons/:seasonId", seasonActions.read);
@@ -42,9 +43,15 @@ router.get(
   "/api/series/:id/seasons/:seasonId/episodes",
   seasonActions.readEpisodes,
 );
+
+router.get("/api/series/:id/seasons/:seasonId/cast", seasonActions.browseCast);
 router.get(
   "/api/series/:id/seasons/:seasonId/episodes/:episodeId",
   episodeActions.read,
+);
+router.get(
+  "/api/series/:id/seasons/:seasonId/episodes/:episodeId/cast",
+  episodeActions.browseCast,
 );
 router.get("/api/actors/:id/filmography", actorActions.browseFilmography);
 router.get("/api/actors/:id/known-for", actorActions.readKnownFor);
@@ -61,8 +68,11 @@ router.post("/api/auth/login", authActions.login);
 router.use("/api/me", requireAuth);
 
 router.get("/api/me/dashboard", userActions.readDashboard);
+router.get("/api/me/settings", userActions.readSettings);
 
 router.get("/api/me/tracks", trackActions.browse);
+router.get("/api/me/favorites", trackActions.browseFavorites);
+router.get("/api/me/watchlist", trackActions.browseWatchlist);
 
 router.get("/api/me/recommendations", catalogActions.readRecommendations);
 

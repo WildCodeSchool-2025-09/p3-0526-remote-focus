@@ -23,7 +23,7 @@ const LINKS = [
   { to: "/profile/watchlist", label: "Watchlist", icon: Bookmark },
   { to: "/profile/actors", label: "Mes Acteurs", icon: Users },
   { to: "/profile/statistics", label: "Statistiques", icon: BarChart3 },
-  { to: "/profile/settings", label: "Réglages", icon: Settings },
+  { to: "/profile/settings", label: "Paramètres", icon: Settings },
 ];
 
 function ProfileMenu() {
