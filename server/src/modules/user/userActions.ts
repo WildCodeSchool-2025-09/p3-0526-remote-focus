@@ -1,9 +1,11 @@
+import argon2 from "argon2";
 import type { RequestHandler } from "express";
 
 import type { RegisterUserInput } from "../../types/User/User.types";
 import {
   validateEmailValue,
   validateLoginValue,
+  validatePasswordValue,
 } from "../../utils/accountValidators";
 import favoriteRepository from "../favorite/favoriteRepository";
 import trackRepository from "../track/trackRepository";
@@ -171,10 +173,65 @@ const updateEmail: RequestHandler = async (req, res, next) => {
   }
 };
 
+const updatePassword: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (typeof currentPassword !== "string" || currentPassword.length === 0) {
+      res
+        .status(400)
+        .json({ error: "Le mot de passe actuel est obligatoire." });
+      return;
+    }
+
+    const passwordError = validatePasswordValue(newPassword);
+
+    if (passwordError != null) {
+      res.status(400).json({ error: passwordError });
+      return;
+    }
+
+    const hashedPassword = await userRepository.readHashedPasswordById(userId);
+
+    if (hashedPassword == null) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const isCurrentPasswordValid = await argon2.verify(
+      hashedPassword,
+      currentPassword,
+    );
+
+    if (!isCurrentPasswordValid) {
+      res.status(400).json({ error: "Le mot de passe actuel est incorrect." });
+      return;
+    }
+
+    const newHashedPassword = await argon2.hash(newPassword, {
+      type: argon2.argon2id,
+    });
+
+    await userRepository.updatePassword(userId, newHashedPassword);
+
+    res.sendStatus(204);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   add,
   readDashboard,
   readSettings,
   updateLogin,
   updateEmail,
+  updatePassword,
 };
