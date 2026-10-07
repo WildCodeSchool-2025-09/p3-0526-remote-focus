@@ -1,12 +1,52 @@
 import { CameraIcon } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { updateLogin } from "../../services/accountApi";
 import { API_URL } from "../../services/api";
+import { UnauthorizedError } from "../../services/errors";
 import type { SettingsProfile } from "../../types/Dashboard";
 
 interface AccountSectionProps {
   profile: SettingsProfile;
+  onProfileChange: (changes: Partial<SettingsProfile>) => void;
 }
 
-function AccountSection({ profile }: AccountSectionProps) {
+function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
+  const { updateUser, logout } = useAuth();
+
+  const [isEditingLogin, setIsEditingLogin] = useState(false);
+  const [loginValue, setLoginValue] = useState(profile.name);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isSavingLogin, setIsSavingLogin] = useState(false);
+
+  async function handleSaveLogin() {
+    setLoginError(null);
+    setIsSavingLogin(true);
+
+    try {
+      const data = await updateLogin(loginValue);
+      updateUser({ login: data.login });
+      onProfileChange({ name: data.login });
+      setIsEditingLogin(false);
+    } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        logout();
+        return;
+      }
+      setLoginError(
+        error instanceof Error ? error.message : "La modification a échoué.",
+      );
+    } finally {
+      setIsSavingLogin(false);
+    }
+  }
+
+  function handleCancelLogin() {
+    setLoginValue(profile.name);
+    setLoginError(null);
+    setIsEditingLogin(false);
+  }
+
   return (
     <>
       <div className="flex gap-4 md:gap-10 items-center my-6">
@@ -23,8 +63,6 @@ function AccountSection({ profile }: AccountSectionProps) {
           <CameraIcon size={18} />
           Changer la photo
         </button>
-        {/* TODO US-PRO-08 = Les champs suivants peuvent être séparés dans un composant.
-        Je te laisse voir ce qui sera le plus pratique pour toi !*/}
       </div>
       <div>
         <h3 className="my-6 mt-14">Compte</h3>
@@ -34,19 +72,51 @@ function AccountSection({ profile }: AccountSectionProps) {
           </label>
           <div className="flex mt-2 mb-6 flex-col items-start gap-4 lg:flex-row">
             <input
+              id="pseudo"
               type="text"
               name="pseudo"
               className="input input-bordered bg-focus-surface w-full md:w-2/3"
-              value={`${profile.name}`}
+              value={loginValue}
+              disabled={!isEditingLogin || isSavingLogin}
+              onChange={(event) => setLoginValue(event.target.value)}
             />
-            <button
-              type="button"
-              className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
-              aria-label="Modifier le Pseudo"
-            >
-              Modifier
-            </button>
+            {isEditingLogin ? (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  aria-label="Valider le pseudo"
+                  disabled={isSavingLogin}
+                  onClick={handleSaveLogin}
+                >
+                  {isSavingLogin ? "..." : "Valider"}
+                </button>
+                <button
+                  type="button"
+                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  aria-label="Annuler la modification du pseudo"
+                  disabled={isSavingLogin}
+                  onClick={handleCancelLogin}
+                >
+                  Annuler
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                aria-label="Modifier le Pseudo"
+                onClick={() => setIsEditingLogin(true)}
+              >
+                Modifier
+              </button>
+            )}
           </div>
+          {loginError != null && (
+            <p className="text-sm text-error" aria-live="polite">
+              {loginError}
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="email" className="text-focus-muted">
