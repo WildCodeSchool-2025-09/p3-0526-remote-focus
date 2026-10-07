@@ -17,12 +17,12 @@ function SeasonEpisodes({ serieId, seasonId }: SeasonEpisodesProps) {
   );
 
   if (loading) {
-    return <p className="px-4 pb-4 text-sm text-[#9FB4BD]">Chargement…</p>;
+    return <p className="px-4 pb-4 text-sm text-focus-muted">Chargement…</p>;
   }
 
   if (error != null || episodes == null) {
     return (
-      <p className="px-4 pb-4 text-sm text-[#9FB4BD]">
+      <p className="px-4 pb-4 text-sm text-focus-muted">
         Épisodes indisponibles.
       </p>
     );
@@ -30,7 +30,7 @@ function SeasonEpisodes({ serieId, seasonId }: SeasonEpisodesProps) {
 
   if (episodes.length === 0) {
     return (
-      <p className="px-4 pb-4 text-sm text-[#9FB4BD]">Aucun épisode listé.</p>
+      <p className="px-4 pb-4 text-sm text-focus-muted">Aucun épisode listé.</p>
     );
   }
 

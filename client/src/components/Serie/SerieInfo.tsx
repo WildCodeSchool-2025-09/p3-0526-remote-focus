@@ -8,12 +8,12 @@ function SerieInfo({ serie }: SerieInfoProps) {
   return (
     <div className="flex flex-col gap-3">
       {serie.synopsis != null && (
-        <p className="max-w-[660px] text-base leading-relaxed text-[#C9D6DB]">
+        <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
           {serie.synopsis}
         </p>
       )}
 
-      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-[#9FB4BD]">
+      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-focus-muted">
         {serie.totalDuration != null && (
           <span>Durée totale : {formatDuration(serie.totalDuration)}</span>
         )}

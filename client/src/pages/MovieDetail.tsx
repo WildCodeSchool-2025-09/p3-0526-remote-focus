@@ -5,6 +5,7 @@ import CastList from "../components/CastList";
 import MovieHeader from "../components/Movie/MovieHeader";
 import useFetch from "../hooks/useFetch";
 import useSelectedActor from "../hooks/useSelectedActor";
+import { fetchCast } from "../services/api";
 import type { Media } from "../types/media";
 
 function MovieDetail() {
@@ -46,6 +47,7 @@ function MovieDetail() {
         castTotal={mediaDetail.castTotal}
         selectedPersonId={selectedPersonId}
         onSelectPerson={handleSelectPerson}
+        fetchMore={(page) => fetchCast(mediaDetail.id, { page })}
       />
       {selectedPersonId != null && (
         <ActorKnownForWidget
