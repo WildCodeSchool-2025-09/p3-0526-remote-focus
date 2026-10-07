@@ -70,7 +70,7 @@ class UserRepository {
   async readProfile(userId: number) {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
       `SELECT firstname, lastname, email, born_at, login, avatar, created_at, dark_theme, is_pegi16
-      FROM user_ 
+      FROM user_
       WHERE ID = ?`,
       [userId],
     );
@@ -78,10 +78,12 @@ class UserRepository {
     return (rows[0] as RowDataPacket | undefined) ?? null;
   }
 
-  async findByEmail(email: string): Promise<boolean> {
+  async findByEmail(email: string, excludeUserId?: number): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
-      "SELECT ID FROM user_ WHERE email = ? LIMIT 1",
-      [email],
+      excludeUserId == null
+        ? "SELECT ID FROM user_ WHERE email = ? LIMIT 1"
+        : "SELECT ID FROM user_ WHERE email = ? AND ID <> ? LIMIT 1",
+      excludeUserId == null ? [email] : [email, excludeUserId],
     );
 
     return rows.length > 0;
