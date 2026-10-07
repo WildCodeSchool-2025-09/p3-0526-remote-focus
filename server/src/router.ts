@@ -14,6 +14,7 @@ import mediaActions from "./modules/media/mediaActions";
 import * as searchActions from "./modules/search/searchActions";
 import seasonActions from "./modules/season/seasonActions";
 import serieActions from "./modules/serie/serieActions";
+import statisticsActions from "./modules/statistics/statisticsActions";
 import trackActions from "./modules/track/trackActions";
 import userActions from "./modules/user/userActions";
 import watchingActions from "./modules/watching/watchingActions";
@@ -69,6 +70,7 @@ router.use("/api/me", requireAuth);
 
 router.get("/api/me/dashboard", userActions.readDashboard);
 router.get("/api/me/settings", userActions.readSettings);
+router.get("/api/me/statistics", statisticsActions.readStatistics);
 
 router.get("/api/me/tracks", trackActions.browse);
 router.get("/api/me/favorites", trackActions.browseFavorites);
