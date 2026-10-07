@@ -109,6 +109,17 @@ class UserRepository {
     return rows.length > 0;
   }
 
+  async readHashedPasswordById(userId: number): Promise<string | null> {
+    const [rows] = await databaseClient.query<RowDataPacket[]>(
+      "SELECT hashed_password FROM user_ WHERE ID = ? LIMIT 1",
+      [userId],
+    );
+
+    const row = rows[0] as { hashed_password: string } | undefined;
+
+    return row?.hashed_password ?? null;
+  }
+
   async addLikedGenres(userId: number, genreIds: number[]): Promise<void> {
     if (genreIds.length === 0) {
       return;
