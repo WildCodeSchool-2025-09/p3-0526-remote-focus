@@ -34,6 +34,7 @@ function WatchStatusFilter() {
         <button
           key={option.value}
           type="button"
+          aria-pressed={activeStatus === option.value}
           className={getButtonClasses(option.value)}
           onClick={() => handleStatusChange(option.value)}
         >

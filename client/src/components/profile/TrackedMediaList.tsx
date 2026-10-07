@@ -20,6 +20,11 @@ const EMPTY_MESSAGES: Record<TrackedList, string> = {
   watchlist: "Aucun média dans votre watchlist pour ce filtre.",
 };
 
+const TITLES: Record<TrackedList, string> = {
+  favorite: "Favoris",
+  watchlist: "Watchlist",
+};
+
 const ERROR_MESSAGES: Record<TrackedList, string> = {
   favorite:
     "Une erreur est survenue lors du chargement de vos favoris. Merci d'actualiser la page.",
@@ -64,6 +69,8 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
         <ChevronLeft size={16} />
         Retour
       </Link>
+
+      <h1 className="sr-only">{TITLES[list]}</h1>
 
       <TypeFilter />
 
