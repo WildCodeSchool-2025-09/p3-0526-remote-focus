@@ -233,11 +233,38 @@ describe("watchingActions.toggleEpisodeWatched", () => {
     expect(mockedRepository.unmarkEpisodeAsWatched).not.toHaveBeenCalled();
     expect(mockedRepository.readSeriesIdFromEpisode).toHaveBeenCalledWith(40);
     expect(mockedRepository.isFullyWatched).toHaveBeenCalledWith(1, 20);
+    expect(mockedRepository.unmarkMediaAsWatched).toHaveBeenCalledWith(1, 20);
 
     expect(res.json).toHaveBeenCalledWith({
       watched: true,
       mediaId: 20,
       seriesFullyWatched: false,
+    });
+  });
+
+  test("ajoute la série aux médias vus lorsque tous ses épisodes sont vus", async () => {
+    mockedRepository.isEpisodeWatched.mockResolvedValue([]);
+    mockedRepository.readSeriesIdFromEpisode.mockResolvedValue(20);
+    mockedRepository.isFullyWatched.mockResolvedValue(true);
+    mockedRepository.isMediaWatched.mockResolvedValue([]);
+
+    const req = { params: { id: "40" }, user: { id: 1 } } as unknown as Request;
+    const res = createResponse();
+
+    await watchingActions.toggleEpisodeWatched(req, res, jest.fn());
+
+    expect(mockedRepository.isEpisodeWatched).toHaveBeenCalledWith(1, 40);
+    expect(mockedRepository.markEpisodeAsWatched).toHaveBeenCalledWith(1, 40);
+    expect(mockedRepository.readSeriesIdFromEpisode).toHaveBeenCalledWith(40);
+    expect(mockedRepository.isFullyWatched).toHaveBeenCalledWith(1, 20);
+    expect(mockedRepository.isMediaWatched).toHaveBeenCalledWith(1, 20);
+    expect(mockedRepository.markMediaAsWatched).toHaveBeenCalledWith(1, 20);
+    expect(mockedRepository.unmarkMediaAsWatched).not.toHaveBeenCalled();
+
+    expect(res.json).toHaveBeenCalledWith({
+      watched: true,
+      mediaId: 20,
+      seriesFullyWatched: true,
     });
   });
 
@@ -257,6 +284,7 @@ describe("watchingActions.toggleEpisodeWatched", () => {
     expect(mockedRepository.isEpisodeWatched).toHaveBeenCalledWith(1, 40);
     expect(mockedRepository.unmarkEpisodeAsWatched).toHaveBeenCalledWith(1, 40);
     expect(mockedRepository.markEpisodeAsWatched).not.toHaveBeenCalled();
+    expect(mockedRepository.unmarkMediaAsWatched).toHaveBeenCalledWith(1, 20);
 
     expect(res.json).toHaveBeenCalledWith({
       watched: false,
