@@ -140,6 +140,13 @@ class UserRepository {
       values,
     );
   }
+
+  async updateLogin(userId: number, login: string): Promise<void> {
+    await databaseClient.query<Result>(
+      "UPDATE user_ SET login = ? WHERE ID = ?",
+      [login, userId],
+    );
+  }
 }
 
 export default new UserRepository();
