@@ -83,7 +83,13 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       <WatchStatusFilter />
 
       {loading && (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
+        <div
+          className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5"
+          aria-busy="true"
+        >
+          <p className="sr-only" aria-live="polite">
+            Chargement en cours…
+          </p>
           {Array.from({ length: 10 }, (_, index) => index + 1).map(
             (loadingId) => (
               <MediaCardLoading key={loadingId} />
