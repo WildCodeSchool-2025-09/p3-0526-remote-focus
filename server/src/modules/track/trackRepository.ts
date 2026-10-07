@@ -6,7 +6,13 @@ export type TrackState = {
   isInWatchlist: boolean;
 };
 
-export type WatchlistType = "movie" | "tv" | "anime" | null;
+export type TrackedList = "favorite" | "watchlist";
+export type TrackedType = "movie" | "tv" | "anime" | null;
+
+const TRACKED_LISTS = {
+  favorite: { flag: "t.favorite_media = TRUE", dateColumn: "t.favorited_at" },
+  watchlist: { flag: "t.watchlist = TRUE", dateColumn: "t.watchlisted_at" },
+} as const;
 
 const MEDIA_TYPE_FILTER = `
   (? IS NULL
@@ -77,10 +83,13 @@ class TrackRepository {
         ID_media,
         favorite_media,
         user_rating,
-        watchlist
+        watchlist,
+        favorited_at,
+        watchlisted_at
       )
-      VALUES (?, ?, TRUE, NULL, FALSE)
+      VALUES (?, ?, TRUE, NULL, FALSE, NOW(), NULL)
       ON DUPLICATE KEY UPDATE
+        favorited_at = IF(favorite_media, NULL, NOW()),
         favorite_media = NOT favorite_media`,
       [userId, mediaId],
     );
@@ -101,10 +110,13 @@ class TrackRepository {
         ID_media,
         favorite_media,
         user_rating,
-        watchlist
+        watchlist,
+        favorited_at,
+        watchlisted_at
       )
-      VALUES (?, ?, FALSE, NULL, TRUE)
+      VALUES (?, ?, FALSE, NULL, TRUE, NULL, NOW())
       ON DUPLICATE KEY UPDATE
+        watchlisted_at = IF(watchlist, NULL, NOW()),
         watchlist = NOT watchlist`,
       [userId, mediaId],
     );
@@ -142,13 +154,15 @@ class TrackRepository {
     return Number(rows[0].total);
   }
 
-  async browseWatchlist(
+  async browseTracked(
     userId: number,
-    type: WatchlistType,
+    list: TrackedList,
+    type: TrackedType,
     seen: boolean | null,
     limit: number,
     offset: number,
   ): Promise<Rows> {
+    const { flag, dateColumn } = TRACKED_LISTS[list];
     const [rows] = await databaseClient.query<Rows>(
       `SELECT
          m.ID, m.tmdb_id, m.name, m.type, m.released_at, m.duration,
@@ -160,27 +174,29 @@ class TrackRepository {
        FROM track AS t
        JOIN media AS m ON m.ID = t.ID_media
        WHERE t.ID_user = ?
-         AND t.watchlist = 1
+         AND ${flag}
          AND ${MEDIA_TYPE_FILTER}
          ${buildSeenFilter(seen)}
-       ORDER BY t.added_at DESC, t.ID_media DESC
+       ORDER BY ${dateColumn} DESC, t.ID_media DESC
        LIMIT ? OFFSET ?`,
       [userId, type, type, type, type, limit, offset],
     );
     return rows;
   }
 
-  async countWatchlistByFilters(
+  async countTrackedByFilters(
     userId: number,
-    type: WatchlistType,
+    list: TrackedList,
+    type: TrackedType,
     seen: boolean | null,
   ): Promise<number> {
+    const { flag } = TRACKED_LISTS[list];
     const [rows] = await databaseClient.query<Rows>(
       `SELECT COUNT(*) AS total
        FROM track AS t
        JOIN media AS m ON m.ID = t.ID_media
        WHERE t.ID_user = ?
-         AND t.watchlist = 1
+         AND ${flag}
          AND ${MEDIA_TYPE_FILTER}
          ${buildSeenFilter(seen)}`,
       [userId, type, type, type, type],
