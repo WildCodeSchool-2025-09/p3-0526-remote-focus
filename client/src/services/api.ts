@@ -7,6 +7,7 @@ import type {
 import type { Actor, CastPage, FilmographyPage } from "../types/media";
 import type { SearchResults } from "../types/search";
 import { getAuthHeaders } from "../utils/authStorage";
+import { UnauthorizedError } from "./errors";
 
 export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
@@ -157,6 +158,10 @@ export async function fetchTrackedMedias(
   const response = await fetch(`${API_URL}${TRACKED_PATHS[list]}?${params}`, {
     headers: getAuthHeaders(),
   });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
 
   if (!response.ok) {
     throw new Error("Liste indisponible");

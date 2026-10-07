@@ -20,6 +20,11 @@ const EMPTY_MESSAGES: Record<TrackedList, string> = {
   watchlist: "Aucun média dans votre watchlist pour ce filtre.",
 };
 
+const TITLES: Record<TrackedList, string> = {
+  favorite: "Favoris",
+  watchlist: "Watchlist",
+};
+
 const ERROR_MESSAGES: Record<TrackedList, string> = {
   favorite:
     "Une erreur est survenue lors du chargement de vos favoris. Merci d'actualiser la page.",
@@ -65,6 +70,8 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
         Retour
       </Link>
 
+      <h1 className="sr-only">{TITLES[list]}</h1>
+
       <TypeFilter />
 
       <ProfileListSwitch
@@ -76,7 +83,13 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       <WatchStatusFilter />
 
       {loading && (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
+        <div
+          className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5"
+          aria-busy="true"
+        >
+          <p className="sr-only" aria-live="polite">
+            Chargement en cours…
+          </p>
           {Array.from({ length: 10 }, (_, index) => index + 1).map(
             (loadingId) => (
               <MediaCardLoading key={loadingId} />
@@ -86,11 +99,15 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       )}
 
       {!loading && error && (
-        <p className="text-focus-muted">{ERROR_MESSAGES[list]}</p>
+        <p className="text-focus-muted" aria-live="polite">
+          {ERROR_MESSAGES[list]}
+        </p>
       )}
 
       {!loading && !error && medias.length === 0 && (
-        <p className="text-focus-muted">{EMPTY_MESSAGES[list]}</p>
+        <p className="text-focus-muted" aria-live="polite">
+          {EMPTY_MESSAGES[list]}
+        </p>
       )}
 
       {!loading && !error && medias.length > 0 && (
@@ -109,7 +126,7 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
       {hasMore && (
         <div className="flex flex-col items-center gap-2">
           {loadMoreError && (
-            <p className="text-sm text-focus-muted">
+            <p className="text-sm text-focus-muted" aria-live="polite">
               Impossible de charger la suite. Réessaie.
             </p>
           )}
