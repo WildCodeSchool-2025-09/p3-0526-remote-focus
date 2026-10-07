@@ -1,7 +1,7 @@
 import { CameraIcon } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { updateLogin } from "../../services/accountApi";
+import { updateEmail, updateLogin } from "../../services/accountApi";
 import { API_URL } from "../../services/api";
 import { UnauthorizedError } from "../../services/errors";
 import type { SettingsProfile } from "../../types/Dashboard";
@@ -45,6 +45,39 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
     setLoginValue(profile.name);
     setLoginError(null);
     setIsEditingLogin(false);
+  }
+
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [emailValue, setEmailValue] = useState(profile.email);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [isSavingEmail, setIsSavingEmail] = useState(false);
+
+  async function handleSaveEmail() {
+    setEmailError(null);
+    setIsSavingEmail(true);
+
+    try {
+      const data = await updateEmail(emailValue);
+      updateUser({ email: data.email });
+      onProfileChange({ email: data.email });
+      setIsEditingEmail(false);
+    } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        logout();
+        return;
+      }
+      setEmailError(
+        error instanceof Error ? error.message : "La modification a échoué.",
+      );
+    } finally {
+      setIsSavingEmail(false);
+    }
+  }
+
+  function handleCancelEmail() {
+    setEmailValue(profile.email);
+    setEmailError(null);
+    setIsEditingEmail(false);
   }
 
   return (
@@ -124,19 +157,51 @@ function AccountSection({ profile, onProfileChange }: AccountSectionProps) {
           </label>
           <div className="flex mt-2 mb-6 flex-col items-start gap-4 lg:flex-row">
             <input
-              type="text"
+              id="email"
+              type="email"
               name="email"
               className="input input-bordered bg-focus-surface w-full md:w-2/3"
-              value={`${profile.email}`}
+              value={emailValue}
+              disabled={!isEditingEmail || isSavingEmail}
+              onChange={(event) => setEmailValue(event.target.value)}
             />
-            <button
-              type="button"
-              className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
-              aria-label="Modifier le Mail"
-            >
-              Modifier
-            </button>
+            {isEditingEmail ? (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  aria-label="Valider l'email"
+                  disabled={isSavingEmail}
+                  onClick={handleSaveEmail}
+                >
+                  {isSavingEmail ? "..." : "Valider"}
+                </button>
+                <button
+                  type="button"
+                  className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                  aria-label="Annuler la modification de l'email"
+                  disabled={isSavingEmail}
+                  onClick={handleCancelEmail}
+                >
+                  Annuler
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="btn px-6 border-focus-muted-dark/40 bg-focus-void"
+                aria-label="Modifier le Mail"
+                onClick={() => setIsEditingEmail(true)}
+              >
+                Modifier
+              </button>
+            )}
           </div>
+          {emailError != null && (
+            <p className="text-sm text-error" aria-live="polite">
+              {emailError}
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="password" className="text-focus-muted">
