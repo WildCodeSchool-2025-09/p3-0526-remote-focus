@@ -1,5 +1,8 @@
+import type { MediaType } from "../types/Catalog";
+import type { WatchlistResponse } from "../types/Watchlist";
 import type { Actor, FilmographyPage } from "../types/media";
 import type { SearchResults } from "../types/search";
+import { getAuthHeaders } from "../utils/authStorage";
 
 export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3310";
 
@@ -59,6 +62,38 @@ export async function fetchFilmography(
 
   if (!response.ok) {
     throw new Error("Filmographie indisponible");
+  }
+
+  return response.json();
+}
+
+type FetchWatchlistOptions = {
+  page?: number;
+  type?: MediaType;
+  seen?: boolean;
+};
+
+export async function fetchWatchlist({
+  page = 1,
+  type,
+  seen,
+}: FetchWatchlistOptions = {}): Promise<WatchlistResponse> {
+  const params = new URLSearchParams({ page: String(page) });
+
+  if (type) {
+    params.set("type", type);
+  }
+
+  if (seen != null) {
+    params.set("seen", String(seen));
+  }
+
+  const response = await fetch(`${API_URL}/api/me/watchlist?${params}`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("Watchlist indisponible");
   }
 
   return response.json();
