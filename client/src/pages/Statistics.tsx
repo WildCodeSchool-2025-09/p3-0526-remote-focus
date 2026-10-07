@@ -46,13 +46,13 @@ function Statistics() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-focus-line/20 bg-base-200 p-4 text-center">
+            <div className="flex flex-col justify-center rounded-lg border border-focus-line/20 bg-base-200 p-4 text-center">
               <h2 className="mb-4 font-semibold">Répartition par genre</h2>
               <GenreDonutChart data={data.genreDistribution} />
             </div>
 
             <div className="rounded-lg border border-focus-line/20 bg-base-200 p-4">
-              <h2 className="mb-4 font-semibold">
+              <h2 className="mb-4 text-center font-semibold">
                 Temps de visionnage par mois
               </h2>
               <MonthlyViewingChart monthlyDuration={data.monthlyDuration} />
@@ -60,7 +60,9 @@ function Statistics() {
           </div>
 
           <div className="rounded-lg border border-focus-line/20 bg-base-200 p-4">
-            <h2 className="mb-4 font-semibold">Mes genres les plus regardés</h2>
+            <h2 className="mb-4 text-center font-semibold">
+              Mes genres les plus regardés
+            </h2>
             <TopGenresList data={data.topGenres} />
           </div>
         </>
