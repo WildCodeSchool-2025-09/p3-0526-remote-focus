@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useWatch } from "../../contexts/WatchingContext";
 import type { Serie } from "../../types/media";
+import { formatSerieStatus } from "../../utils/formatSerieStatus";
 import PlatformList from "../PlatformList";
 import TrackActions from "../TrackActions";
 import SerieInfo from "./SerieInfo";
@@ -86,7 +87,7 @@ function SerieHeader({ serie }: SerieHeaderProps) {
             )}
 
             {serie.status != null && (
-              <span className={PILL}>{serie.status}</span>
+              <span className={PILL}>{formatSerieStatus(serie.status)}</span>
             )}
 
             {serie.pegi != null && (
