@@ -98,10 +98,12 @@ class UserRepository {
     return rows[0] ?? null;
   }
 
-  async findByLogin(login: string): Promise<boolean> {
+  async findByLogin(login: string, excludeUserId?: number): Promise<boolean> {
     const [rows] = await databaseClient.query<RowDataPacket[]>(
-      "SELECT ID FROM user_ WHERE login = ? LIMIT 1",
-      [login],
+      excludeUserId == null
+        ? "SELECT ID FROM user_ WHERE login = ? LIMIT 1"
+        : "SELECT ID FROM user_ WHERE login = ? AND ID <> ? LIMIT 1",
+      excludeUserId == null ? [login] : [login, excludeUserId],
     );
 
     return rows.length > 0;
