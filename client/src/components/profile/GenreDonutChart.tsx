@@ -39,7 +39,7 @@ function GenreDonutChart({ data }: GenreDonutChartProps) {
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-2 text-left">
         {data.map((entry, index) => (
           <li key={entry.genre} className="flex items-center gap-2 text-sm">
             <span
