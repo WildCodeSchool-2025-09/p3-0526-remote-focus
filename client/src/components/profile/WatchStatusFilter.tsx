@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router";
-import type { WatchStatus } from "../../types/Watchlist";
+import type { WatchStatus } from "../../types/Tracked";
 
 const OPTIONS: { value: WatchStatus; label: string }[] = [
   { value: "all", label: "Tous" },

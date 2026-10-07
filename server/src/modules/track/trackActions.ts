@@ -2,12 +2,83 @@ import type { RequestHandler } from "express";
 
 import { formatMedias } from "../../utils/formatters";
 import mediaRepository from "../media/mediaRepository";
-import trackRepository, { type WatchlistType } from "./trackRepository";
+import trackRepository, {
+  type TrackedList,
+  type TrackedType,
+} from "./trackRepository";
 
-const LIMIT = 10;
+const TRACKED_LIMIT = 10;
 
 function isMediaType(value: unknown): value is "movie" | "tv" | "anime" {
   return value === "movie" || value === "tv" || value === "anime";
+}
+
+function browseTrackedList(list: TrackedList): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      const userId = req.user?.id;
+
+      if (userId == null) {
+        res.status(401).json({
+          error: "Vous devez être connecté.",
+        });
+        return;
+      }
+
+      const {
+        type: requestedType,
+        seen: requestedSeen,
+        page: requestedPage,
+      } = req.query;
+
+      if (requestedType !== undefined && !isMediaType(requestedType)) {
+        res.status(400).json({ error: "Type de média invalide." });
+        return;
+      }
+
+      if (
+        requestedSeen !== undefined &&
+        requestedSeen !== "true" &&
+        requestedSeen !== "false"
+      ) {
+        res.status(400).json({ error: "Filtre de visionnage invalide." });
+        return;
+      }
+
+      const page = requestedPage === undefined ? 1 : Number(requestedPage);
+
+      if (!Number.isInteger(page) || page < 1) {
+        res.status(400).json({ error: "Numéro de page invalide." });
+        return;
+      }
+
+      const type: TrackedType = isMediaType(requestedType)
+        ? requestedType
+        : null;
+      const seen =
+        requestedSeen === undefined ? null : requestedSeen === "true";
+      const offset = (page - 1) * TRACKED_LIMIT;
+
+      const [rows, total] = await Promise.all([
+        trackRepository.browseTracked(
+          userId,
+          list,
+          type,
+          seen,
+          TRACKED_LIMIT,
+          offset,
+        ),
+        trackRepository.countTrackedByFilters(userId, list, type, seen),
+      ]);
+
+      res.json({
+        medias: formatMedias(rows),
+        hasMore: offset + rows.length < total,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 const browse: RequestHandler = async (req, res, next) => {
@@ -101,67 +172,10 @@ const toggleWatchlist: RequestHandler = async (req, res, next) => {
   }
 };
 
-const browseWatchlist: RequestHandler = async (req, res, next) => {
-  try {
-    const userId = req.user?.id;
-
-    if (userId == null) {
-      res.status(401).json({
-        error: "Vous devez être connecté.",
-      });
-      return;
-    }
-
-    const {
-      type: requestedType,
-      seen: requestedSeen,
-      page: requestedPage,
-    } = req.query;
-
-    if (requestedType !== undefined && !isMediaType(requestedType)) {
-      res.status(400).json({ error: "Type de média invalide." });
-      return;
-    }
-
-    if (
-      requestedSeen !== undefined &&
-      requestedSeen !== "true" &&
-      requestedSeen !== "false"
-    ) {
-      res.status(400).json({ error: "Filtre de visionnage invalide." });
-      return;
-    }
-
-    const page = requestedPage === undefined ? 1 : Number(requestedPage);
-
-    if (!Number.isInteger(page) || page < 1) {
-      res.status(400).json({ error: "Numéro de page invalide." });
-      return;
-    }
-
-    const type: WatchlistType = isMediaType(requestedType)
-      ? requestedType
-      : null;
-    const seen = requestedSeen === undefined ? null : requestedSeen === "true";
-    const offset = (page - 1) * LIMIT;
-
-    const [rows, total] = await Promise.all([
-      trackRepository.browseWatchlist(userId, type, seen, LIMIT, offset),
-      trackRepository.countWatchlistByFilters(userId, type, seen),
-    ]);
-
-    res.json({
-      medias: formatMedias(rows),
-      hasMore: offset + rows.length < total,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export default {
   browse,
-  browseWatchlist,
+  browseFavorites: browseTrackedList("favorite"),
+  browseWatchlist: browseTrackedList("watchlist"),
   toggleFavorite,
   toggleWatchlist,
 };

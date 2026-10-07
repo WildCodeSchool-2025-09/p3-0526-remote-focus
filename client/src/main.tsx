@@ -13,6 +13,7 @@ import ActorDetail from "./pages/ActorDetail";
 import Calendar from "./pages/Calendar";
 import Catalog from "./pages/Catalog";
 import EpisodeDetail from "./pages/EpisodeDetail";
+import Favorites from "./pages/Favorites";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
@@ -50,6 +51,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/favorites",
+        element: (
+          <PrivateRoute>
+            <Favorites />
           </PrivateRoute>
         ),
       },
