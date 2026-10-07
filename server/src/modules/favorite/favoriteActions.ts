@@ -21,6 +21,66 @@ const browse: RequestHandler = async (req, res, next) => {
   }
 };
 
+const FAVORITE_ACTORS_LIMIT = 6;
+const FAVORITE_ACTORS_MAX_LIMIT = 50;
+
+const browseFavoriteActors: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.status(401).json({
+        error: "Vous devez être connecté.",
+      });
+      return;
+    }
+
+    const page = req.query.page === undefined ? 1 : Number(req.query.page);
+    const limit =
+      req.query.limit === undefined
+        ? FAVORITE_ACTORS_LIMIT
+        : Number(req.query.limit);
+
+    if (!Number.isInteger(page) || page < 1) {
+      res.status(400).json({ error: "Numéro de page invalide." });
+      return;
+    }
+
+    if (
+      !Number.isInteger(limit) ||
+      limit < 1 ||
+      limit > FAVORITE_ACTORS_MAX_LIMIT
+    ) {
+      res.status(400).json({ error: "Limite invalide." });
+      return;
+    }
+
+    const offset = (page - 1) * limit;
+
+    const [rows, total] = await Promise.all([
+      favoriteRepository.readFavoriteActors(userId, limit, offset),
+      favoriteRepository.countFavoriteActors(userId),
+    ]);
+
+    res.json({
+      data: rows.map((row) => ({
+        id: row.ID,
+        name: row.name,
+        photo: row.photo,
+        viewedCount: Number(row.viewed_count),
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        hasMore: offset + rows.length < total,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const toggleFavorite: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?.id;
@@ -57,4 +117,4 @@ const toggleFavorite: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { browse, toggleFavorite };
+export default { browse, browseFavoriteActors, toggleFavorite };

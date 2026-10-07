@@ -69,6 +69,7 @@ router.get("/api/me/watchlist", trackActions.browseWatchlist);
 
 router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
 router.get("/api/me/actors/favorites", favoriteActions.browse);
+router.get("/api/me/favorite-actors", favoriteActions.browseFavoriteActors);
 
 router.patch("/api/me/actors/:id/favorite", favoriteActions.toggleFavorite);
 router.patch("/api/me/medias/:id/watchlist", trackActions.toggleWatchlist);
