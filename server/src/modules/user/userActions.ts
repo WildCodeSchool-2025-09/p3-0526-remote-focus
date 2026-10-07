@@ -63,4 +63,40 @@ const readDashboard: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { add, readDashboard };
+const readSettings: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const profile = await userRepository.readProfile(userId);
+
+    if (profile == null) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json({
+      profile: {
+        firstname: profile.firstname,
+        lastname: profile.lastname,
+        email: profile.email,
+        bornAt: profile.born_at,
+        name: profile.login,
+        avatar: profile.avatar,
+        createdAt: profile.created_at,
+      },
+      preferences: {
+        darkTheme: profile.dark_theme,
+        isPegi16: profile.is_pegi16,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { add, readDashboard, readSettings };
