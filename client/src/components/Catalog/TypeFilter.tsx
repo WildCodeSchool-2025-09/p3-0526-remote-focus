@@ -31,7 +31,7 @@ function TypeFilter() {
   }
 
   return (
-    <search className="flex gap-4 justify-center md:justify-start md:gap-8 border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10 text-xs md:text-base">
+    <search className="flex gap-4 justify-start md:gap-8 border-b border-white/10 mt-5 pt-3 sticky top-0 bg-focus-void z-10 text-xs md:text-base">
       <button
         type="button"
         className={getButtonClasses("all")}
