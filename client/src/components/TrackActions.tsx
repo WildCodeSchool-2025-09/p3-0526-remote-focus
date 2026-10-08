@@ -1,9 +1,9 @@
 import { Check, Heart, Minus, Plus, Star } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTrackActions } from "../hooks/useTrackActions";
 import ActionButton from "./ActionButton";
 import AuthRequiredModal from "./AuthRequiredModal";
-import { useState } from "react";
 import RatingModal from "./RatingModal";
 
 type TrackActionsProps = {
