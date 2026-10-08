@@ -77,8 +77,11 @@ router.get("/api/me/tracks", trackActions.browse);
 router.get("/api/me/favorites", trackActions.browseFavorites);
 router.get("/api/me/watchlist", trackActions.browseWatchlist);
 
+router.get("/api/me/recommendations", catalogActions.readRecommendations);
+
 router.patch("/api/me/medias/:id/favorite", trackActions.toggleFavorite);
 router.get("/api/me/actors/favorites", favoriteActions.browse);
+router.get("/api/me/actors/most-watched", actorActions.readMostWatched);
 
 router.patch("/api/me/actors/:id/favorite", favoriteActions.toggleFavorite);
 router.patch("/api/me/medias/:id/watchlist", trackActions.toggleWatchlist);
