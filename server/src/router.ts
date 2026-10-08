@@ -69,6 +69,9 @@ router.use("/api/me", requireAuth);
 
 router.get("/api/me/dashboard", userActions.readDashboard);
 router.get("/api/me/settings", userActions.readSettings);
+router.patch("/api/me/login", userActions.updateLogin);
+router.patch("/api/me/email", userActions.updateEmail);
+router.patch("/api/me/password", userActions.updatePassword);
 
 router.get("/api/me/tracks", trackActions.browse);
 router.get("/api/me/favorites", trackActions.browseFavorites);
