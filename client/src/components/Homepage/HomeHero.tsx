@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import logoFocus from "../../assets/images/logoFocus.png";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link } from "react-router";
 
 function HomeHero() {
   const { isAuthenticated, user } = useAuth();
