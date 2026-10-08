@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronLeft, Heart } from "lucide-react";
+import { ArrowLeft, ChevronDown, Heart } from "lucide-react";
 import { Link } from "react-router";
 import ActorSection from "../components/profile/ActorSection";
 import useFavoriteActors from "../hooks/useFavoriteActors";
@@ -16,13 +16,16 @@ function MyActorsPage() {
 
   return (
     <div className="space-y-6">
-      <Link
-        to="/profile"
-        className="inline-flex items-center gap-2 text-sm text-base-content"
-      >
-        <ChevronLeft size={16} />
-        Retour
-      </Link>
+      <div className="flex w-full justify-end px-4 pt-6">
+        <Link
+          to="/profile"
+          aria-label="Retour au profil"
+          className="flex shrink-0 items-center gap-2 rounded-full border border-base-content/30 p-2.5 text-sm transition-colors hover:border-primary hover:text-primary lg:px-4 lg:py-2"
+        >
+          <ArrowLeft size={16} />
+          <span className="hidden lg:inline">Retour</span>
+        </Link>
+      </div>
 
       <h1 className="text-2xl font-bold md:text-3xl">Mes Acteurs</h1>
 
