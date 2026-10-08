@@ -7,9 +7,9 @@ function TypeFilter() {
 
   function getButtonClasses(filter: string) {
     if (activeFilter === filter) {
-      return "border-b-2 border-focus-yellow px-0.5 pb-3 font-semibold text-focus-yellow flex gap-2 items-center";
+      return "flex flex-1 items-center justify-center gap-2 md:flex-none md:justify-start border-b-2 border-focus-yellow px-0.5 pb-3 font-semibold text-focus-yellow flex gap-2 items-center";
     }
-    return "border-b-2 border-transparent px-0.5 pb-3 text-focus-muted flex gap-2 items-center";
+    return "flex flex-1 items-center justify-center gap-2 md:flex-none md:justify-start border-b-2 border-transparent px-0.5 pb-3 text-focus-muted flex gap-2 items-center";
   }
 
   function getIconColor(filter: string) {
