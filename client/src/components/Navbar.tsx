@@ -1,4 +1,4 @@
-import { Calendar, Home, Tv, User } from "lucide-react";
+import { Home, Search, Tv, User } from "lucide-react";
 import { NavLink } from "react-router";
 import logoFocus from "../assets/images/logoFocus.png";
 
@@ -32,9 +32,9 @@ function Navbar() {
         <span>Catalogue</span>
       </NavLink>
 
-      <NavLink to="/calendar" className={linkClass}>
-        <Calendar size={20} />
-        <span>Calendrier</span>
+      <NavLink to="/search" className={linkClass}>
+        <Search size={20} />
+        <span>Recherche</span>
       </NavLink>
 
       <NavLink to="/profile" className={linkClass}>
