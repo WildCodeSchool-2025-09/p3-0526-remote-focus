@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { formatFilmography } from "../../utils/formatters";
+import { formatCast, formatFilmography } from "../../utils/formatters";
 import actorRepository from "./actorRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -126,4 +126,23 @@ const readKnownFor: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { read, browseFilmography, readKnownFor };
+const readMostWatched: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId == null) {
+      res.status(401).json({
+        error: "Vous devez être connecté.",
+      });
+      return;
+    }
+
+    const actors = await actorRepository.readMostWatched(userId, 12);
+
+    res.json({ actors: formatCast(actors) });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { read, browseFilmography, readKnownFor, readMostWatched };

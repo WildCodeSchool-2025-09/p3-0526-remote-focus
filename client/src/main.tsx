@@ -17,6 +17,7 @@ import Favorites from "./pages/Favorites";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import MovieDetail from "./pages/MovieDetail";
+import MyActorsPage from "./pages/MyActorsPage";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
@@ -67,6 +68,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Watchlist />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/actors",
+        element: (
+          <PrivateRoute>
+            <MyActorsPage />
           </PrivateRoute>
         ),
       },
