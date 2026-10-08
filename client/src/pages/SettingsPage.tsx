@@ -38,6 +38,14 @@ function SettingsPage() {
     if (settings) setFormData(settings);
   }, [settings]);
 
+  function handleProfileChange(changes: Partial<SettingsResponse["profile"]>) {
+    setFormData((current) =>
+      current
+        ? { ...current, profile: { ...current.profile, ...changes } }
+        : current,
+    );
+  }
+
   function handlePegi() {
     if (formData) {
       setFormData({
@@ -74,7 +82,10 @@ function SettingsPage() {
 
       {settings && formData && (
         <>
-          <AccountSection profile={formData.profile} />
+          <AccountSection
+            profile={formData.profile}
+            onProfileChange={handleProfileChange}
+          />
           <PreferencesSection
             preferences={formData.preferences}
             onPegiChange={handlePegi}

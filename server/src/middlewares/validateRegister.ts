@@ -1,4 +1,9 @@
 import type { RequestHandler } from "express";
+import {
+  validateEmailValue,
+  validateLoginValue,
+  validatePasswordValue,
+} from "../utils/accountValidators";
 
 const validateRegister: RequestHandler = (req, res, next) => {
   const { firstName, lastName, email, bornAt, login, password, genreIds } =
@@ -25,23 +30,10 @@ const validateRegister: RequestHandler = (req, res, next) => {
     return;
   }
 
-  if (
-    typeof email !== "string" ||
-    email.trim().length === 0 ||
-    email.trim().length > 255
-  ) {
-    res.status(400).json({
-      error: "L'adresse e-mail est obligatoire.",
-    });
-    return;
-  }
+  const emailError = validateEmailValue(email);
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailPattern.test(email.trim())) {
-    res.status(400).json({
-      error: "Le format de l'adresse e-mail est invalide.",
-    });
+  if (emailError != null) {
+    res.status(400).json({ error: emailError });
     return;
   }
 
@@ -62,25 +54,17 @@ const validateRegister: RequestHandler = (req, res, next) => {
     return;
   }
 
-  if (
-    typeof login !== "string" ||
-    login.trim().length === 0 ||
-    login.trim().length > 50
-  ) {
-    res.status(400).json({
-      error: "Le pseudo est obligatoire et limité à 50 caractères.",
-    });
+  const loginError = validateLoginValue(login);
+
+  if (loginError != null) {
+    res.status(400).json({ error: loginError });
     return;
   }
 
-  if (
-    typeof password !== "string" ||
-    password.length < 8 ||
-    password.length > 255
-  ) {
-    res.status(400).json({
-      error: "Le mot de passe doit contenir entre 8 et 255 caractères.",
-    });
+  const passwordError = validatePasswordValue(password);
+
+  if (passwordError != null) {
+    res.status(400).json({ error: passwordError });
     return;
   }
 

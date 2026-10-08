@@ -27,6 +27,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (data: LoginResponse) => void;
   logout: () => void;
+  updateUser: (changes: Partial<AuthUser>) => void;
 }
 
 interface AuthProviderProps {
@@ -91,6 +92,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((changes: Partial<AuthUser>) => {
+    setUser((currentUser) => {
+      if (currentUser === null) {
+        return currentUser;
+      }
+
+      const updatedUser = { ...currentUser, ...changes };
+      safeSetItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+
+      return updatedUser;
+    });
+  }, []);
+
   // Déconnexion automatique à l'expiration du token.
   useEffect(() => {
     if (token === null) {
@@ -151,8 +165,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: token !== null && user !== null,
       login,
       logout,
+      updateUser,
     }),
-    [user, token, login, logout],
+    [user, token, login, logout, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
