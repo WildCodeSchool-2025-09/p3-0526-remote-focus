@@ -1,3 +1,4 @@
+import type { ProfileActorsPage } from "../types/ProfileActor";
 import { UnauthorizedError } from "./errors";
 
 export type ActorFavoriteState = {
@@ -49,4 +50,33 @@ export async function toggleActorFavorite(
   }
 
   return (await response.json()) as ActorFavoriteState;
+}
+
+type FetchFavoriteActorsOptions = {
+  page?: number;
+  limit?: number;
+};
+
+export async function fetchFavoriteActors(
+  token: string,
+  { page = 1, limit = 6 }: FetchFavoriteActorsOptions = {},
+): Promise<ProfileActorsPage> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  const response = await fetch(`${API_URL}/api/me/favorite-actors?${params}`, {
+    headers: getAuthHeaders(token),
+  });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
+
+  if (!response.ok) {
+    throw new Error("Impossible de récupérer vos acteurs favoris.");
+  }
+
+  return (await response.json()) as ProfileActorsPage;
 }
