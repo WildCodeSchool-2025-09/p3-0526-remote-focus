@@ -2,6 +2,27 @@ import type { RowDataPacket } from "mysql2";
 import databaseClient, { type Rows } from "../../../database/client";
 import type { PersonRow } from "../../types/Person/Person.types";
 
+export const SEEN_ACTOR_MEDIAS_SQL = `
+  (SELECT mp.ID_person, mp.ID_media
+   FROM media_person AS mp
+   JOIN media_user AS mu ON mu.ID_media = mp.ID_media
+   WHERE mu.ID_user = ? AND mp.role = 'actor')
+  UNION
+  (SELECT mp.ID_person, s.ID_media
+   FROM media_person AS mp
+   JOIN season AS s ON s.ID_media = mp.ID_media
+   JOIN episode AS e ON e.ID_season = s.ID
+   JOIN episode_user AS eu ON eu.ID_episode = e.ID
+   WHERE eu.ID_user = ? AND mp.role = 'actor')
+  UNION
+  (SELECT ep.ID_person, s.ID_media
+   FROM episode_person AS ep
+   JOIN episode AS e ON e.ID = ep.ID_episode
+   JOIN season AS s ON s.ID = e.ID_season
+   JOIN episode_user AS eu ON eu.ID_episode = e.ID
+   WHERE eu.ID_user = ? AND ep.role = 'actor')
+`;
+
 class ActorRepository {
   async read(id: number) {
     const [rows] = await databaseClient.query<PersonRow[]>(
@@ -166,36 +187,26 @@ class ActorRepository {
     return rows[0].total;
   }
 
-  async readMostWatched(userId: number, limit = 12) {
+  async readMostWatched(userId: number, limit = 12, offset = 0) {
     const [rows] = await databaseClient.query<Rows>(
-      `SELECT pe.ID, pe.name, pe.photo, NULL AS personnage_name, 'actor' AS role
+      `SELECT pe.ID, pe.name, pe.photo, NULL AS personnage_name, 'actor' AS role,
+              COUNT(*) AS viewed_count
        FROM person AS pe
-       JOIN (
-         (SELECT mp.ID_person, mp.ID_media
-          FROM media_person AS mp
-          JOIN media_user AS mu ON mu.ID_media = mp.ID_media
-          WHERE mu.ID_user = ? AND mp.role = 'actor')
-         UNION
-         (SELECT mp.ID_person, s.ID_media
-          FROM media_person AS mp
-          JOIN season AS s ON s.ID_media = mp.ID_media
-          JOIN episode AS e ON e.ID_season = s.ID
-          JOIN episode_user AS eu ON eu.ID_episode = e.ID
-          WHERE eu.ID_user = ? AND mp.role = 'actor')
-         UNION
-         (SELECT ep.ID_person, s.ID_media
-          FROM episode_person AS ep
-          JOIN episode AS e ON e.ID = ep.ID_episode
-          JOIN season AS s ON s.ID = e.ID_season
-          JOIN episode_user AS eu ON eu.ID_episode = e.ID
-          WHERE eu.ID_user = ? AND ep.role = 'actor')
-       ) AS seen ON seen.ID_person = pe.ID
+       JOIN (${SEEN_ACTOR_MEDIAS_SQL}) AS seen ON seen.ID_person = pe.ID
        GROUP BY pe.ID, pe.name, pe.photo
-       ORDER BY COUNT(*) DESC, pe.name ASC, pe.ID ASC
-       LIMIT ?`,
-      [userId, userId, userId, limit],
+       ORDER BY viewed_count DESC, pe.name ASC, pe.ID ASC 
+       LIMIT ? OFFSET ?`,
+      [userId, userId, userId, limit, offset],
     );
     return rows;
+  }
+  async countMostWatched(userId: number): Promise<number> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT COUNT(DISTINCT seen.ID_person) AS total
+      FROM (${SEEN_ACTOR_MEDIAS_SQL}) AS seen`,
+      [userId, userId, userId],
+    );
+    return Number(rows[0].total);
   }
 }
 
