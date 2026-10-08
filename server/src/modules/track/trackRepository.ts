@@ -4,6 +4,7 @@ export type TrackState = {
   mediaId: number;
   isFavorite: boolean;
   isInWatchlist: boolean;
+  userRating: number | null;
 };
 
 export type TrackedList = "favorite" | "watchlist";
@@ -38,7 +39,8 @@ class TrackRepository {
       `SELECT
         ID_media AS mediaId,
         favorite_media AS isFavorite,
-        watchlist AS isInWatchlist
+        watchlist AS isInWatchlist,
+        user_rating AS userRating
       FROM track
       WHERE ID_user = ? AND ID_media = ?`,
       [userId, mediaId],
@@ -54,6 +56,7 @@ class TrackRepository {
       mediaId: Number(track.mediaId),
       isFavorite: Boolean(track.isFavorite),
       isInWatchlist: Boolean(track.isInWatchlist),
+      userRating: track.userRating === null ? null : Number(track.userRating),
     };
   }
 
@@ -62,7 +65,8 @@ class TrackRepository {
       `SELECT
         ID_media AS mediaId,
         favorite_media AS isFavorite,
-        watchlist AS isInWatchlist
+        watchlist AS isInWatchlist,
+        user_rating AS userRating
       FROM track
       WHERE ID_user = ?
         AND (favorite_media = TRUE OR watchlist = TRUE)`,
@@ -73,6 +77,7 @@ class TrackRepository {
       mediaId: Number(track.mediaId),
       isFavorite: Boolean(track.isFavorite),
       isInWatchlist: Boolean(track.isInWatchlist),
+      userRating: track.userRating === null ? null : Number(track.userRating),
     }));
   }
 
@@ -202,6 +207,52 @@ class TrackRepository {
       [userId, type, type, type, type],
     );
     return Number(rows[0].total);
+  }
+
+  async upsertRating(
+    userId: number,
+    mediaId: number,
+    rating: number,
+  ): Promise<TrackState> {
+    await databaseClient.query(
+      `INSERT INTO track (
+      ID_user,
+      ID_media,
+      favorite_media,
+      user_rating,
+      watchlist,
+      favorited_at,
+      watchlisted_at
+    )
+    VALUES (?, ?, FALSE, ?, FALSE, NULL, NULL)
+    ON DUPLICATE KEY UPDATE
+      user_rating = ?`,
+      [userId, mediaId, rating, rating],
+    );
+
+    const track = await this.read(userId, mediaId);
+
+    if (track == null) {
+      throw new Error("Impossible de récupérer le média.");
+    }
+
+    return track;
+  }
+
+  async readUserRating(
+    userId: number,
+    mediaId: number,
+  ): Promise<number | null> {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT user_rating AS userRating
+     FROM track
+     WHERE ID_user = ? AND ID_media = ?`,
+      [userId, mediaId],
+    );
+
+    const rating = rows[0]?.userRating;
+
+    return rating === null || rating === undefined ? null : Number(rating);
   }
 }
 
