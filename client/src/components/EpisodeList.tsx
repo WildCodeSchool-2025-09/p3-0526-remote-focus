@@ -15,13 +15,13 @@ function EpisodeList({ episodes, seriesId, seasonId }: EpisodeListProps) {
       {episodes.map((episode) => (
         <li
           key={episode.id}
-          className="flex items-start gap-4 border-t border-white/10 px-4 py-3 md:items-center md:px-6"
+          className="flex items-start gap-4 border-t border-base-content/10 px-4 py-3 md:items-center md:px-6"
         >
           <Link
             to={`/series/${seriesId}/seasons/${seasonId}/episodes/${episode.id}`}
             className="flex min-w-0 flex-1 items-start gap-4 md:items-center"
           >
-            <span className="w-6 shrink-0 text-sm text-[#9FB4BD]">
+            <span className="w-6 shrink-0 text-sm text-focus-muted">
               {String(episode.number ?? 0).padStart(2, "0")}
             </span>
 
@@ -30,7 +30,7 @@ function EpisodeList({ episodes, seriesId, seasonId }: EpisodeListProps) {
                 {episode.name}
               </span>
               {episode.duration != null && (
-                <span className="text-sm text-[#9FB4BD]">
+                <span className="text-sm text-focus-muted">
                   {formatDuration(episode.duration)}
                 </span>
               )}
