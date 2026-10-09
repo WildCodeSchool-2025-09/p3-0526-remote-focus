@@ -4,12 +4,14 @@ import { NavLink, useLocation, useNavigate } from "react-router";
 import logoFocus from "../assets/images/logoFocus.png";
 import { useAuth } from "../contexts/AuthContext";
 import { useSearch } from "../contexts/SearchContext";
+import useHideOnScroll from "../hooks/useHideOnScroll";
 import ProfileMenu from "./ProfileMenu";
 import SearchBar from "./SearchBar";
 
 const Header = () => {
   const { searchQuery, setSearchQuery, hasNoResults } = useSearch();
   const { isAuthenticated } = useAuth();
+  const isHidden = useHideOnScroll();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +27,11 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-focus-line/20 bg-base-100/95 p-4 backdrop-blur">
+    <header
+      className={`sticky top-0 z-30 border-b border-focus-line/20 bg-base-100/95 p-4 backdrop-blur transition-transform duration-300 ${
+        isHidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div className="relative grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <NavLink to="/" end className="lg:hidden">
           <img src={logoFocus} alt="Focus" width={100} />
