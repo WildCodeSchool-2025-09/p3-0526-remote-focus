@@ -7,10 +7,12 @@ import MediaCardLoading from "./MediaCardLoading";
 
 type GenreFilterProps = {
   resetLabel?: string;
+  showSelectAll?: boolean;
 };
 
 function GenreFilter({
   resetLabel = "Réinitialiser les genres et revenir au catalogue général",
+  showSelectAll = false,
 }: GenreFilterProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -96,13 +98,15 @@ function GenreFilter({
   return (
     <div className="relative">
       <Carousel>
-        <button
-          type="button"
-          className={pillClasses(urlGenres.length === genres.length)}
-          onClick={handleSelectAllGenres}
-        >
-          Tous les genres
-        </button>
+        {showSelectAll && (
+          <button
+            type="button"
+            className={pillClasses(urlGenres.length === genres.length)}
+            onClick={handleSelectAllGenres}
+          >
+            Tous les genres
+          </button>
+        )}
         {genres.map((genre) => (
           <button
             type="button"
