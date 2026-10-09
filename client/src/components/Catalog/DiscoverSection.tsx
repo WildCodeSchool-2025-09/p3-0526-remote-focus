@@ -6,7 +6,11 @@ import { isValidMediaType } from "../../utils/catalogUtils";
 import MediaCardLoading from "./MediaCardLoading";
 import MediaSection from "./MediaSection";
 
-function DiscoverSection() {
+type DiscoverSectionProps = {
+  showGenreSections?: boolean;
+};
+
+function DiscoverSection({ showGenreSections = true }: DiscoverSectionProps) {
   const [searchParams] = useSearchParams();
 
   const type = searchParams.get("type");
@@ -76,16 +80,17 @@ function DiscoverSection() {
         showTypeIcon={!requestedType}
         showGenre={true}
       />
-      {discover.genreSections.map((genre) => (
-        <MediaSection
-          key={genre.id}
-          title={genre.name}
-          medias={genre.medias}
-          showTypeIcon={!requestedType}
-          showGenre={false}
-          genreId={genre.id}
-        />
-      ))}
+      {showGenreSections &&
+        discover.genreSections.map((genre) => (
+          <MediaSection
+            key={genre.id}
+            title={genre.name}
+            medias={genre.medias}
+            showTypeIcon={!requestedType}
+            showGenre={false}
+            genreId={genre.id}
+          />
+        ))}
     </>
   );
 }

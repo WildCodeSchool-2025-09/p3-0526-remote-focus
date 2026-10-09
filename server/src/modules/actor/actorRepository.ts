@@ -165,6 +165,38 @@ class ActorRepository {
 
     return rows[0].total;
   }
+
+  async readMostWatched(userId: number, limit = 12) {
+    const [rows] = await databaseClient.query<Rows>(
+      `SELECT pe.ID, pe.name, pe.photo, NULL AS personnage_name, 'actor' AS role
+       FROM person AS pe
+       JOIN (
+         (SELECT mp.ID_person, mp.ID_media
+          FROM media_person AS mp
+          JOIN media_user AS mu ON mu.ID_media = mp.ID_media
+          WHERE mu.ID_user = ? AND mp.role = 'actor')
+         UNION
+         (SELECT mp.ID_person, s.ID_media
+          FROM media_person AS mp
+          JOIN season AS s ON s.ID_media = mp.ID_media
+          JOIN episode AS e ON e.ID_season = s.ID
+          JOIN episode_user AS eu ON eu.ID_episode = e.ID
+          WHERE eu.ID_user = ? AND mp.role = 'actor')
+         UNION
+         (SELECT ep.ID_person, s.ID_media
+          FROM episode_person AS ep
+          JOIN episode AS e ON e.ID = ep.ID_episode
+          JOIN season AS s ON s.ID = e.ID_season
+          JOIN episode_user AS eu ON eu.ID_episode = e.ID
+          WHERE eu.ID_user = ? AND ep.role = 'actor')
+       ) AS seen ON seen.ID_person = pe.ID
+       GROUP BY pe.ID, pe.name, pe.photo
+       ORDER BY COUNT(*) DESC, pe.name ASC, pe.ID ASC
+       LIMIT ?`,
+      [userId, userId, userId, limit],
+    );
+    return rows;
+  }
 }
 
 export default new ActorRepository();
