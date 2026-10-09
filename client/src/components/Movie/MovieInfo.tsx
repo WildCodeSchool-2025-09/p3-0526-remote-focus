@@ -1,4 +1,5 @@
 import type { Media } from "../../types/media";
+import ExpandableText from "../ExpandableText";
 
 type MovieInfoProps = {
   media: Media;
@@ -9,11 +10,7 @@ function MovieInfo({ media }: MovieInfoProps) {
     return null;
   }
 
-  return (
-    <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
-      {media.synopsis}
-    </p>
-  );
+  return <ExpandableText text={media.synopsis} />;
 }
 
 export default MovieInfo;
