@@ -65,47 +65,44 @@ function SettingsPage() {
 
   return (
     <div>
-      <div className="flex w-full justify-end px-4 py-6">
+      <div className="flex items-center justify-between gap-4 pt-6">
+        <h1>Paramètres</h1>
         <BackButton />
       </div>
 
-      <div className="mt-4">
-        <h1>Paramètres</h1>
+      {loading && <p>Chargement…</p>}
+      {error && <p>Erreur : {error}</p>}
 
-        {loading && <p>Chargement…</p>}
-        {error && <p>Erreur : {error}</p>}
-
-        {settings && formData && (
-          <>
-            <AccountSection
-              profile={formData.profile}
-              onProfileChange={handleProfileChange}
-            />
-            <PreferencesSection
-              preferences={formData.preferences}
-              onPegiChange={handlePegi}
-            />
-            <div className="flex gap-4 mt-6 justify-center md:justify-start">
-              <button
-                type="button"
-                aria-label="Enregistrer les changements"
-                className="w-32 btn bg-warning py-2.5 text-center text-sm font-semibold text-warning-content transition hover:brightness-95 hover:text-focus-cream"
-                onClick={handleSave}
-              >
-                Enregistrer
-              </button>
-              <button
-                type="button"
-                aria-label="Annuler les changements"
-                className="w-32 btn py-2.5 text-center text-sm font-semibold text-focus-muted"
-                onClick={() => setFormData(settings)}
-              >
-                Annuler
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+      {settings && formData && (
+        <>
+          <AccountSection
+            profile={formData.profile}
+            onProfileChange={handleProfileChange}
+          />
+          <PreferencesSection
+            preferences={formData.preferences}
+            onPegiChange={handlePegi}
+          />
+          <div className="flex gap-4 mt-6 justify-center md:justify-start">
+            <button
+              type="button"
+              aria-label="Enregistrer les changements"
+              className="w-32 btn bg-warning py-2.5 text-center text-sm font-semibold text-warning-content transition hover:brightness-95 hover:text-focus-cream"
+              onClick={handleSave}
+            >
+              Enregistrer
+            </button>
+            <button
+              type="button"
+              aria-label="Annuler les changements"
+              className="w-32 btn py-2.5 text-center text-sm font-semibold text-focus-muted"
+              onClick={() => setFormData(settings)}
+            >
+              Annuler
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
