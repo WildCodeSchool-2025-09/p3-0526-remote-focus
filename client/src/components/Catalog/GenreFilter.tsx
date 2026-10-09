@@ -62,6 +62,13 @@ function GenreFilter({
     setSearchParams(newSearchParams);
   }
 
+  function handleSelectAllGenres() {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("genre", genres.map((genre) => genre.id).join(","));
+    newSearchParams.delete("page");
+    setSearchParams(newSearchParams);
+  }
+
   if (isLoading) {
     return (
       <>
@@ -89,6 +96,13 @@ function GenreFilter({
   return (
     <div className="relative">
       <Carousel>
+        <button
+          type="button"
+          className={pillClasses(urlGenres.length === genres.length)}
+          onClick={handleSelectAllGenres}
+        >
+          Tous les genres
+        </button>
         {genres.map((genre) => (
           <button
             type="button"
