@@ -63,10 +63,11 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
 
   return (
     <section className="space-y-6">
-      <div className="flex w-full justify-end px-4 pt-6">
-        <BackButton />
+      <div className="flex w-full justify-end px-4 pt-6 md:relative md:z-20 md:h-0 md:p-0">
+        <div className="md:absolute md:right-4 md:top-6">
+          <BackButton />
+        </div>
       </div>
-
       <h1 className="sr-only">{TITLES[list]}</h1>
 
       <TypeFilter />
