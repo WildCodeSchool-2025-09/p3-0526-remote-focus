@@ -19,7 +19,7 @@ const Header = () => {
   const handleChange = (value: string) => {
     setSearchQuery(value);
 
-    if (location.pathname !== "/search") {
+    if (value.trim() && location.pathname !== "/search") {
       navigate("/search");
     }
   };
