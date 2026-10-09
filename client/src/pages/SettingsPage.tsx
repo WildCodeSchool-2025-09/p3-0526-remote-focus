@@ -1,6 +1,5 @@
-import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import BackButton from "../components/BackButton";
 import AccountSection from "../components/profile/AccountSection";
 import PreferencesSection from "../components/profile/PreferencesSection";
 import { useAuth } from "../contexts/AuthContext";
@@ -29,8 +28,6 @@ function SettingsPage() {
     loading,
     error,
   } = useFetch<SettingsResponse>(token ? "/api/me/settings" : null);
-
-  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<SettingsResponse | null>(null);
 
@@ -67,15 +64,11 @@ function SettingsPage() {
   }
 
   return (
-    <div className="mt-10 md:ml-4">
-      <button
-        type="button"
-        className="flex items-center gap-2 my-6 text-focus-muted"
-        onClick={() => navigate(-1)}
-      >
-        <ChevronLeft size={16} /> Retour
-      </button>
-      <h1>Paramètres</h1>
+    <div>
+      <div className="flex items-center justify-between gap-4 pt-6">
+        <h1>Paramètres</h1>
+        <BackButton />
+      </div>
 
       {loading && <p>Chargement…</p>}
       {error && <p>Erreur : {error}</p>}

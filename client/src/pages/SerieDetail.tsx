@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import ActorKnownForWidget from "../components/ActorKnownForWidget";
+import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import CastList from "../components/CastList";
 import SeasonList from "../components/Serie/SeasonList";
@@ -30,19 +31,22 @@ function SerieDetail() {
 
   return (
     <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
-      <Breadcrumb
-        items={[
-          { label: "Accueil", to: "/" },
-          { label: "Catalogue", to: "/catalog" },
-          {
-            label: serieDetail.isAnime ? "Animés" : "Séries",
-            to: serieDetail.isAnime
-              ? "/catalog?type=anime"
-              : "/catalog?type=tv",
-          },
-          { label: serieDetail.name },
-        ]}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <Breadcrumb
+          items={[
+            { label: "Accueil", to: "/" },
+            { label: "Catalogue", to: "/catalog" },
+            {
+              label: serieDetail.isAnime ? "Animés" : "Séries",
+              to: serieDetail.isAnime
+                ? "/catalog?type=anime"
+                : "/catalog?type=tv",
+            },
+            { label: serieDetail.name },
+          ]}
+        />
+        <BackButton />
+      </div>
       <SerieHeader serie={serieDetail} />
       <SeasonList seasons={serieDetail.seasons} serieId={serieDetail.id} />
       <CastList
