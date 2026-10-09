@@ -1,10 +1,11 @@
-import { ChevronDown, ChevronLeft } from "lucide-react";
-import { Link, useSearchParams } from "react-router";
+import { ChevronDown } from "lucide-react";
+import { useSearchParams } from "react-router";
 import { useTracks } from "../../contexts/TrackContext";
 import useTrackedMedias from "../../hooks/useTrackedMedias";
 import type { MediaType } from "../../types/Catalog";
 import type { TrackedList, WatchStatus } from "../../types/Tracked";
 import { isValidMediaType } from "../../utils/catalogUtils";
+import BackButton from "../BackButton";
 import MediaCard from "../Catalog/MediaCard";
 import MediaCardLoading from "../Catalog/MediaCardLoading";
 import TypeFilter from "../Catalog/TypeFilter";
@@ -62,13 +63,9 @@ function TrackedMediaList({ list }: TrackedMediaListProps) {
 
   return (
     <section className="space-y-6">
-      <Link
-        to="/profile"
-        className="inline-flex items-center gap-2 text-sm text-base-content"
-      >
-        <ChevronLeft size={16} />
-        Retour
-      </Link>
+      <div className="flex w-full justify-end px-4 pt-6">
+        <BackButton />
+      </div>
 
       <h1 className="sr-only">{TITLES[list]}</h1>
 
