@@ -22,7 +22,12 @@ const LINKS = [
   { to: "/profile/favorites", label: "Favoris", icon: Heart },
   { to: "/profile/watchlist", label: "Watchlist", icon: Bookmark },
   { to: "/profile/actors", label: "Mes Acteurs", icon: Users },
-  { to: "/profile/statistics", label: "Statistiques", icon: BarChart3 },
+  {
+    to: "/profile/statistics",
+    label: "Statistiques",
+    icon: BarChart3,
+    disabled: true,
+  },
   { to: "/profile/settings", label: "Paramètres", icon: Settings },
 ];
 
@@ -104,17 +109,28 @@ function ProfileMenu() {
           id="profile-menu"
           className="absolute right-0 top-full z-40 mt-2 w-48 overflow-hidden rounded-lg border border-focus-line/20 bg-base-100 shadow-lg"
         >
-          {LINKS.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-base-content transition hover:bg-base-200"
-            >
-              <link.icon size={16} />
-              {link.label}
-            </Link>
-          ))}
+          {LINKS.map((link) =>
+            link.disabled ? (
+              <div
+                key={link.to}
+                aria-disabled="true"
+                className="flex cursor-not-allowed items-center gap-2 px-4 py-2.5 text-sm text-focus-muted"
+              >
+                <link.icon size={16} />
+                {link.label}
+              </div>
+            ) : (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-base-content transition hover:bg-base-200"
+              >
+                <link.icon size={16} />
+                {link.label}
+              </Link>
+            ),
+          )}
 
           <button
             type="button"

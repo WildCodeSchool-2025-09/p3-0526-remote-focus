@@ -13,7 +13,7 @@ function Catalog() {
       <h1 className="sr-only">Catalogue</h1>
 
       <TypeFilter />
-      <GenreFilter />
+      <GenreFilter showSelectAll />
       {hasGenreFilter ? <FilteredCatalog /> : <DiscoverSection />}
     </>
   );

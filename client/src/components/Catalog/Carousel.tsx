@@ -75,6 +75,10 @@ function Carousel({ children }: CarouselProps) {
           {children}
         </div>
 
+        {!isAtStart && (
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-12 bg-gradient-to-l from-transparent to-base-100" />
+        )}
+
         {!isAtEnd && (
           <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-r from-transparent to-base-100" />
         )}

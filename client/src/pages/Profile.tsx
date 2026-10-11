@@ -70,7 +70,8 @@ function Profile() {
           icon={BarChart3}
           iconColor="#F2B705"
           title="Statistiques"
-          subtitle="voir mon activité"
+          subtitle="Fonctionnalité bientôt disponible"
+          disabled
         />
       </div>
 

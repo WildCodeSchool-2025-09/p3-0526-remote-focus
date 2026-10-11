@@ -75,7 +75,6 @@ const SearchResults = () => {
   const handleClearSearch = () => {
     setSearchQuery("");
     setHasNoResults(false);
-    navigate("/catalog");
   };
 
   const trimmedLower = trimmedQuery.toLowerCase();
@@ -108,6 +107,26 @@ const SearchResults = () => {
 
       {!loading && error && (
         <p className="text-error">Une erreur est survenue, réessayez.</p>
+      )}
+
+      {!loading && !error && trimmedQuery.length < MIN_QUERY_LENGTH && (
+        <div className="flex flex-col items-center gap-4 py-12 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-focus-yellow">
+            <Search className="size-6 text-focus-yellow" />
+          </div>
+          <h2>Que cherchez-vous ?</h2>
+          <p className="max-w-md text-focus-muted">
+            Entrez votre texte dans la barre de recherche en haut de cette page
+            pour commencer votre recherche, ou retournez au catalogue.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/catalog")}
+            className="btn-cta-pill"
+          >
+            Retour au catalogue
+          </button>
+        </div>
       )}
 
       {!loading &&

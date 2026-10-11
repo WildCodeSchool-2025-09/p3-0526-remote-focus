@@ -7,10 +7,12 @@ import MediaCardLoading from "./MediaCardLoading";
 
 type GenreFilterProps = {
   resetLabel?: string;
+  showSelectAll?: boolean;
 };
 
 function GenreFilter({
   resetLabel = "Réinitialiser les genres et revenir au catalogue général",
+  showSelectAll = false,
 }: GenreFilterProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -62,6 +64,13 @@ function GenreFilter({
     setSearchParams(newSearchParams);
   }
 
+  function handleSelectAllGenres() {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("genre", genres.map((genre) => genre.id).join(","));
+    newSearchParams.delete("page");
+    setSearchParams(newSearchParams);
+  }
+
   if (isLoading) {
     return (
       <>
@@ -89,6 +98,15 @@ function GenreFilter({
   return (
     <div className="relative">
       <Carousel>
+        {showSelectAll && (
+          <button
+            type="button"
+            className={pillClasses(urlGenres.length === genres.length)}
+            onClick={handleSelectAllGenres}
+          >
+            Tous les genres
+          </button>
+        )}
         {genres.map((genre) => (
           <button
             type="button"

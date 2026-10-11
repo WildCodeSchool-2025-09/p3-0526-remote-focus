@@ -1,8 +1,10 @@
 import { Check, Heart, Minus, Plus, Star } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTrackActions } from "../hooks/useTrackActions";
 import ActionButton from "./ActionButton";
 import AuthRequiredModal from "./AuthRequiredModal";
+import RatingModal from "./RatingModal";
 
 type TrackActionsProps = {
   mediaId: number;
@@ -43,6 +45,9 @@ function TrackActions({
 
     onSeenClick?.();
   }
+
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [rating, setRating] = useState(0);
 
   return (
     <>
@@ -98,10 +103,17 @@ function TrackActions({
         <ActionButton
           label="Noter"
           icon={Star}
-          buttonClassName="border-focus-yellow text-focus-yellow"
-          disabled
+          buttonClassName="border-focus-yellow text-focus-yellow hover:border-focus-yellow hover:text-focus-void hover:bg-focus-yellow"
+          fillIcon={rating > 0}
+          onClick={() => setIsRatingModalOpen(true)}
         />
       )}
+      <RatingModal
+        isOpen={isRatingModalOpen}
+        onClose={() => setIsRatingModalOpen(false)}
+        rating={rating}
+        setRating={setRating}
+      />
 
       {errorMessage !== null && (
         <p role="alert" className="w-full text-sm text-focus-coral">
