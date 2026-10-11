@@ -2,6 +2,7 @@ import databaseClient, {
   type Result,
   type Rows,
 } from "../../../database/client";
+import { SEEN_ACTOR_MEDIAS_SQL } from "../actor/actorRepository";
 
 class FavoriteRepository {
   async countFavoriteActors(userId: number): Promise<number> {
@@ -32,31 +33,14 @@ class FavoriteRepository {
        FROM favorite AS f
        JOIN person AS pe ON pe.ID = f.ID_person
        LEFT JOIN (
-         SELECT seen_media.ID_person,
-                COUNT(DISTINCT seen_media.ID_media) AS viewed_count
-         FROM (
-           SELECT mp.ID_person, mp.ID_media
-           FROM media_person AS mp
-           JOIN media_user AS mu ON mu.ID_media = mp.ID_media
-           JOIN favorite AS fm ON fm.ID_person = mp.ID_person
-           WHERE mu.ID_user = ? AND fm.ID_user = ? AND mp.role = 'actor'
-
-           UNION
-
-           SELECT ep.ID_person, s.ID_media
-           FROM episode_person AS ep
-           JOIN episode_user AS eu ON eu.ID_episode = ep.ID_episode
-           JOIN episode AS e ON e.ID = ep.ID_episode
-           JOIN season AS s ON s.ID = e.ID_season
-           JOIN favorite AS fe ON fe.ID_person = ep.ID_person
-           WHERE eu.ID_user = ? AND fe.ID_user = ? AND ep.role = 'actor'
-         ) AS seen_media
+         SELECT seen_media.ID_person, COUNT(*) AS viewed_count
+         FROM (${SEEN_ACTOR_MEDIAS_SQL}) AS seen_media
          GROUP BY seen_media.ID_person
        ) AS seen ON seen.ID_person = pe.ID
        WHERE f.ID_user = ?
        ORDER BY viewed_count DESC, pe.name ASC, pe.ID ASC
        LIMIT ? OFFSET ?`,
-      [userId, userId, userId, userId, userId, limit, offset],
+      [userId, userId, userId, userId, limit, offset],
     );
 
     return rows;
