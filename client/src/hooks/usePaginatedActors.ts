@@ -9,7 +9,7 @@ type FetchActorsPage = (
   options: { page: number; limit: number },
 ) => Promise<ProfileActorsPage>;
 
-type UseFavoriteActorsResult = {
+type UsePaginatedActorsResult = {
   actors: ProfileActor[];
   loading: boolean;
   loadingMore: boolean;
@@ -20,10 +20,10 @@ type UseFavoriteActorsResult = {
   showLess: () => void;
 };
 
-function useFavoriteActors(
+function usePaginatedActors(
   pageSize: number,
   fetchPage: FetchActorsPage = fetchFavoriteActors,
-): UseFavoriteActorsResult {
+): UsePaginatedActorsResult {
   const { token, logout } = useAuth();
   const [actors, setActors] = useState<ProfileActor[]>([]);
   const [page, setPage] = useState(1);
@@ -113,6 +113,9 @@ function useFavoriteActors(
   };
 
   const showLess = () => {
+    generation.current += 1;
+    setLoadingMore(false);
+    setLoadMoreError(false);
     setActors((previous) => previous.slice(0, pageSize));
     setPage(1);
     setHasMore(true);
@@ -130,4 +133,4 @@ function useFavoriteActors(
   };
 }
 
-export default useFavoriteActors;
+export default usePaginatedActors;

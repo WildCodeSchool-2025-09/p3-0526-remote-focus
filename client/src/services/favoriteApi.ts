@@ -1,4 +1,4 @@
-import type { ProfileActorsPage } from "../types/ProfileActor";
+import type { ProfileActor, ProfileActorsPage } from "../types/ProfileActor";
 import { UnauthorizedError } from "./errors";
 
 export type ActorFavoriteState = {
@@ -57,11 +57,11 @@ type FetchActorsOptions = {
   limit?: number;
 };
 
-async function getActorsPage(
+async function getActorsPage<T>(
   path: string,
   token: string,
   { page = 1, limit = 6 }: FetchActorsOptions = {},
-) {
+): Promise<T> {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -79,25 +79,28 @@ async function getActorsPage(
     throw new Error("Impossible de récupérer vos acteurs.");
   }
 
-  return response.json();
+  return (await response.json()) as T;
 }
 
 export async function fetchFavoriteActors(
   token: string,
   options?: FetchActorsOptions,
 ): Promise<ProfileActorsPage> {
-  return getActorsPage("/api/me/favorite-actors", token, options);
+  return getActorsPage<ProfileActorsPage>(
+    "/api/me/favorite-actors",
+    token,
+    options,
+  );
 }
 
 export async function fetchMostWatchedActors(
   token: string,
   options?: FetchActorsOptions,
 ): Promise<ProfileActorsPage> {
-  const { actors, pagination } = await getActorsPage(
-    "/api/me/actors/most-watched",
-    token,
-    options,
-  );
+  const { actors, pagination } = await getActorsPage<{
+    actors: ProfileActor[];
+    pagination: ProfileActorsPage["pagination"];
+  }>("/api/me/actors/most-watched", token, options);
 
   return { data: actors, pagination };
 }

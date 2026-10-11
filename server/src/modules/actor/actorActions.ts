@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { formatCast, formatFilmography } from "../../utils/formatters";
+import { formatFilmography } from "../../utils/formatters";
 import actorRepository from "./actorRepository";
 
 const read: RequestHandler = async (req, res, next) => {
@@ -161,23 +161,34 @@ const readMostWatched: RequestHandler = async (req, res, next) => {
     }
 
     const offset = (page - 1) * limit;
+    const paginated = req.query.page !== undefined;
 
+    // Sans `page` (carrousel de l'accueil), le total n'est pas utilisé :
+    // on évite de rejouer le UNION pour le calculer.
     const [rows, total] = await Promise.all([
       actorRepository.readMostWatched(userId, limit, offset),
-      actorRepository.countMostWatched(userId),
+      paginated ? actorRepository.countMostWatched(userId) : null,
     ]);
 
+    const actors = rows.map((row) => ({
+      id: row.ID,
+      name: row.name,
+      photo: row.photo,
+      characterName: row.personnage_name,
+      role: row.role,
+      viewedCount: Number(row.viewed_count),
+    }));
+
     res.json({
-      actors: formatCast(rows).map((actor, index) => ({
-        ...actor,
-        viewedCount: Number(rows[index].viewed_count),
-      })),
-      pagination: {
-        page,
-        limit,
-        total,
-        hasMore: offset + rows.length < total,
-      },
+      actors,
+      ...(total !== null && {
+        pagination: {
+          page,
+          limit,
+          total,
+          hasMore: offset + rows.length < total,
+        },
+      }),
     });
   } catch (err) {
     next(err);

@@ -1,8 +1,9 @@
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Heart } from "lucide-react";
+import { ArrowLeft, Check, Heart } from "lucide-react";
 import { Link } from "react-router";
 import ActorSection from "../components/profile/ActorSection";
-import useFavoriteActors from "../hooks/useFavoriteActors";
+import LoadMoreControls from "../components/profile/LoadMoreControls";
 import useMediaQuery from "../hooks/useMediaQuery";
+import usePaginatedActors from "../hooks/usePaginatedActors";
 import { fetchMostWatchedActors } from "../services/favoriteApi";
 
 function usePageSize() {
@@ -24,17 +25,8 @@ function usePageSize() {
 
 function MyActorsPage() {
   const pageSize = usePageSize();
-  const mostWatched = useFavoriteActors(pageSize, fetchMostWatchedActors);
-  const {
-    actors,
-    loading,
-    loadingMore,
-    error,
-    loadMoreError,
-    hasMore,
-    loadMore,
-    showLess,
-  } = useFavoriteActors(pageSize);
+  const favorites = usePaginatedActors(pageSize);
+  const mostWatched = usePaginatedActors(pageSize, fetchMostWatchedActors);
 
   return (
     <div className="space-y-6">
@@ -56,62 +48,36 @@ function MyActorsPage() {
         icon={Heart}
         iconClassName="text-accent"
         fillIcon
-        actors={actors}
+        actors={favorites.actors}
       >
-        {loading && <span className="loading loading-spinner text-primary" />}
+        {favorites.loading && (
+          <span className="loading loading-spinner text-primary" />
+        )}
 
-        {!loading && error && (
+        {!favorites.loading && favorites.error && (
           <p className="text-focus-muted">
             Impossible de charger vos acteurs favoris. Merci d'actualiser la
             page.
           </p>
         )}
 
-        {!loading && !error && actors.length === 0 && (
-          <p className="text-focus-muted">
-            Vous n'avez pas encore d'acteur favori. Ajoutez-en depuis la fiche
-            d'un acteur avec le ♥.
-          </p>
-        )}
+        {!favorites.loading &&
+          !favorites.error &&
+          favorites.actors.length === 0 && (
+            <p className="text-focus-muted">
+              Vous n'avez pas encore d'acteur favori. Ajoutez-en depuis la fiche
+              d'un acteur avec le ♥.
+            </p>
+          )}
 
-        {(hasMore || actors.length > pageSize) && (
-          <div className="flex flex-col items-center gap-2">
-            {loadMoreError && (
-              <p className="text-sm text-focus-muted">
-                Impossible de charger la suite. Réessaie.
-              </p>
-            )}
-            <div className="flex justify-center gap-3">
-              {actors.length > pageSize && (
-                <button
-                  type="button"
-                  onClick={showLess}
-                  className="btn-cta-pill"
-                >
-                  Voir moins
-                  <ChevronUp size={16} />
-                </button>
-              )}
-              {hasMore && (
-                <button
-                  type="button"
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="btn-cta-pill"
-                >
-                  {loadingMore ? (
-                    "Chargement…"
-                  ) : (
-                    <>
-                      Voir plus
-                      <ChevronDown size={16} />
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        <LoadMoreControls
+          canShowLess={favorites.actors.length > pageSize}
+          hasMore={favorites.hasMore}
+          loadingMore={favorites.loadingMore}
+          loadMoreError={favorites.loadMoreError}
+          onShowLess={favorites.showLess}
+          onLoadMore={favorites.loadMore}
+        />
       </ActorSection>
 
       <ActorSection
@@ -140,44 +106,14 @@ function MyActorsPage() {
             </p>
           )}
 
-        {(mostWatched.hasMore || mostWatched.actors.length > pageSize) && (
-          <div className="flex flex-col items-center gap-2">
-            {mostWatched.loadMoreError && (
-              <p className="text-sm text-focus-muted">
-                Impossible de charger la suite. Réessaie.
-              </p>
-            )}
-            <div className="flex justify-center gap-3">
-              {mostWatched.actors.length > pageSize && (
-                <button
-                  type="button"
-                  onClick={mostWatched.showLess}
-                  className="btn-cta-pill"
-                >
-                  Voir moins
-                  <ChevronUp size={16} />
-                </button>
-              )}
-              {mostWatched.hasMore && (
-                <button
-                  type="button"
-                  onClick={mostWatched.loadMore}
-                  disabled={mostWatched.loadingMore}
-                  className="btn-cta-pill"
-                >
-                  {mostWatched.loadingMore ? (
-                    "Chargement…"
-                  ) : (
-                    <>
-                      Voir plus
-                      <ChevronDown size={16} />
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        <LoadMoreControls
+          canShowLess={mostWatched.actors.length > pageSize}
+          hasMore={mostWatched.hasMore}
+          loadingMore={mostWatched.loadingMore}
+          loadMoreError={mostWatched.loadMoreError}
+          onShowLess={mostWatched.showLess}
+          onLoadMore={mostWatched.loadMore}
+        />
       </ActorSection>
     </div>
   );

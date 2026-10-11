@@ -1,27 +1,7 @@
 import type { RowDataPacket } from "mysql2";
 import databaseClient, { type Rows } from "../../../database/client";
 import type { PersonRow } from "../../types/Person/Person.types";
-
-export const SEEN_ACTOR_MEDIAS_SQL = `
-  (SELECT mp.ID_person, mp.ID_media
-   FROM media_person AS mp
-   JOIN media_user AS mu ON mu.ID_media = mp.ID_media
-   WHERE mu.ID_user = ? AND mp.role = 'actor')
-  UNION
-  (SELECT mp.ID_person, s.ID_media
-   FROM media_person AS mp
-   JOIN season AS s ON s.ID_media = mp.ID_media
-   JOIN episode AS e ON e.ID_season = s.ID
-   JOIN episode_user AS eu ON eu.ID_episode = e.ID
-   WHERE eu.ID_user = ? AND mp.role = 'actor')
-  UNION
-  (SELECT ep.ID_person, s.ID_media
-   FROM episode_person AS ep
-   JOIN episode AS e ON e.ID = ep.ID_episode
-   JOIN season AS s ON s.ID = e.ID_season
-   JOIN episode_user AS eu ON eu.ID_episode = e.ID
-   WHERE eu.ID_user = ? AND ep.role = 'actor')
-`;
+import { SEEN_ACTOR_MEDIAS_SQL } from "../shared/seenActorsSql";
 
 class ActorRepository {
   async read(id: number) {

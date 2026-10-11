@@ -2,7 +2,7 @@ import databaseClient, {
   type Result,
   type Rows,
 } from "../../../database/client";
-import { SEEN_ACTOR_MEDIAS_SQL } from "../actor/actorRepository";
+import { buildSeenActorMediasSql } from "../shared/seenActorsSql";
 
 class FavoriteRepository {
   async countFavoriteActors(userId: number): Promise<number> {
@@ -34,13 +34,13 @@ class FavoriteRepository {
        JOIN person AS pe ON pe.ID = f.ID_person
        LEFT JOIN (
          SELECT seen_media.ID_person, COUNT(*) AS viewed_count
-         FROM (${SEEN_ACTOR_MEDIAS_SQL}) AS seen_media
+         FROM (${buildSeenActorMediasSql(true)}) AS seen_media
          GROUP BY seen_media.ID_person
        ) AS seen ON seen.ID_person = pe.ID
        WHERE f.ID_user = ?
        ORDER BY viewed_count DESC, pe.name ASC, pe.ID ASC
        LIMIT ? OFFSET ?`,
-      [userId, userId, userId, userId, limit, offset],
+      [userId, userId, userId, userId, userId, userId, userId, limit, offset],
     );
 
     return rows;

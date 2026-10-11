@@ -33,7 +33,40 @@ describe("GET /api/me/actors/most-watched", () => {
     expect(response.status).toBe(401);
   });
 
-  it("renvoie 200 avec viewedCount et la pagination par défaut (page 1, limite 12)", async () => {
+  it("renvoie 200 avec viewedCount, sans pagination ni count quand page est absent", async () => {
+    jest.spyOn(actorRepository, "readMostWatched").mockResolvedValue([
+      {
+        ID: 5,
+        name: "Actrice Test",
+        photo: "/photo.jpg",
+        personnage_name: null,
+        role: "actor",
+        viewed_count: 3,
+      },
+    ] as never);
+    const countMostWatched = jest.spyOn(actorRepository, "countMostWatched");
+
+    const response = await supertest(app)
+      .get("/api/me/actors/most-watched")
+      .set("Authorization", authorization);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      actors: [
+        {
+          id: 5,
+          name: "Actrice Test",
+          photo: "/photo.jpg",
+          characterName: null,
+          role: "actor",
+          viewedCount: 3,
+        },
+      ],
+    });
+    expect(countMostWatched).not.toHaveBeenCalled();
+  });
+
+  it("renvoie 200 avec viewedCount et la pagination (page 1, limite 12 par défaut)", async () => {
     const readMostWatched = jest
       .spyOn(actorRepository, "readMostWatched")
       .mockResolvedValue([
@@ -51,7 +84,7 @@ describe("GET /api/me/actors/most-watched", () => {
       .mockResolvedValue(1);
 
     const response = await supertest(app)
-      .get("/api/me/actors/most-watched")
+      .get("/api/me/actors/most-watched?page=1")
       .set("Authorization", authorization);
 
     expect(response.status).toBe(200);
@@ -77,7 +110,7 @@ describe("GET /api/me/actors/most-watched", () => {
     jest.spyOn(actorRepository, "countMostWatched").mockResolvedValue(0);
 
     const response = await supertest(app)
-      .get("/api/me/actors/most-watched")
+      .get("/api/me/actors/most-watched?page=1")
       .set("Authorization", authorization);
 
     expect(response.status).toBe(200);
