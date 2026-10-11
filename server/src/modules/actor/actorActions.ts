@@ -126,6 +126,9 @@ const readKnownFor: RequestHandler = async (req, res, next) => {
   }
 };
 
+const MOST_WATCHED_DEFAULT_LIMIT = 12;
+const MOST_WATCHED_MAX_LIMIT = 50;
+
 const readMostWatched: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?.id;
@@ -137,9 +140,45 @@ const readMostWatched: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const actors = await actorRepository.readMostWatched(userId, 12);
+    const page = req.query.page === undefined ? 1 : Number(req.query.page);
+    const limit =
+      req.query.limit === undefined
+        ? MOST_WATCHED_DEFAULT_LIMIT
+        : Number(req.query.limit);
 
-    res.json({ actors: formatCast(actors) });
+    if (!Number.isInteger(page) || page < 1) {
+      res.status(400).json({ error: "Numéro de page invalide." });
+      return;
+    }
+
+    if (
+      !Number.isInteger(limit) ||
+      limit < 1 ||
+      limit > MOST_WATCHED_MAX_LIMIT
+    ) {
+      res.status(400).json({ error: "Limite invalide." });
+      return;
+    }
+
+    const offset = (page - 1) * limit;
+
+    const [rows, total] = await Promise.all([
+      actorRepository.readMostWatched(userId, limit, offset),
+      actorRepository.countMostWatched(userId),
+    ]);
+
+    res.json({
+      actors: formatCast(rows).map((actor, index) => ({
+        ...actor,
+        viewedCount: Number(rows[index].viewed_count),
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        hasMore: offset + rows.length < total,
+      },
+    });
   } catch (err) {
     next(err);
   }
