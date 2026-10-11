@@ -2,9 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { UnauthorizedError } from "../services/errors";
 import { fetchFavoriteActors } from "../services/favoriteApi";
-import type { ProfileActor } from "../types/ProfileActor";
+import type { ProfileActor, ProfileActorsPage } from "../types/ProfileActor";
 
 const PAGE_SIZE = 6;
+
+type FetchActorsPage = (
+  token: string,
+  options: { page: number; limit: number },
+) => Promise<ProfileActorsPage>;
 
 type UseFavoriteActorsResult = {
   actors: ProfileActor[];
@@ -16,7 +21,9 @@ type UseFavoriteActorsResult = {
   loadMore: () => void;
 };
 
-function useFavoriteActors(): UseFavoriteActorsResult {
+function useFavoriteActors(
+  fetchPage: FetchActorsPage = fetchFavoriteActors,
+): UseFavoriteActorsResult {
   const { token, logout } = useAuth();
   const [actors, setActors] = useState<ProfileActor[]>([]);
   const [page, setPage] = useState(1);
@@ -43,7 +50,7 @@ function useFavoriteActors(): UseFavoriteActorsResult {
       return;
     }
 
-    fetchFavoriteActors(token, { page: 1, limit: PAGE_SIZE })
+    fetchPage(token, { page: 1, limit: PAGE_SIZE })
       .then((data) => {
         if (generation.current !== current) {
           return;
@@ -66,7 +73,7 @@ function useFavoriteActors(): UseFavoriteActorsResult {
           setLoading(false);
         }
       });
-  }, [token, logout]);
+  }, [token, logout, fetchPage]);
 
   const loadMore = () => {
     if (token === null) {
@@ -79,7 +86,7 @@ function useFavoriteActors(): UseFavoriteActorsResult {
     setLoadingMore(true);
     setLoadMoreError(false);
 
-    fetchFavoriteActors(token, { page: nextPage, limit: PAGE_SIZE })
+    fetchPage(token, { page: nextPage, limit: PAGE_SIZE })
       .then((data) => {
         if (generation.current !== current) {
           return;

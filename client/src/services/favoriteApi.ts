@@ -52,21 +52,22 @@ export async function toggleActorFavorite(
   return (await response.json()) as ActorFavoriteState;
 }
 
-type FetchFavoriteActorsOptions = {
+type FetchActorsOptions = {
   page?: number;
   limit?: number;
 };
 
-export async function fetchFavoriteActors(
+async function getActorsPage(
+  path: string,
   token: string,
-  { page = 1, limit = 6 }: FetchFavoriteActorsOptions = {},
-): Promise<ProfileActorsPage> {
+  { page = 1, limit = 6 }: FetchActorsOptions = {},
+) {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
   });
 
-  const response = await fetch(`${API_URL}/api/me/favorite-actors?${params}`, {
+  const response = await fetch(`${API_URL}${path}?${params}`, {
     headers: getAuthHeaders(token),
   });
 
@@ -75,8 +76,28 @@ export async function fetchFavoriteActors(
   }
 
   if (!response.ok) {
-    throw new Error("Impossible de récupérer vos acteurs favoris.");
+    throw new Error("Impossible de récupérer vos acteurs.");
   }
 
-  return (await response.json()) as ProfileActorsPage;
+  return response.json();
+}
+
+export async function fetchFavoriteActors(
+  token: string,
+  options?: FetchActorsOptions,
+): Promise<ProfileActorsPage> {
+  return getActorsPage("/api/me/favorite-actors", token, options);
+}
+
+export async function fetchMostWatchedActors(
+  token: string,
+  options?: FetchActorsOptions,
+): Promise<ProfileActorsPage> {
+  const { actors, pagination } = await getActorsPage(
+    "/api/me/actors/most-watched",
+    token,
+    options,
+  );
+
+  return { data: actors, pagination };
 }
