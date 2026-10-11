@@ -4,8 +4,6 @@ import { UnauthorizedError } from "../services/errors";
 import { fetchFavoriteActors } from "../services/favoriteApi";
 import type { ProfileActor, ProfileActorsPage } from "../types/ProfileActor";
 
-const PAGE_SIZE = 6;
-
 type FetchActorsPage = (
   token: string,
   options: { page: number; limit: number },
@@ -19,9 +17,11 @@ type UseFavoriteActorsResult = {
   loadMoreError: boolean;
   hasMore: boolean;
   loadMore: () => void;
+  showLess: () => void;
 };
 
 function useFavoriteActors(
+  pageSize: number,
   fetchPage: FetchActorsPage = fetchFavoriteActors,
 ): UseFavoriteActorsResult {
   const { token, logout } = useAuth();
@@ -50,7 +50,7 @@ function useFavoriteActors(
       return;
     }
 
-    fetchPage(token, { page: 1, limit: PAGE_SIZE })
+    fetchPage(token, { page: 1, limit: pageSize })
       .then((data) => {
         if (generation.current !== current) {
           return;
@@ -73,7 +73,7 @@ function useFavoriteActors(
           setLoading(false);
         }
       });
-  }, [token, logout, fetchPage]);
+  }, [token, logout, fetchPage, pageSize]);
 
   const loadMore = () => {
     if (token === null) {
@@ -86,7 +86,7 @@ function useFavoriteActors(
     setLoadingMore(true);
     setLoadMoreError(false);
 
-    fetchPage(token, { page: nextPage, limit: PAGE_SIZE })
+    fetchPage(token, { page: nextPage, limit: pageSize })
       .then((data) => {
         if (generation.current !== current) {
           return;
@@ -112,6 +112,12 @@ function useFavoriteActors(
       });
   };
 
+  const showLess = () => {
+    setActors((previous) => previous.slice(0, pageSize));
+    setPage(1);
+    setHasMore(true);
+  };
+
   return {
     actors,
     loading,
@@ -120,6 +126,7 @@ function useFavoriteActors(
     loadMoreError,
     hasMore,
     loadMore,
+    showLess,
   };
 }
 
