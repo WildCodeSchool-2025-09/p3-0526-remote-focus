@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useWatch } from "../../contexts/WatchingContext";
 import type { SeasonDetail } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
+import ExpandableText from "../ExpandableText";
 import PlatformList from "../PlatformList";
 import TrackActions from "../TrackActions";
 
@@ -85,11 +86,7 @@ function SeasonHeader({ season, isSeasonComplete }: SeasonHeaderProps) {
       </div>
 
       <div className="col-span-2 row-start-2 flex flex-col gap-4 md:col-span-1 md:col-start-2">
-        {season.synopsis != null && (
-          <p className="max-w-[660px] text-base leading-relaxed text-focus-cream/80">
-            {season.synopsis}
-          </p>
-        )}
+        {season.synopsis != null && <ExpandableText text={season.synopsis} />}
 
         <div className="flex flex-wrap items-start gap-4">
           <TrackActions

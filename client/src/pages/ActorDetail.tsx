@@ -1,6 +1,6 @@
-import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
+import BackButton from "../components/BackButton";
 import Breadcrumb from "../components/Breadcrumb";
 import ActorFilmography from "../components/actor/ActorFilmography";
 import ActorHeader from "../components/actor/ActorHeader";
@@ -9,7 +9,6 @@ import type { Actor } from "../types/media";
 
 function ActorDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [actor, setActor] = useState<Actor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,10 +46,6 @@ function ActorDetail() {
     };
   }, [id]);
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   if (loading) {
     return <p className="p-8 text-focus-muted">Chargement…</p>;
   }
@@ -70,15 +65,7 @@ function ActorDetail() {
           ]}
         />
 
-        <button
-          type="button"
-          onClick={handleGoBack}
-          aria-label="Retour"
-          className="flex shrink-0 items-center gap-2 rounded-full border border-white/30 p-2.5 text-sm transition-colors hover:border-[#F2B705] hover:text-[#F2B705] lg:px-4 lg:py-2"
-        >
-          <ArrowLeft size={16} />
-          <span className="hidden lg:inline">Retour</span>
-        </button>
+        <BackButton />
       </div>
 
       <ActorHeader actor={actor} />
