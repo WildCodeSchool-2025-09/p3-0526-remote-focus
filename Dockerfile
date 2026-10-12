@@ -12,7 +12,7 @@ FROM node:20-alpine
 # Additionally, consider whether libc6-compat is absolutely necessary here.
 # `no-cache` is used to avoid persisting the package index, saving space.
 # hadolint ignore=DL3018
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 
 # Set the working directory for the application. This is where commands will be run by default.
 # Creating the directory first (RUN mkdir -p /usr/src/app) is generally redundant, as WORKDIR will create it.

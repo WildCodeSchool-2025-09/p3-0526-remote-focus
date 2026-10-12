@@ -1,6 +1,5 @@
 import client from "./client";
 
-// Try to get a connection to the database
 client
   .getConnection()
   .then((connection) => {

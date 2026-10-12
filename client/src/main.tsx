@@ -1,44 +1,149 @@
-// Import necessary modules from React and React Router
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
-
-/* ************************************************************************* */
-
-// Import the main app component
+import { ActorFavoriteProvider } from "./contexts/ActorFavoriteContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { SearchProvider } from "./contexts/SearchContext";
+import { TrackProvider } from "./contexts/TrackContext";
+import { WatchingProvider } from "./contexts/WatchingContext";
+import SearchResults from "./pages/SearchResults";
+import "./globals.css";
 import App from "./App";
+import PrivateRoute from "./components/PrivateRoute";
+import ActorDetail from "./pages/ActorDetail";
+import Calendar from "./pages/Calendar";
+import Catalog from "./pages/Catalog";
+import EpisodeDetail from "./pages/EpisodeDetail";
+import Favorites from "./pages/Favorites";
+import Homepage from "./pages/Homepage";
+import Login from "./pages/Login";
+import MovieDetail from "./pages/MovieDetail";
+import MyActorsPage from "./pages/MyActorsPage";
+import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import Register from "./pages/Register";
+import SeasonDetail from "./pages/SeasonDetail";
+import SerieDetail from "./pages/SerieDetail";
+import SettingsPage from "./pages/SettingsPage";
+import Watchlist from "./pages/Watchlist";
 
-// Import additional components for new routes
-// Try creating these components in the "pages" folder
-
-// import About from "./pages/About";
-// import Contact from "./pages/Contact";
-
-/* ************************************************************************* */
-
-// Create router configuration with routes
-// You can add more routes as you build out your app!
 const router = createBrowserRouter([
   {
-    path: "/", // The root path
-    element: <App />, // Renders the App component for the home page
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        index: true,
+        element: <Homepage />,
+      },
+      {
+        path: "catalog",
+        element: <Catalog />,
+      },
+      {
+        path: "search",
+        element: <SearchResults />,
+      },
+      {
+        path: "calendar",
+        element: <Calendar />,
+      },
+      {
+        path: "profile",
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/favorites",
+        element: (
+          <PrivateRoute>
+            <Favorites />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/watchlist",
+        element: (
+          <PrivateRoute>
+            <Watchlist />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/actors",
+        element: (
+          <PrivateRoute>
+            <MyActorsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "profile/settings",
+        element: (
+          <PrivateRoute>
+            <SettingsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
+      {
+        path: "movies/:id",
+        element: <MovieDetail />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "series/:id",
+        element: <SerieDetail />,
+      },
+      {
+        path: "series/:seriesId/seasons/:seasonId",
+        element: <SeasonDetail />,
+      },
+      {
+        path: "series/:seriesId/seasons/:seasonId/episodes/:episodeId",
+        element: <EpisodeDetail />,
+      },
+      {
+        path: "animes/:id",
+        element: <SerieDetail />,
+      },
+      {
+        path: "actors/:id",
+        element: <ActorDetail />,
+      },
+    ],
   },
-  // Try adding a new route! For example, "/about" with an About component
 ]);
 
-/* ************************************************************************* */
-
-// Find the root element in the HTML document
 const rootElement = document.getElementById("root");
 if (rootElement == null) {
   throw new Error(`Your HTML Document should contain a <div id="root"></div>`);
 }
 
-// Render the app inside the root element
 createRoot(rootElement).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+  <AuthProvider>
+    <SearchProvider>
+      <WatchingProvider>
+        <TrackProvider>
+          <ActorFavoriteProvider>
+            <RouterProvider router={router} />
+          </ActorFavoriteProvider>
+        </TrackProvider>
+      </WatchingProvider>
+    </SearchProvider>
+  </AuthProvider>,
 );
 
 /**

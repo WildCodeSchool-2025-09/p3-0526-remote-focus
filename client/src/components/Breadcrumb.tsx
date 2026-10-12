@@ -1,0 +1,48 @@
+import { Link } from "react-router";
+
+type BreadcrumbItem = {
+  label: string;
+  to?: string;
+};
+
+type BreadcrumbProps = {
+  items: BreadcrumbItem[];
+};
+
+function Breadcrumb({ items }: BreadcrumbProps) {
+  const isLong = items.length > 4;
+
+  return (
+    <nav
+      aria-label="Fil d'Ariane"
+      className="flex flex-wrap items-center gap-2 text-sm text-focus-muted"
+    >
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+        const isHiddenOnMobile = isLong && index < 2;
+
+        return (
+          <span
+            key={item.to ?? item.label}
+            className={isHiddenOnMobile ? "hidden md:contents" : "contents"}
+          >
+            {isLast ? (
+              <span aria-current="page" className="font-medium text-primary]">
+                {item.label}
+              </span>
+            ) : item.to != null ? (
+              <Link to={item.to} className="hover:text-base-content">
+                {item.label}
+              </Link>
+            ) : (
+              <span>{item.label}</span>
+            )}
+            {!isLast && <span className="text-base-content/40">›</span>}
+          </span>
+        );
+      })}
+    </nav>
+  );
+}
+
+export default Breadcrumb;

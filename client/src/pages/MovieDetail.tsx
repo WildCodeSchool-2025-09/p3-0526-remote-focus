@@ -1,0 +1,67 @@
+import { useParams } from "react-router";
+import ActorKnownForWidget from "../components/ActorKnownForWidget";
+import BackButton from "../components/BackButton";
+import Breadcrumb from "../components/Breadcrumb";
+import CastList from "../components/CastList";
+import MovieHeader from "../components/Movie/MovieHeader";
+import useFetch from "../hooks/useFetch";
+import useSelectedActor from "../hooks/useSelectedActor";
+import { fetchCast } from "../services/api";
+import type { Media } from "../types/media";
+
+function MovieDetail() {
+  const { id } = useParams();
+
+  const {
+    data: mediaDetail,
+    loading,
+    error,
+  } = useFetch<Media>(id != null ? `/api/medias/${id}` : null);
+  const { selectedPersonId, handleSelectPerson, handleCloseActorWidget } =
+    useSelectedActor();
+
+  if (loading) {
+    return <p className="p-8 text-focus-muted">Chargement…</p>;
+  }
+
+  if (error != null || mediaDetail == null) {
+    return <p className="p-8 text-focus-muted">Ce film est introuvable.</p>;
+  }
+
+  if (mediaDetail.type !== "movie") {
+    return <p className="p-8 text-focus-muted">Ce média n'est pas un film.</p>;
+  }
+
+  return (
+    <div className="min-h-screen min-w-0 max-w-full space-y-8 overflow-x-hidden bg-base-100 pt-4 md:p-8">
+      <div className="flex items-start justify-between gap-4">
+        <Breadcrumb
+          items={[
+            { label: "Accueil", to: "/" },
+            { label: "Catalogue", to: "/catalog" },
+            { label: "Films", to: "/catalog?type=movie" },
+            { label: mediaDetail.name },
+          ]}
+        />
+        <BackButton />
+      </div>
+      <MovieHeader media={mediaDetail} />
+      <CastList
+        cast={mediaDetail.cast}
+        castTotal={mediaDetail.castTotal}
+        selectedPersonId={selectedPersonId}
+        onSelectPerson={handleSelectPerson}
+        fetchMore={(page) => fetchCast(mediaDetail.id, { page })}
+      />
+      {selectedPersonId != null && (
+        <ActorKnownForWidget
+          personId={selectedPersonId}
+          mediaId={mediaDetail.id}
+          onClose={handleCloseActorWidget}
+        />
+      )}
+    </div>
+  );
+}
+
+export default MovieDetail;

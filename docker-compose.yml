@@ -11,7 +11,7 @@ services:
       - "3000:3000"
     environment:
       APP_PORT: 3310
-      APP_SECRET: 123456789
+      JWT_SECRET: 123456789
       DB_HOST: database
       DB_PORT: 3306
       DB_USER: user
@@ -41,5 +41,5 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - target: 3306
-        published: 3306
+        published: 3307
         protocol: tcp
