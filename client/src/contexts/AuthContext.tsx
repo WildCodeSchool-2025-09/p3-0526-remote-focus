@@ -18,7 +18,6 @@ import {
   safeSetItem,
 } from "../utils/authStorage";
 
-// Délai maximal accepté par setTimeout (environ 24,8 jours).
 const MAX_TIMEOUT_DELAY = 2_147_483_647;
 
 interface AuthContextValue {
@@ -105,7 +104,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   }, []);
 
-  // Déconnexion automatique à l'expiration du token.
   useEffect(() => {
     if (token === null) {
       return;
@@ -136,7 +134,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [token, logout]);
 
-  // Synchronisation de la session entre les onglets.
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
       if (

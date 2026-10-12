@@ -2,7 +2,6 @@ import argon2 from "argon2";
 
 import AbstractSeeder from "./AbstractSeeder";
 
-// Mot de passe commun aux comptes de développement uniquement.
 const DEV_PASSWORD = "Focus2026!";
 
 class UserSeeder extends AbstractSeeder {

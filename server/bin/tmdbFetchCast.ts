@@ -1,98 +1,41 @@
-/**
- * Casting complet des médias déjà présents dans le dump principal.
- *
- * Produit un fichier SÉPARÉ, server/database/seeds/tmdb-cast.json.gz :
- *   - tout le casting de chaque média (aucun plafond)
- *   - tout le casting de chaque épisode (réguliers + invités)
- *   - les fiches des acteurs absents du dump principal
- *
- * tmdb.json.gz n'est jamais modifié. L'enrichissement s'applique
- * ensuite, et seulement si on le veut, via tmdbActSeed.ts :
- *
- *   npm run tmdb:seed      → le catalogue
- *   npm run tmdbAct:seed   → le casting complet par-dessus
- *
- * Le script sauvegarde son avancement par lots : s'il est interrompu,
- * le relancer reprend là où il s'était arrêté.
- *
- * Usage : npm run tmdb:fetch:cast
- */
-
 import "dotenv/config";
 
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 
-/* ================================================================== *
- * 1. CONFIGURATION
- * ================================================================== */
-
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
 const LANG = "fr-FR";
 const FALLBACK_LANG = "en-US";
 
-/**
- * Débit maximal, en requêtes par seconde.
- *
- * TMDB a désactivé sa limite stricte en décembre 2019 et annonce
- * aujourd'hui un seuil indicatif d'environ 40 req/s, avec un 429 à la
- * clé si on le dépasse. On se cale à 32 : assez bas pour ne jamais
- * déclencher de 429, assez haut pour que le run reste court.
- */
 const RATE_LIMIT = 32;
 
-/**
- * Requêtes simultanées. Plus haut que le débit visé, pour absorber les
- * réponses lentes : c'est RATE_LIMIT qui cadence réellement les départs,
- * ce plafond ne sert qu'à éviter d'accumuler les requêtes en vol.
- */
 const CONCURRENCY = 40;
 
 const MAX_RETRIES = 4;
 
-/**
- * Cache disque. Désactivé ici : sur un run de plusieurs centaines de
- * milliers de requêtes, il crée autant de petits fichiers, ce qui sature
- * le disque et ralentit tout. La reprise est assurée par les
- * sauvegardes intermédiaires ci-dessous.
- */
 const USE_CACHE = false;
 
-/** Taille des lots traités avant de considérer une sauvegarde. */
 const CHECKPOINT_EVERY = 2000;
 
-/**
- * Délai minimal entre deux sauvegardes, en secondes. Le fichier pèse
- * plusieurs centaines de Mo une fois sérialisé : l'écrire à chaque lot
- * coûterait plus cher que les requêtes elles-mêmes.
- */
 const CHECKPOINT_MIN_INTERVAL = 60;
 
-/** Quels médias traiter. Mettre un type à false l'exclut. */
 const SCOPE = {
   movies: true,
   series: true,
   animes: true,
 };
 
-/** Restreindre à quelques médias (leur tmdb_id). Vide = tous. */
 const ONLY_MEDIA_TMDB_IDS: number[] = [];
 
-/** Télécharger la biographie des acteurs découverts. */
 const FETCH_PERSON_DETAILS = true;
 
-/** Délai avant démarrage, pour laisser le temps d'annuler (Ctrl+C). */
 const COUNTDOWN_SECONDS = 5;
 
 const CACHE_DIR = path.join(__dirname, "../database/.tmdb-cache");
 const DUMP_FILE = path.join(__dirname, "../database/seeds/tmdb.json.gz");
 const CAST_FILE = path.join(__dirname, "../database/seeds/tmdb-cast.json.gz");
-
-/* ================================================================== *
- * 2. TYPES
- * ================================================================== */
 
 type SeedCredit = {
   person_tmdb_id: number;
@@ -107,7 +50,6 @@ type SeedPerson = {
   photo: string | null;
 };
 
-/** Le dump principal, lu en seule lecture. */
 type SeedFile = {
   persons: { tmdb_id: number }[];
   medias: {
@@ -122,18 +64,14 @@ type SeedFile = {
   }[];
 };
 
-/** Le fichier produit par ce script. */
 type CastFile = {
   generated_at: string;
-  /** Acteurs absents du dump principal. */
   persons: SeedPerson[];
-  /** Casting complet, par média. */
   media_cast: {
     media_tmdb_id: number;
     media_type: "movie" | "tv";
     cast: SeedCredit[];
   }[];
-  /** Casting complet, par épisode. */
   episode_cast: {
     episode_tmdb_id: number;
     cast: SeedCredit[];
@@ -148,17 +86,7 @@ type CastMember = {
   roles?: { character?: string }[];
 };
 
-/* ================================================================== *
- * 3. CLIENT HTTP
- * ================================================================== */
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/* --- Régulateur de débit -------------------------------------------- *
- * Chaque requête réserve un créneau de départ. Les créneaux sont
- * espacés de 1000/RATE_LIMIT millisecondes, ce qui plafonne le débit
- * quelle que soit la latence du réseau.
- */
 
 const MIN_INTERVAL = 1000 / RATE_LIMIT;
 let nextSlot = 0;
@@ -174,12 +102,9 @@ const reserveSlot = async () => {
   if (delay > 0) await sleep(delay);
 };
 
-/** Sur un 429, on repousse le prochain créneau pour tout le monde. */
 const backOffEveryone = (seconds: number) => {
   nextSlot = Math.max(nextSlot, Date.now() + seconds * 1000);
 };
-
-/* --- Limiteur de concurrence ---------------------------------------- */
 
 let active = 0;
 const waiting: (() => void)[] = [];
@@ -199,10 +124,7 @@ const release = () => {
   waiting.shift()?.();
 };
 
-/* --- Cache (optionnel) ----------------------------------------------- */
-
 const cachePath = (key: string) => {
-  // Hash léger : pas besoin de crypto pour nommer un fichier de cache.
   let hash = 0;
 
   for (let index = 0; index < key.length; index += 1) {
@@ -232,8 +154,6 @@ const writeCache = (key: string, value: unknown) => {
   fs.mkdirSync(CACHE_DIR, { recursive: true });
   fs.writeFileSync(cachePath(key), JSON.stringify(value), "utf8");
 };
-
-/* --- Requête ---------------------------------------------------------- */
 
 let requestCount = 0;
 let rateLimitHits = 0;
@@ -311,15 +231,6 @@ const tmdbGet = async <T>(
   }
 };
 
-/* ================================================================== *
- * 4. TRAITEMENT PAR LOTS
- * ================================================================== */
-
-/**
- * Traite les éléments par tranches, en sauvegardant entre chaque.
- * Si le script est interrompu, la relance repart de la dernière tranche
- * terminée au lieu de tout recommencer.
- */
 const processInBatches = async <T, R>(
   label: string,
   items: T[],
@@ -358,10 +269,6 @@ const formatDuration = (seconds: number) => {
   ).padStart(2, "0")}`;
 };
 
-/* ================================================================== *
- * 5. CASTING
- * ================================================================== */
-
 const personIds = new Set<number>();
 
 const orNull = (value: string | null | undefined): string | null => {
@@ -370,7 +277,6 @@ const orNull = (value: string | null | undefined): string | null => {
   return trimmed ? trimmed : null;
 };
 
-/** Ne conserve que les acteurs, sans plafond, et sans doublon. */
 const toCredits = (cast: CastMember[] | undefined): SeedCredit[] => {
   if (!cast) return [];
 
@@ -386,7 +292,6 @@ const toCredits = (cast: CastMember[] | undefined): SeedCredit[] => {
 
     credits.push({
       person_tmdb_id: member.id,
-      // aggregate_credits expose les rôles dans "roles", credits dans "character"
       personnage_name: orNull(member.roles?.[0]?.character ?? member.character),
       role: "actor",
     });
@@ -426,18 +331,12 @@ const episodeCast = async (
   return toCredits([...(data?.cast ?? []), ...(data?.guest_stars ?? [])]);
 };
 
-/* ================================================================== *
- * 6. ORCHESTRATION
- * ================================================================== */
-
 const readGzip = <T>(file: string): T =>
   JSON.parse(zlib.gunzipSync(fs.readFileSync(file)).toString("utf8"));
 
 const writeGzip = (file: string, value: unknown, level: number) => {
   fs.mkdirSync(path.dirname(file), { recursive: true });
 
-  // Écriture via un fichier temporaire : une coupure de courant au
-  // mauvais moment ne laisse pas un fichier à moitié écrit.
   const temporary = `${file}.tmp`;
 
   fs.writeFileSync(
@@ -459,7 +358,6 @@ const main = async () => {
 
   const dump = readGzip<SeedFile>(DUMP_FILE);
 
-  // Reprise : ce qui a déjà été récupéré lors d'un run précédent.
   const output: CastFile = fs.existsSync(CAST_FILE)
     ? readGzip<CastFile>(CAST_FILE)
     : {
@@ -478,19 +376,14 @@ const main = async () => {
     output.episode_cast.map((entry) => entry.episode_tmdb_id),
   );
 
-  // Les acteurs déjà connus : ceux du dump principal, plus ceux
-  // récupérés lors d'un run précédent de ce script.
   const knownPersons = new Set([
     ...dump.persons.map((person) => person.tmdb_id),
     ...output.persons.map((person) => person.tmdb_id),
   ]);
 
-  // Les crédits déjà récupérés comptent dans les personnes à traiter.
   for (const entry of [...output.media_cast, ...output.episode_cast]) {
     for (const credit of entry.cast) personIds.add(credit.person_tmdb_id);
   }
-
-  /* --- Portée -------------------------------------------------------- */
 
   const targets = dump.medias.filter((media) => {
     if (ONLY_MEDIA_TMDB_IDS.length > 0) {
@@ -521,11 +414,6 @@ const main = async () => {
 
   let lastSave = Date.now();
 
-  /**
-   * Sauvegarde intermédiaire : compression rapide, et pas plus d'une
-   * fois par minute. La sauvegarde finale repasse en compression
-   * maximale, puisque c'est elle qui part sur Git.
-   */
   const save = (force = false) => {
     const elapsed = (Date.now() - lastSave) / 1000;
 
@@ -536,8 +424,6 @@ const main = async () => {
 
     lastSave = Date.now();
   };
-
-  /* --- Annonce ------------------------------------------------------- */
 
   const estimatedRequests = mediaTasks.length + episodeTasks.length;
   const estimatedSeconds = Math.round(estimatedRequests / RATE_LIMIT);
@@ -561,8 +447,6 @@ const main = async () => {
 
   await sleep(COUNTDOWN_SECONDS * 1000);
 
-  /* --- Casting des médias -------------------------------------------- */
-
   if (mediaTasks.length > 0) {
     console.info("① Casting des médias");
 
@@ -585,8 +469,6 @@ const main = async () => {
     );
   }
 
-  /* --- Casting des épisodes ------------------------------------------- */
-
   if (episodeTasks.length > 0) {
     console.info("② Casting des épisodes");
 
@@ -608,8 +490,6 @@ const main = async () => {
       save,
     );
   }
-
-  /* --- Fiches des acteurs découverts ----------------------------------- */
 
   const newPersonIds = [...personIds].filter((id) => !knownPersons.has(id));
 
@@ -663,8 +543,6 @@ const main = async () => {
   }
 
   save(true);
-
-  /* --- Récapitulatif ---------------------------------------------------- */
 
   const stats = fs.statSync(CAST_FILE);
   const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)} Mo`;

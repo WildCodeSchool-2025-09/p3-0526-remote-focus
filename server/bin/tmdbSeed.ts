@@ -1,12 +1,3 @@
-/**
- * Insertion en base des données produites par tmdbFetch.ts
- *
- * Ce script ne contacte jamais TMDB : aucune clé API n'est nécessaire.
- * À lancer après npm run db:migrate.
- *
- * Usage : npm run tmdb:seed
- */
-
 import "dotenv/config";
 
 import fs from "node:fs";
@@ -19,13 +10,10 @@ import type { Rows } from "../database/client";
 
 const SEEDS_DIR = path.join(__dirname, "../database/seeds");
 
-/** Dump compressé produit par tmdbFetch.ts. */
 const SEED_FILE_GZ = path.join(SEEDS_DIR, "tmdb.json.gz");
 
-/** Variante non compressée, tolérée pour le débogage. */
 const SEED_FILE_RAW = path.join(SEEDS_DIR, "tmdb.json");
 
-/** Lit le dump, compressé ou non. */
 const readSeedFile = (): SeedFile => {
   if (fs.existsSync(SEED_FILE_GZ)) {
     const compressed = fs.readFileSync(SEED_FILE_GZ);
@@ -41,10 +29,6 @@ const readSeedFile = (): SeedFile => {
     `Aucun dump trouvé dans ${SEEDS_DIR}\nLancez d'abord "npm run tmdb:fetch".`,
   );
 };
-
-/* ------------------------------------------------------------------ *
- * Types (miroir de la sortie de tmdbFetch.ts)
- * ------------------------------------------------------------------ */
 
 type SeedCredit = {
   person_tmdb_id: number;
@@ -111,13 +95,8 @@ type SeedFile = {
   medias: SeedMedia[];
 };
 
-/* ------------------------------------------------------------------ *
- * Utilitaires
- * ------------------------------------------------------------------ */
-
 const CHUNK_SIZE = 500;
 
-/** Insertion groupée : un INSERT multi-lignes par tranche de 500. */
 const insertMany = async (
   table: string,
   columns: string[],
@@ -138,7 +117,6 @@ const insertMany = async (
   console.info(`  ${table} : ${rows.length} ligne(s)`);
 };
 
-/** Construit la correspondance tmdb_id → id auto-incrémenté. */
 const buildIdMap = async (table: string) => {
   const [rows] = await database.query<Rows>(`SELECT id, tmdb_id FROM ${table}`);
 
@@ -151,17 +129,11 @@ const buildIdMap = async (table: string) => {
   return map;
 };
 
-/* ------------------------------------------------------------------ *
- * Seed
- * ------------------------------------------------------------------ */
-
 const seed = async () => {
   const data = readSeedFile();
 
   console.info(`Seed depuis un export du ${data.generated_at}\n`);
 
-  // Vidage : on désactive les contraintes le temps du nettoyage pour ne
-  // pas avoir à respecter l'ordre des dépendances.
   await database.query("SET FOREIGN_KEY_CHECKS = 0");
 
   for (const table of [
@@ -180,8 +152,6 @@ const seed = async () => {
   }
 
   await database.query("SET FOREIGN_KEY_CHECKS = 1");
-
-  /* --- Référentiels ------------------------------------------------ */
 
   await insertMany(
     "genre",
@@ -214,8 +184,6 @@ const seed = async () => {
   const genreIds = await buildIdMap("genre");
   const platformIds = await buildIdMap("platform");
   const personIds = await buildIdMap("person");
-
-  /* --- Médias ------------------------------------------------------ */
 
   await insertMany(
     "media",
@@ -251,8 +219,6 @@ const seed = async () => {
     ]),
   );
 
-  // media est la seule table où tmdb_id ne suffit pas : films et séries
-  // partagent le même espace de numérotation chez TMDB.
   const [mediaRows] = await database.query<Rows>(
     "SELECT id, tmdb_id, type FROM media",
   );
@@ -269,8 +235,6 @@ const seed = async () => {
 
   const mediaKey = (media: { type: string; tmdb_id: number }) =>
     mediaIds.get(`${media.type}:${media.tmdb_id}`);
-
-  /* --- Liaisons des médias ----------------------------------------- */
 
   const classifyAs: unknown[][] = [];
   const availableOn: unknown[][] = [];
@@ -310,8 +274,6 @@ const seed = async () => {
     mediaPerson,
   );
 
-  /* --- Saisons ----------------------------------------------------- */
-
   const seasons: unknown[][] = [];
 
   for (const media of data.medias) {
@@ -349,8 +311,6 @@ const seed = async () => {
   );
 
   const seasonIds = await buildIdMap("season");
-
-  /* --- Épisodes ---------------------------------------------------- */
 
   const episodes: unknown[][] = [];
 
@@ -390,8 +350,6 @@ const seed = async () => {
 
   const episodeIds = await buildIdMap("episode");
 
-  /* --- Casting des épisodes ---------------------------------------- */
-
   const episodePerson: unknown[][] = [];
   const seen = new Set<string>();
 
@@ -407,7 +365,6 @@ const seed = async () => {
 
           if (!personId) continue;
 
-          // TMDB peut lister une même personne dans cast et guest_stars.
           const key = `${episodeId}:${personId}`;
 
           if (seen.has(key)) continue;

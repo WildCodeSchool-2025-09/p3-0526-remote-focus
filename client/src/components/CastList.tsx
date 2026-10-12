@@ -24,7 +24,6 @@ function CastList({
   const [loadMoreError, setLoadMoreError] = useState(false);
   const generation = useRef(0);
 
-  // Quand on change de média, on repart des 10 premiers acteurs
   useEffect(() => {
     generation.current += 1;
     setItems(cast);

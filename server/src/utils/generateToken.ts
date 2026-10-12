@@ -8,7 +8,6 @@ type TokenPayload = {
   role: UserRole;
 };
 
-// Durée de vie courte : un token volé devient inutilisable plus vite.
 const TOKEN_LIFETIME = "24h";
 
 export function generateToken(payload: TokenPayload): string {

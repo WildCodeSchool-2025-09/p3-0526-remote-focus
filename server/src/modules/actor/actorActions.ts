@@ -163,8 +163,6 @@ const readMostWatched: RequestHandler = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const paginated = req.query.page !== undefined;
 
-    // Sans `page` (carrousel de l'accueil), le total n'est pas utilisé :
-    // on évite de rejouer le UNION pour le calculer.
     const [rows, total] = await Promise.all([
       actorRepository.readMostWatched(userId, limit, offset),
       paginated ? actorRepository.countMostWatched(userId) : null,

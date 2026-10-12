@@ -1,4 +1,3 @@
-// server/database/fixtures/EpisodeUserSeeder.ts
 import database from "../client";
 
 import type { Rows } from "../client";
@@ -63,9 +62,6 @@ class EpisodeUserSeeder extends AbstractSeeder {
       for (const mediaId of followedMediaIds) {
         const orderedEpisodes = episodesByMedia.get(mediaId) ?? [];
 
-        // Progression depuis le premier épisode, sans trou. watchedCount peut
-        // atteindre orderedEpisodes.length : une série à une saison entièrement
-        // vue signifie que tous ses épisodes (donc toute la série) sont trackés.
         const watchedCount = this.faker.number.int({
           min: 1,
           max: orderedEpisodes.length,
@@ -73,23 +69,18 @@ class EpisodeUserSeeder extends AbstractSeeder {
 
         const watchedEpisodes = orderedEpisodes.slice(0, watchedCount);
 
-        // Point de départ du visionnage, assez loin dans le passé pour laisser
-        // de la place à la progression sans dépasser "maintenant".
         let viewedAt = this.faker.date.recent({
           days: 180 + watchedEpisodes.length * 3,
         });
 
         for (const episodeId of watchedEpisodes) {
-          // Chaque épisode suivant est vu quelques heures à 3 jours après le précédent
           const incrementMs =
             this.faker.number.int({ min: 1, max: 72 }) * HOUR_MS;
           const nextViewedAt = new Date(viewedAt.getTime() + incrementMs);
 
-          // Filet de sécurité : ne jamais dépasser la date actuelle
           viewedAt =
             nextViewedAt.getTime() > now ? new Date(now) : nextViewedAt;
 
-          // Variable intermédiaire obligatoire : évite le excess property check
           const fakeEpisodeUser = {
             ID_user: userId,
             ID_episode: episodeId,

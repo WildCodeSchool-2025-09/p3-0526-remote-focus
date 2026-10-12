@@ -31,7 +31,6 @@ class CatalogRepository {
     type: "movie" | "tv" | "anime" | null,
     limit = 10,
   ): Promise<Media[]> {
-    // Excluded 10/10 notes because they can be unrelevant
     const [rows] = await databaseClient.query<Media[]>(
       `SELECT ${MEDIA_COLUMNS},
 ${GENRE_NAME}

@@ -1,16 +1,3 @@
-/**
- * Récupération CIBLÉE de médias TMDB → server/database/seeds/tmdb.json.gz
- *
- * Variante de tmdbFetch.ts : au lieu de piocher les titres les plus
- * populaires via /discover, ce script va chercher une liste précise
- * d'œuvres nommées dans TARGETS ci-dessous.
- *
- * Il écrit dans le MÊME dump que tmdbFetch.ts et s'y ajoute : les
- * médias déjà présents sont ignorés, les nouveaux viennent à la suite.
- *
- * Usage : npm run tmdb:fetch:specific
- */
-
 import "dotenv/config";
 
 import crypto from "node:crypto";
@@ -18,38 +5,19 @@ import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 
-/* ================================================================== *
- * 1. CONFIGURATION
- * ================================================================== */
-
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
-/** Langue principale, et repli quand le champ FR est vide. */
 const LANG = "fr-FR";
 const FALLBACK_LANG = "en-US";
 
-/** Région pour les certifications et les plateformes. */
 const REGION = "FR";
 
-/* --- Les œuvres à récupérer ----------------------------------------- *
- * Chaque cible est résolue par /search, et le script affiche le titre
- * et l'identifiant retenus pour que vous puissiez vérifier.
- *
- * Si une recherche tombe à côté, renseignez `tmdbId` : il court-circuite
- * la recherche. L'identifiant se lit dans l'URL d'une fiche TMDB
- * (themoviedb.org/tv/46260-naruto → 46260).
- */
-
 type Target = {
-  /** Titre recherché. */
   query: string;
-  /** Année de sortie, pour départager les homonymes. */
   year?: number;
-  /** Identifiant TMDB explicite, prioritaire sur la recherche. */
   tmdbId?: number;
 };
 
-/** Séries (animées ou non : is_anime est déduit du genre et du pays). */
 const TARGET_TV: Target[] = [
   { query: "Naruto", year: 2002, tmdbId: 46260 },
   { query: "Naruto Shippuden", year: 2007, tmdbId: 31910 },
@@ -57,66 +25,32 @@ const TARGET_TV: Target[] = [
   { query: "One Piece", year: 1999, tmdbId: 37854 },
 ];
 
-/** Films nommés un par un. */
 const TARGET_MOVIES: Target[] = [
   { query: "L'Étrange Histoire de Benjamin Button", year: 2008, tmdbId: 4922 },
 ];
 
-/**
- * Sagas entières : on récupère tous les films de chaque collection
- * TMDB dont le nom correspond. Plus durable qu'une liste de titres,
- * qui serait à compléter à chaque nouvelle sortie.
- */
 const TARGET_COLLECTIONS = ["Spider-Man", "Spider-Verse"];
 
-/** ID du genre "Animation" chez TMDB (ce n'est PAS un âge). */
 const ANIMATION_GENRE_ID = 16;
 const ANIME_ORIGIN_COUNTRY = "JP";
 
-/**
- * Acteurs max par média. Infinity = tout le cast.
- * Le plafond a un effet en cascade : moins d'acteurs retenus, donc
- * moins de fiches personne à télécharger, donc un run bien plus court.
- */
 const CAST_LIMIT = 20;
 
-/** Récupérer la biographie de chaque personne (1 requête par personne). */
 const FETCH_PERSON_DETAILS = true;
 
-/**
- * "all"    → cast principal + invités de chaque épisode (1 requête/épisode)
- * "guests" → invités seuls, déjà présents dans la réponse de saison (0 requête)
- */
 type EpisodeCastMode = "all" | "guests";
 
 const EPISODE_CAST_MODE = "all" as EpisodeCastMode;
 
-/*
- * Pas de plafond d'épisodes ici : les séries fleuves sont justement
- * ce que ce script vient chercher.
- */
-
-/** La saison 0 regroupe les "spéciaux", souvent mal renseignés. */
 const INCLUDE_SEASON_ZERO = false;
 
-/** Sections de /watch/providers retenues ("buy" et "rent" exclus). */
 const PROVIDER_SECTIONS = ["flatrate", "free", "ads"] as const;
 
-/** Requêtes simultanées. TMDB tolère ~50/s, on reste très en dessous. */
 const CONCURRENCY = 10;
 const MAX_RETRIES = 4;
 
 const CACHE_DIR = path.join(__dirname, "../database/.tmdb-cache");
-/**
- * Le dump est compressé : le JSON brut dépasse les limites de GitHub
- * à cette volumétrie, et gzip le divise par huit environ.
- * tmdbSeed.ts le décompresse en mémoire.
- */
 const OUTPUT_FILE = path.join(__dirname, "../database/seeds/tmdb.json.gz");
-
-/* ================================================================== *
- * 2. TYPES
- * ================================================================== */
 
 type SeedGenre = { tmdb_id: number; name: string };
 
@@ -188,8 +122,6 @@ type SeedFile = {
   persons: SeedPerson[];
   medias: SeedMedia[];
 };
-
-/* --- Types TMDB (partiels : uniquement les champs consommés) -------- */
 
 type CastMember = {
   id: number;
@@ -300,15 +232,6 @@ type CollectionDetail = {
   parts?: { id: number; title: string; release_date?: string }[];
 };
 
-/* ================================================================== *
- * 3. CLIENT HTTP
- * ================================================================== */
-
-/* --- Limiteur de concurrence --------------------------------------- *
- * File d'attente maison : au plus CONCURRENCY requêtes en vol.
- * Évite d'ajouter p-limit en dépendance pour si peu.
- */
-
 let active = 0;
 const waiting: (() => void)[] = [];
 
@@ -326,12 +249,6 @@ const release = () => {
   active -= 1;
   waiting.shift()?.();
 };
-
-/* --- Cache disque --------------------------------------------------- *
- * Chaque réponse est stockée sous le hash de son URL. Si le script est
- * interrompu, la relance repart des données déjà téléchargées.
- * Supprimer le dossier pour forcer un rafraîchissement complet.
- */
 
 const cachePath = (key: string) =>
   path.join(
@@ -356,16 +273,10 @@ const writeCache = (key: string, value: unknown) => {
   fs.writeFileSync(cachePath(key), JSON.stringify(value), "utf8");
 };
 
-/* --- Requête -------------------------------------------------------- */
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let requestCount = 0;
 
-/**
- * Appelle un endpoint TMDB. Renvoie null sur un 404
- * (ressource absente côté TMDB, cas normal).
- */
 const tmdbGet = async <T>(
   endpoint: string,
   params: Record<string, string | number | boolean | undefined> = {},
@@ -380,8 +291,6 @@ const tmdbGet = async <T>(
     if (value !== undefined) url.searchParams.set(key, String(value));
   }
 
-  // La clé n'entre pas dans la clé de cache : deux membres de l'équipe
-  // avec des clés différentes partagent le même cache.
   const cacheKey = url.toString();
   const cached = readCache(cacheKey);
 
@@ -405,7 +314,6 @@ const tmdbGet = async <T>(
           return null;
         }
 
-        // Quota dépassé : TMDB indique combien de temps patienter.
         if (response.status === 429) {
           const retryAfter = Number(response.headers.get("retry-after") ?? 1);
           await sleep((retryAfter + 1) * 1000);
@@ -427,7 +335,6 @@ const tmdbGet = async <T>(
           return null;
         }
 
-        // Backoff exponentiel : 0,5s puis 1s, 2s, 4s.
         await sleep(500 * 2 ** attempt);
       }
     }
@@ -438,7 +345,6 @@ const tmdbGet = async <T>(
   }
 };
 
-/** Exécute des tâches en parallèle avec une progression lisible. */
 const mapWithProgress = async <T, R>(
   label: string,
   items: T[],
@@ -461,20 +367,8 @@ const mapWithProgress = async <T, R>(
   );
 };
 
-/* ================================================================== *
- * 4. RÈGLES DE MAPPING
- * ================================================================== */
-
-/* --- PEGI ----------------------------------------------------------- *
- * TMDB renvoie des libellés hétérogènes selon le type et le pays.
- * On les ramène à un jeu fermé : "TP" | "10" | "12" | "16" | "18".
- * La colonne reste en VARCHAR(50), mais le filtre applicatif devient
- * fiable (WHERE pegi IN (...)) au lieu d'une liste ouverte de libellés.
- */
-
 type Pegi = "TP" | "10" | "12" | "16" | "18";
 
-/** Certifications françaises : "Tous publics", "-12", "16", "U"… */
 const normalizeFrench = (raw: string): Pegi | null => {
   const value = raw.trim().toLowerCase();
 
@@ -488,7 +382,6 @@ const normalizeFrench = (raw: string): Pegi | null => {
   return null;
 };
 
-/** Certifications américaines, utilisées en repli. */
 const US_MAP: Record<string, Pegi> = {
   G: "TP",
   PG: "10",
@@ -516,7 +409,6 @@ const firstCertification = (data: ReleaseDates, country: string) => {
   );
 };
 
-/** Films : FR prioritaire, US converti en repli. */
 const pegiFromMovie = (data: ReleaseDates | undefined): Pegi | null => {
   if (!data) return null;
 
@@ -532,7 +424,6 @@ const pegiFromMovie = (data: ReleaseDates | undefined): Pegi | null => {
   return us ? normalizeUs(us) : null;
 };
 
-/** Séries : FR prioritaire, US converti en repli. */
 const pegiFromTv = (data: ContentRatings | undefined): Pegi | null => {
   if (!data) return null;
 
@@ -550,12 +441,6 @@ const pegiFromTv = (data: ContentRatings | undefined): Pegi | null => {
   return us ? normalizeUs(us) : null;
 };
 
-/* --- Saison terminée ------------------------------------------------ *
- * Une saison est terminée si elle contient un épisode marqué "finale"
- * par TMDB et déjà diffusé. À défaut de marqueur, on se base sur la
- * date du dernier épisode connu.
- */
-
 const isSeasonFinished = (episodes: TvEpisode[]): boolean => {
   if (episodes.length === 0) return false;
 
@@ -570,35 +455,20 @@ const isSeasonFinished = (episodes: TvEpisode[]): boolean => {
   return isAired(episodes[episodes.length - 1]?.air_date);
 };
 
-/* --- Petits helpers -------------------------------------------------- */
-
-/** Chaîne vide → null, pour ne pas polluer la base. */
 const orNull = (value: string | null | undefined): string | null => {
   const trimmed = value?.trim();
 
   return trimmed ? trimmed : null;
 };
 
-/** TMDB renvoie 0 quand la note n'existe pas. */
 const ratingOrNull = (value: number | undefined): number | null =>
   value && value > 0 ? Math.round(value * 10) / 10 : null;
 
-/** Date TMDB ("" quand inconnue) → format MySQL ou null. */
 const dateOrNull = (value: string | null | undefined): string | null =>
   value && value.trim() !== "" ? value : null;
 
-/* ================================================================== *
- * 5. RÉCUPÉRATION
- * ================================================================== */
-
 const platforms = new Map<number, SeedPlatform>();
 const personIds = new Set<number>();
-
-/* --- Dump existant --------------------------------------------------- *
- * Le script est cumulatif : à chaque run, il repart du dump déjà produit,
- * écarte les médias qu'il contient et ajoute COUNTS nouveaux titres.
- * Supprimer tmdb.json.gz pour repartir de zéro.
- */
 
 const loadExisting = (): SeedFile | null => {
   if (!fs.existsSync(OUTPUT_FILE)) return null;
@@ -615,7 +485,6 @@ const loadExisting = (): SeedFile | null => {
 
 const existing = loadExisting();
 
-/** Clé d'unicité d'un média : films et séries partagent leur numérotation. */
 const mediaKey = (type: string, tmdbId: number) => `${type}:${tmdbId}`;
 
 const knownMedia = new Set(
@@ -629,7 +498,6 @@ const knownPersons = new Set(
 const isKnownMovie = (id: number) => knownMedia.has(mediaKey("movie", id));
 const isKnownTv = (id: number) => knownMedia.has(mediaKey("tv", id));
 
-/** Ne conserve que les acteurs, dans la limite de CAST_LIMIT. */
 const toCredits = (cast: CastMember[] | undefined): SeedCredit[] => {
   if (!cast) return [];
 
@@ -646,14 +514,12 @@ const toCredits = (cast: CastMember[] | undefined): SeedCredit[] => {
 
     return {
       person_tmdb_id: member.id,
-      // aggregate_credits expose les rôles dans "roles", credits dans "character"
       personnage_name: orNull(member.roles?.[0]?.character ?? member.character),
       role: "actor",
     };
   });
 };
 
-/** Extrait les plateformes FR, hors sections "buy" et "rent". */
 const collectPlatforms = (providers: Providers | undefined): number[] => {
   const region = providers?.results?.[REGION];
 
@@ -670,8 +536,6 @@ const collectPlatforms = (providers: Providers | undefined): number[] => {
           tmdb_id: provider.provider_id,
           name: provider.provider_name,
           logo: provider.logo_path ?? null,
-          // TMDB ne fournit pas d'URL par plateforme : à compléter à la
-          // main si l'équipe veut des liens sortants.
           url: null,
         });
       }
@@ -681,8 +545,6 @@ const collectPlatforms = (providers: Providers | undefined): number[] => {
   return [...ids];
 };
 
-/* --- Genres ---------------------------------------------------------- */
-
 const fetchGenres = async (): Promise<SeedGenre[]> => {
   type GenreList = { genres?: { id: number; name: string }[] };
 
@@ -691,7 +553,6 @@ const fetchGenres = async (): Promise<SeedGenre[]> => {
     tmdbGet<GenreList>("/genre/tv/list", { language: LANG }),
   ]);
 
-  // Les deux listes se recoupent (Animation, Comédie…) : l'ID fait foi.
   const byId = new Map<number, SeedGenre>();
 
   for (const genre of [...(movie?.genres ?? []), ...(tv?.genres ?? [])]) {
@@ -701,16 +562,9 @@ const fetchGenres = async (): Promise<SeedGenre[]> => {
   return [...byId.values()];
 };
 
-/* --- Résolution des cibles -------------------------------------------- *
- * On traduit un titre en identifiant TMDB. Chaque résolution est
- * affichée pour que vous puissiez vérifier que le script a bien
- * attrapé l'œuvre voulue.
- */
-
 const yearOf = (date: string | undefined) =>
   date ? Number(date.slice(0, 4)) : undefined;
 
-/** Résout une cible via /search, ou renvoie directement son tmdbId. */
 const resolveTarget = async (
   kind: "tv" | "movie",
   target: Target,
@@ -724,7 +578,6 @@ const resolveTarget = async (
     query: target.query,
     language: LANG,
     include_adult: false,
-    // Restreint la recherche à la bonne année quand elle est précisée.
     ...(target.year
       ? kind === "tv"
         ? { first_air_date_year: target.year }
@@ -734,7 +587,6 @@ const resolveTarget = async (
 
   const results = data?.results ?? [];
 
-  // Avec une année, TMDB filtre déjà ; sans, on prend le plus pertinent.
   const match = results[0];
 
   if (!match) {
@@ -762,10 +614,6 @@ const resolveTargets = async (kind: "tv" | "movie", targets: Target[]) => {
   return ids;
 };
 
-/**
- * Résout les sagas : chaque collection TMDB dont le nom correspond
- * apporte tous ses films d'un coup.
- */
 const resolveCollections = async (queries: string[]): Promise<number[]> => {
   const movieIds = new Set<number>();
   const seenCollections = new Set<number>();
@@ -779,10 +627,6 @@ const resolveCollections = async (queries: string[]): Promise<number[]> => {
     for (const result of search?.results ?? []) {
       if (seenCollections.has(result.id)) continue;
 
-      // Garde-fou : /search/collection remonte parfois des sagas sans
-      // rapport. On compare sur le premier mot ("Spider-Man" → "spider"),
-      // car les noms de collection sont traduits et ne reprennent pas
-      // toujours le titre exact ("Spider-Man: New Generation" en VF).
       const root = query.toLowerCase().split(/[\s\-:]+/)[0];
 
       if (!result.name.toLowerCase().includes(root)) {
@@ -811,8 +655,6 @@ const resolveCollections = async (queries: string[]): Promise<number[]> => {
   return [...movieIds];
 };
 
-/* --- Films ------------------------------------------------------------ */
-
 const fetchMovie = async (id: number): Promise<SeedMedia | null> => {
   const detail = await tmdbGet<MovieDetail>(`/movie/${id}`, {
     language: LANG,
@@ -821,7 +663,6 @@ const fetchMovie = async (id: number): Promise<SeedMedia | null> => {
 
   if (!detail) return null;
 
-  // Repli anglais quand le synopsis FR est absent.
   let synopsis = orNull(detail.overview);
 
   if (!synopsis) {
@@ -853,15 +694,11 @@ const fetchMovie = async (id: number): Promise<SeedMedia | null> => {
   };
 };
 
-/* --- Saisons et épisodes ---------------------------------------------- */
-
 const fetchEpisodeCast = async (
   tvId: number,
   seasonNumber: number,
   episode: TvEpisode,
 ): Promise<SeedCredit[]> => {
-  // Mode "guests" : les invités sont déjà dans la réponse de saison,
-  // aucune requête supplémentaire.
   if (EPISODE_CAST_MODE === "guests") return toCredits(episode.guest_stars);
 
   const credits = await tmdbGet<{
@@ -885,7 +722,6 @@ const fetchSeason = async (
 
   if (!detail) return null;
 
-  // Un seul appel de repli par saison plutôt qu'un par épisode.
   const needsFallback =
     !orNull(detail.overview) ||
     (detail.episodes ?? []).some((episode) => !orNull(episode.overview));
@@ -928,8 +764,6 @@ const fetchSeason = async (
   };
 };
 
-/* --- Séries ------------------------------------------------------------ */
-
 const fetchTvDetail = (id: number) =>
   tmdbGet<TvDetail>(`/tv/${id}`, {
     language: LANG,
@@ -959,7 +793,6 @@ const fetchTv = async (
     .filter((number) => INCLUDE_SEASON_ZERO || number > 0)
     .sort((a, b) => a - b);
 
-  // En parallèle : le limiteur global de concurrence fait le garde-fou.
   const seasons = (
     await Promise.all(
       seasonNumbers.map((number) => fetchSeason(detail.id, number)),
@@ -974,8 +807,6 @@ const fetchTv = async (
     original_name: orNull(detail.original_name),
     original_language: orNull(detail.original_language),
     released_at: dateOrNull(detail.first_air_date),
-    // Volontairement nul : la durée d'une série n'a pas de sens, le calcul
-    // du temps de visionnage passe par episode.duration.
     duration: null,
     poster: detail.poster_path ?? null,
     synopsis,
@@ -989,11 +820,6 @@ const fetchTv = async (
   };
 };
 
-/**
- * Récupère les séries nommées. Pas de filtrage par popularité ni de
- * plafond d'épisodes : on prend ce qui a été demandé, avec toutes ses
- * saisons. is_anime est déduit du genre et du pays d'origine.
- */
 const collectTargetTvShows = async (ids: number[]): Promise<SeedMedia[]> => {
   const details = await mapWithProgress("Fiches", ids, fetchTvDetail);
 
@@ -1019,10 +845,7 @@ const collectTargetTvShows = async (ids: number[]): Promise<SeedMedia[]> => {
   );
 };
 
-/* --- Personnes ---------------------------------------------------------- */
-
 const fetchPersons = async (): Promise<SeedPerson[]> => {
-  // Les fiches déjà présentes dans le dump ne sont pas retéléchargées.
   const ids = [...personIds].filter((id) => !knownPersons.has(id));
 
   if (!FETCH_PERSON_DETAILS) {
@@ -1065,10 +888,6 @@ const fetchPersons = async (): Promise<SeedPerson[]> => {
   return persons.filter((person): person is SeedPerson => person !== null);
 };
 
-/* ================================================================== *
- * 6. ORCHESTRATION
- * ================================================================== */
-
 const main = async () => {
   const startedAt = Date.now();
 
@@ -1110,13 +929,6 @@ const main = async () => {
   console.info(`⑦ Personnes (${personIds.size} référencées)`);
   const persons = await fetchPersons();
 
-  /* --- Fusion avec le dump existant --------------------------------- *
-   * Les entrées existantes sont conservées en tête, les nouvelles
-   * ajoutées à la suite. Cet ordre garantit que les id auto-incrémentés
-   * générés au seed restent identiques d'un run à l'autre : une fiche
-   * déjà en base ne change pas d'identifiant quand le catalogue grandit.
-   */
-
   const mergeById = <T extends { tmdb_id: number }>(
     before: T[],
     after: T[],
@@ -1157,8 +969,6 @@ const main = async () => {
 
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
 
-  // Pas d'indentation : le fichier n'est pas destiné à être lu à l'œil,
-  // et gzip travaille sur du contenu plus compact.
   const raw = Buffer.from(JSON.stringify(output), "utf8");
   const compressed = zlib.gzipSync(raw, { level: 9 });
 

@@ -20,18 +20,15 @@ describe("favoriteRepository.readFavoriteActors", () => {
 
     const [sql, params] = query.mock.calls[0] as unknown as [string, unknown[]];
 
-    // media_user (①), episode_user via le casting de la série (②) et via le casting de l'épisode (③)
     expect(sql).toContain("FROM media_person AS mp");
     expect(sql).toContain("JOIN media_user AS mu");
     expect(sql).toContain("FROM episode_person AS ep");
     expect(sql.match(/JOIN episode_user AS eu/g)).toHaveLength(2);
 
-    // chaque branche est filtrée sur les favoris avant l'agrégation
     expect(
       sql.match(/IN \(SELECT ID_person FROM favorite WHERE ID_user = \?\)/g),
     ).toHaveLength(3);
 
-    // 3 branches × (utilisateur, filtre favoris) + WHERE f.ID_user + limit + offset
     expect(sql.match(/\?/g)).toHaveLength(params.length);
     expect(params).toEqual([7, 7, 7, 7, 7, 7, 7, 6, 0]);
   });

@@ -1,4 +1,3 @@
-// server/database/fixtures/TrackSeeder.ts
 import database from "../client";
 
 import type { Rows } from "../client";
@@ -8,14 +7,10 @@ import UserSeeder from "./UserSeeder";
 
 class TrackSeeder extends AbstractSeeder {
   constructor() {
-    // dependencies ne peut lister que des AbstractSeeder : media n'en est pas un,
-    // donc seul UserSeeder est déclaré ici. L'ordre avec tmdb:seed est géré à la main
-    // (voir les étapes ci-dessous).
     super({ table: "track", truncate: true, dependencies: [UserSeeder] });
   }
 
   async run() {
-    // 1. Récupérer les IDs media déjà en base (peuplés par npm run tmdb:seed)
     const [rows] = await database.query<Rows>("select ID from media");
     const mediaIds = (rows as { ID: number }[]).map((row) => row.ID);
 
@@ -25,8 +20,6 @@ class TrackSeeder extends AbstractSeeder {
       );
     }
 
-    // 2. Pour chacun des 4 users, tirer un échantillon aléatoire de médias
-    //    sans doublon (respecte la clé composite ID_user + ID_media)
     for (let userIndex = 0; userIndex < 4; userIndex += 1) {
       const userId = this.getRef(`user_${userIndex}`).insertId;
 
@@ -37,7 +30,6 @@ class TrackSeeder extends AbstractSeeder {
       );
 
       for (const mediaId of pickedMediaIds) {
-        // 3. Générer des valeurs plausibles
         const hasRated = this.faker.datatype.boolean({ probability: 0.6 });
         const isFavorite = this.faker.datatype.boolean({ probability: 0.3 });
         const isInWatchlist = this.faker.datatype.boolean({ probability: 0.4 });
@@ -46,7 +38,6 @@ class TrackSeeder extends AbstractSeeder {
           ID_user: userId,
           ID_media: mediaId,
           favorite_media: isFavorite,
-          // DECIMAL(2,1) → 1 chiffre avant la virgule, 1 après : 0.0 à 5.0 max
           user_rating: hasRated
             ? this.faker.number.float({ min: 0, max: 5.0, fractionDigits: 1 })
             : null,
@@ -59,7 +50,6 @@ class TrackSeeder extends AbstractSeeder {
             : null,
         };
 
-        // 4. Insertion (pas de refName : aucune autre table ne référence "track")
         this.insert(fakeTrack);
       }
     }

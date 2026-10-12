@@ -50,7 +50,6 @@ export function ActorFavoriteProvider({
           return;
         }
 
-        // Le serveur refuse le token : la session n'est plus valable.
         if (error instanceof UnauthorizedError) {
           logout();
           return;

@@ -8,8 +8,6 @@ type BackButtonProps = {
 function BackButton({ label = "Retour" }: BackButtonProps) {
   const navigate = useNavigate();
 
-  // Retour à la page précédente, ou à l'accueil si on est arrivé
-  // directement sur cette page (lien partagé, nouvel onglet)
   const handleGoBack = () => {
     const historyIndex = window.history.state?.idx;
 

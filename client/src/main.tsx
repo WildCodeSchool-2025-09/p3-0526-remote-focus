@@ -125,19 +125,12 @@ const router = createBrowserRouter([
       },
     ],
   },
-
-  // Try adding a new route! For example, "/about" with an About component
 ]);
 
-/* ************************************************************************* */
-
-// Find the root element in the HTML document
 const rootElement = document.getElementById("root");
 if (rootElement == null) {
   throw new Error(`Your HTML Document should contain a <div id="root"></div>`);
 }
-
-// Render the app inside the root element
 
 createRoot(rootElement).render(
   <AuthProvider>

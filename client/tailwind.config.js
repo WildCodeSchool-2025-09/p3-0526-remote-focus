@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 import daisyui from "daisyui";
 
 export default {
@@ -49,21 +48,21 @@ export default {
           neutral: "#2E6373",
           "neutral-content": "#F5F5F0",
 
-          "base-100": "#0D1117", // fond de page
-          "base-200": "#0F242F", // cards, surfaces
-          "base-300": "#1B3A49", // bordures, surfaces surélevées
-          "base-content": "#F5F5F0", // texte principal
+          "base-100": "#0D1117",
+          "base-200": "#0F242F",
+          "base-300": "#1B3A49",
+          "base-content": "#F5F5F0",
 
           info: "#7FB3BF",
           success: "#17B890",
           warning: "#F2B705",
           error: "#E83658",
 
-          "--rounded-box": "0.75rem", // 12px : cards, modales
-          "--rounded-btn": "0.5rem", // 8px  : boutons, inputs
-          "--rounded-badge": "1.375rem", // 22px : pastilles, tags
+          "--rounded-box": "0.75rem",
+          "--rounded-btn": "0.5rem",
+          "--rounded-badge": "1.375rem",
 
-          "--btn-text-case": "none", // pas de majuscules forcées
+          "--btn-text-case": "none",
           "--border-btn": "1px",
           "--animation-btn": "0.2s",
           "--animation-input": "0.2s",
@@ -71,9 +70,6 @@ export default {
         },
       },
     ],
-    // Quand le thème clair arrivera (US "modifier mon thème"), il suffira
-    // d'ajouter un objet "focus-light" ci-dessus et de basculer l'attribut
-    // data-theme sur <html>.
     darkTheme: "focus",
     logs: false,
   },

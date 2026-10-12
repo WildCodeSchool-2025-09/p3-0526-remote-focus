@@ -18,7 +18,6 @@ function EpisodeList({ episodes, seriesId, seasonId }: EpisodeListProps) {
   const [currentSeasonId, setCurrentSeasonId] = useState(seasonId);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Quand on change de saison, on repart des 20 premiers épisodes
   if (seasonId !== currentSeasonId) {
     setCurrentSeasonId(seasonId);
     setVisibleCount(EPISODES_PAGE_SIZE);
@@ -34,7 +33,6 @@ function EpisodeList({ episodes, seriesId, seasonId }: EpisodeListProps) {
 
   const handleShowLess = () => {
     setVisibleCount(EPISODES_PAGE_SIZE);
-    // On remonte au début de la liste pour ne pas se retrouver plus bas que les épisodes
     listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 

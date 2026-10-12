@@ -1,7 +1,3 @@
-/* ================================================================== *
- * Polices — servies depuis client/public/fonts, donc chemins absolus
- * ================================================================== */
-
 @font-face {
   font-family: "Inter";
   src: url("/fonts/Inter/Inter-VariableFont.woff2") format("woff2");
@@ -34,17 +30,9 @@
   font-display: swap;
 }
 
-/* ================================================================== *
- * Tailwind
- * ================================================================== */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* ================================================================== *
- * Base
- * ================================================================== */
 
 @layer base {
   html {
@@ -100,10 +88,6 @@
   }
 }
 
-/* ================================================================== *
- * Composants réutilisables
- * ================================================================== */
-
 @layer components {
   .scrollbar-none {
     scrollbar-width: none;
@@ -156,10 +140,6 @@
     @apply btn px-6 border-focus-muted-dark/40 bg-focus-void transition-colors hover:border-focus-yellow hover:text-focus-yellow focus-visible:border-focus-yellow focus-visible:text-focus-yellow active:border-focus-yellow active:text-focus-yellow;
   }
 }
-
-/* ================================================================== *
- * Accessibilité
- * ================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   html {

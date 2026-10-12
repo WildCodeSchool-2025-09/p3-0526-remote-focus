@@ -1,5 +1,3 @@
-// Avec restrictToFavorites, chaque branche ajoute un paramètre (l'id de
-// l'utilisateur) juste après le sien : 6 paramètres au lieu de 3.
 export const buildSeenActorMediasSql = (restrictToFavorites = false) => {
   const onlyFavorites = (personColumn: string) =>
     restrictToFavorites
