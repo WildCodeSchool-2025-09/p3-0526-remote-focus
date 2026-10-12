@@ -22,9 +22,6 @@ const router = express.Router();
 
 router.use(optionalAuth);
 
-/* ************************************************************************* */
-// Define Your API Routes Here
-/* ************************************************************************* */
 router.get("/api/medias/search", searchActions.browse);
 
 router.get("/api/medias/discover", catalogActions.readDiscoverSections);
@@ -33,7 +30,6 @@ router.get("/api/genres", catalogActions.browseGenres);
 
 router.get("/api/medias/home", homepageActions.browseHomepage);
 
-/* ************************************************************************* */
 router.get("/api/medias/:id", mediaActions.read);
 router.get("/api/medias/:id/cast", mediaActions.browseCast);
 router.get("/api/actors/:id", actorActions.read);

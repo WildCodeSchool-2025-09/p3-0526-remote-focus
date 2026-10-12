@@ -43,7 +43,6 @@ export function TrackProvider({ children }: TrackProviderProps) {
       .catch((error) => {
         setTracks([]);
 
-        // Le serveur refuse le token : la session n'est plus valable.
         if (error instanceof UnauthorizedError) {
           logout();
         }

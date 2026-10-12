@@ -28,8 +28,6 @@ export function useTrackActions(mediaId: number) {
     try {
       await toggle(mediaId);
     } catch (error) {
-      // Token refusé par le serveur : on ferme la session et on invite à se
-      // reconnecter plutôt que d'échouer silencieusement.
       if (error instanceof UnauthorizedError) {
         logout();
         setIsAuthModalOpen(true);

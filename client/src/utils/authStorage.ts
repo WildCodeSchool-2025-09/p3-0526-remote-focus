@@ -1,9 +1,6 @@
 export const TOKEN_STORAGE_KEY = "focus.token";
 export const USER_STORAGE_KEY = "focus.user";
 
-// Le localStorage peut être bloqué (navigation privée stricte, données de
-// site désactivées) : ces fonctions évitent qu'une exception fasse planter
-// l'application.
 export function safeGetItem(key: string): string | null {
   try {
     return localStorage.getItem(key);
@@ -15,17 +12,13 @@ export function safeGetItem(key: string): string | null {
 export function safeSetItem(key: string, value: string): void {
   try {
     localStorage.setItem(key, value);
-  } catch {
-    // Stockage indisponible : la session reste seulement en mémoire.
-  }
+  } catch {}
 }
 
 export function safeRemoveItem(key: string): void {
   try {
     localStorage.removeItem(key);
-  } catch {
-    // Stockage indisponible : il n'y a rien à supprimer.
-  }
+  } catch {}
 }
 
 export function getAuthHeaders(): Record<string, string> {

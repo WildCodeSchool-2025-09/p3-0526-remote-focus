@@ -1,20 +1,3 @@
-/**
- * Applique le casting complet produit par tmdbFetchCast.ts.
- *
- * À lancer APRÈS tmdbSeed.ts, et seulement si l'on veut le casting
- * exhaustif :
- *
- *   npm run db:migrate
- *   npm run tmdb:seed      → le catalogue
- *   npm run tmdbAct:seed   → le casting complet par-dessus
- *
- * Le script ajoute les acteurs manquants, puis REMPLACE le casting des
- * médias et des épisodes concernés. Il est rejouable sans créer de
- * doublon.
- *
- * Usage : npm run tmdbAct:seed
- */
-
 import "dotenv/config";
 
 import fs from "node:fs";
@@ -26,10 +9,6 @@ import database from "../database/client";
 import type { Rows } from "../database/client";
 
 const CAST_FILE = path.join(__dirname, "../database/seeds/tmdb-cast.json.gz");
-
-/* ------------------------------------------------------------------ *
- * Types (miroir de la sortie de tmdbFetchCast.ts)
- * ------------------------------------------------------------------ */
 
 type SeedCredit = {
   person_tmdb_id: number;
@@ -55,10 +34,6 @@ type CastFile = {
     cast: SeedCredit[];
   }[];
 };
-
-/* ------------------------------------------------------------------ *
- * Utilitaires
- * ------------------------------------------------------------------ */
 
 const CHUNK_SIZE = 500;
 
@@ -90,7 +65,6 @@ const insertMany = async (
   console.info(`  ${table} : ${rows.length} ligne(s) insérée(s)`);
 };
 
-/** Supprime par paquets : un IN (...) de 36 000 valeurs ferait exploser la requête. */
 const deleteByIds = async (table: string, column: string, ids: number[]) => {
   if (ids.length === 0) return;
 
@@ -122,10 +96,6 @@ const buildIdMap = async (table: string) => {
   return map;
 };
 
-/* ------------------------------------------------------------------ *
- * Seed
- * ------------------------------------------------------------------ */
-
 const seed = async () => {
   if (!fs.existsSync(CAST_FILE)) {
     throw new Error(
@@ -138,8 +108,6 @@ const seed = async () => {
   ) as CastFile;
 
   console.info(`Casting depuis un export du ${data.generated_at}\n`);
-
-  /* --- 1. Acteurs manquants ---------------------------------------- */
 
   const existingPersons = await buildIdMap("person");
 
@@ -158,10 +126,7 @@ const seed = async () => {
     ]),
   );
 
-  // Rechargée après insertion, pour contenir les nouveaux identifiants.
   const personIds = await buildIdMap("person");
-
-  /* --- 2. Casting des médias ---------------------------------------- */
 
   const [mediaRows] = await database.query<Rows>(
     "SELECT id, tmdb_id, type FROM media",
@@ -183,8 +148,6 @@ const seed = async () => {
   for (const entry of data.media_cast) {
     const mediaId = mediaIds.get(`${entry.media_type}:${entry.media_tmdb_id}`);
 
-    // Un média du fichier casting absent de la base : le dump principal
-    // a changé depuis. On l'ignore plutôt que de planter.
     if (!mediaId) continue;
 
     touchedMediaIds.push(mediaId);
@@ -203,9 +166,6 @@ const seed = async () => {
     }
   }
 
-  // On remplace plutôt que d'ajouter : le casting complet est un
-  // sur-ensemble de celui posé par tmdbSeed, et cela rend le script
-  // rejouable sans doublon.
   await deleteByIds("media_person", "ID_media", touchedMediaIds);
 
   await insertMany(
@@ -213,8 +173,6 @@ const seed = async () => {
     ["ID_media", "ID_person", "personnage_name", "role"],
     mediaPersonRows,
   );
-
-  /* --- 3. Casting des épisodes --------------------------------------- */
 
   const episodeIds = await buildIdMap("episode");
 

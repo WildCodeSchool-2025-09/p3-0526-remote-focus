@@ -1,4 +1,3 @@
-// server/database/fixtures/FavoriteSeeder.ts
 import database from "../client";
 
 import type { Rows } from "../client";
@@ -31,7 +30,6 @@ class FavoriteSeeder extends AbstractSeeder {
       );
 
       for (const personId of pickedPersonIds) {
-        // Variable intermédiaire obligatoire : évite le excess property check
         const fakeFavorite = {
           ID_user: userId,
           ID_person: personId,

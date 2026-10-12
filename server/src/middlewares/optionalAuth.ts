@@ -24,9 +24,7 @@ const optionalAuth: RequestHandler = (req, _res, next) => {
     if (typeof payload.id === "number") {
       req.user = { id: payload.id };
     }
-  } catch {
-    // Token invalide ou expiré : on continue en visiteur.
-  }
+  } catch {}
 
   next();
 };

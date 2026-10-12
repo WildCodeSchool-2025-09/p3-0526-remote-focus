@@ -59,7 +59,6 @@ function SettingsPage() {
     if (!settings || !formData) return;
 
     if (settings.preferences.isPegi16 !== formData.preferences.isPegi16) {
-      // TODO : appeler l'API de l'US qui modifiera le PEGI
     }
   }
 

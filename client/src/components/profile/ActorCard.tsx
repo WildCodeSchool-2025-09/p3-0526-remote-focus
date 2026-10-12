@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 import type { ProfileActor } from "../../types/ProfileActor";
 
-type FavoriteActorCardProps = {
+type ActorCardProps = {
   actor: ProfileActor;
 };
 
-function FavoriteActorCard({ actor }: FavoriteActorCardProps) {
+function ActorCard({ actor }: ActorCardProps) {
   const viewedLabel =
     actor.viewedCount > 1
       ? `${actor.viewedCount} titres vus`
@@ -36,4 +36,4 @@ function FavoriteActorCard({ actor }: FavoriteActorCardProps) {
   );
 }
 
-export default FavoriteActorCard;
+export default ActorCard;

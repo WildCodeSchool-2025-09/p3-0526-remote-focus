@@ -26,7 +26,6 @@ function ExpandableText({ text }: ExpandableTextProps) {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isSmallMobile = useMediaQuery("(max-width: 767px)");
 
-  // Quand le texte change (autre film, autre saison…), on le referme
   if (text !== currentText) {
     setCurrentText(text);
     setIsExpanded(false);

@@ -208,17 +208,13 @@ function WatchingProvider({ children }: { children: ReactNode }) {
       });
   }
 
-  const {
-    data: watchedMediaIdsData,
-    // loading: mediaLoading,
-    // error: mediaError,
-  } = useFetch<number[]>(token ? "/api/me/medias/watched" : null);
+  const { data: watchedMediaIdsData } = useFetch<number[]>(
+    token ? "/api/me/medias/watched" : null,
+  );
 
-  const {
-    data: watchedEpisodeIdsData,
-    // loading: episodeLoading,
-    // error: episodeError,
-  } = useFetch<number[]>(token ? "/api/me/episodes/watched" : null);
+  const { data: watchedEpisodeIdsData } = useFetch<number[]>(
+    token ? "/api/me/episodes/watched" : null,
+  );
 
   useEffect(() => {
     if (token === null) {

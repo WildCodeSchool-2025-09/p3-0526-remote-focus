@@ -1,4 +1,3 @@
-// server/database/fixtures/MediaUserSeeder.ts
 import database from "../client";
 
 import type { Rows } from "../client";
@@ -16,8 +15,6 @@ class MediaUserSeeder extends AbstractSeeder {
   }
 
   async run() {
-    // 1. Seuls les FILMS passent par media_user : les séries/animes sont
-    //    suivis épisode par épisode via episode_user (voir EpisodeSeeder).
     const [rows] = await database.query<Rows>(
       "select ID from media where type = 'movie'",
     );
@@ -29,7 +26,6 @@ class MediaUserSeeder extends AbstractSeeder {
       );
     }
 
-    // 2. Chaque user a "vu" un sous-ensemble de films
     for (let userIndex = 0; userIndex < 4; userIndex += 1) {
       const userId = this.getRef(`user_${userIndex}`).insertId;
 
@@ -40,11 +36,9 @@ class MediaUserSeeder extends AbstractSeeder {
       );
 
       for (const movieId of pickedMovieIds) {
-        // Variable intermédiaire obligatoire : évite le excess property check
         const fakeMediaUser = {
           ID_user: userId,
           ID_media: movieId,
-          // Un visionnage passé, dans les 6 derniers mois
           viewed_at: this.faker.date.recent({ days: 180 }),
         };
 
