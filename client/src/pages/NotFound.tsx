@@ -1,25 +1,12 @@
-import { ArrowLeft, X } from "lucide-react";
-import { NavLink, useNavigate } from "react-router";
+import { X } from "lucide-react";
+import { NavLink } from "react-router";
+import BackButton from "../components/BackButton";
 
 function NotFound() {
-  const navigate = useNavigate();
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
     <section className="flex min-h-[70vh] flex-col">
       <div className="flex w-full justify-end px-4 py-6">
-        <button
-          type="button"
-          onClick={handleGoBack}
-          aria-label="Retour"
-          className="flex shrink-0 items-center gap-2 rounded-full border border-white/30 p-2.5 text-sm transition-colors hover:border-[#F2B705] hover:text-[#F2B705] lg:px-4 lg:py-2"
-        >
-          <ArrowLeft size={16} />
-          <span className="hidden lg:inline">Retour</span>
-        </button>
+        <BackButton />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-5 text-center">

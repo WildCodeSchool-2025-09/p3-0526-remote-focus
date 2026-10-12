@@ -7,6 +7,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link } from "react-router";
+import BackButton from "../components/BackButton";
 import DashboardCard from "../components/profile/DashboardCard";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import useFetch from "../hooks/useFetch";
@@ -33,13 +34,16 @@ function Profile() {
       <div className="flex items-center justify-between gap-4">
         <ProfileHeader profile={data.profile} />
 
-        <Link
-          to="/profile/settings"
-          aria-label="Paramètres"
-          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-[#F2B705] hover:text-[#F2B705] lg:flex"
-        >
-          <Settings size={18} />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/profile/settings"
+            aria-label="Paramètres"
+            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-base-content/30 transition-colors hover:border-primary hover:text-primary lg:flex"
+          >
+            <Settings size={18} />
+          </Link>
+          <BackButton />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

@@ -1,5 +1,7 @@
 import type { Serie } from "../../types/media";
 import { formatDuration } from "../../utils/formatDuration";
+import ExpandableText from "../ExpandableText";
+
 type SerieInfoProps = {
   serie: Serie;
 };
@@ -7,11 +9,7 @@ type SerieInfoProps = {
 function SerieInfo({ serie }: SerieInfoProps) {
   return (
     <div className="flex flex-col gap-3">
-      {serie.synopsis != null && (
-        <p className="max-w-[660px] text-base leading-relaxed text-base-content/80">
-          {serie.synopsis}
-        </p>
-      )}
+      {serie.synopsis != null && <ExpandableText text={serie.synopsis} />}
 
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-focus-muted">
         {serie.totalDuration != null && (
