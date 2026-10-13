@@ -89,7 +89,7 @@ ${GENRE_NAME}
       JOIN classify_as ON m.ID = classify_as.ID_media
       WHERE ${MEDIA_TYPE}
       ${genreIds ? `AND (classify_as.ID_genre IN (${genrePlaceHolders}))` : ""}
-      ORDER BY m.overall_rating DESC LIMIT ? OFFSET ?
+      ORDER BY m.overall_rating DESC, m.ID ASC LIMIT ? OFFSET ?
       `,
       [type, type, type, type, ...(genreIds ?? []), limit, offset],
     );
