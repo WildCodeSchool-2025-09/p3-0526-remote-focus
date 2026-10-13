@@ -93,17 +93,11 @@ describe("GET api/medias", () => {
 
     expect(response.status).toBe(200);
 
-    expect(queryMock).toHaveBeenNthCalledWith(2, expect.any(String), [
-      null,
-      null,
-      null,
-      null,
+    expect(queryMock).toHaveBeenNthCalledWith(
       2,
-      5,
-      8,
-      15,
-      0,
-    ]);
+      expect.stringContaining("ORDER BY m.overall_rating DESC, m.ID ASC"),
+      [null, null, null, null, 2, 5, 8, 15, 0],
+    );
   });
 });
 describe("GET api/genres", () => {
